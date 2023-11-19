@@ -1,4 +1,4 @@
-# Procedural Maze
+# Hyacinth Labyrinth
 
 ## Idea
 Procedurally generated maze with procedurally generated innards with ball physically moving around it
