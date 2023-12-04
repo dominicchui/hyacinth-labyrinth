@@ -10,6 +10,7 @@ class Maze
 public:
     Maze();
     Maze(int width, int height);
+    Maze(int width, int height, bool insertClosedSpaces);
 
     int width;
     int height;
