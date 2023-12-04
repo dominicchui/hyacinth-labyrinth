@@ -9,18 +9,16 @@ Maze::Maze()
 
 Maze::Maze(int _width, int _height): width(_width), height(_height) {
     cells = std::vector(size(),Cell(CellType::Empty));
-    std::cout << "size: " << size() << std::endl;
-//    static std::random_device rd;
-//    static std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
 }
 
 int Maze::getRandomEmptyCell() {
     if (mazeCells.size() == size()) { return -1; }
-    // todo move for performance
+    // todo move for performance?
     static std::random_device rd;
     static std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib(0, size()-1);
     // todo maybe don't rely on luck
+    // idea: shuffle cells and iterate
     while (true) {
         int n = distrib(gen);
         // check cell is valid target
@@ -30,23 +28,24 @@ int Maze::getRandomEmptyCell() {
     }
 }
 
+// generates a maze using Wilson's algorithm
+// https://en.wikipedia.org/wiki/Maze_generation_algorithm#Wilson's_algorithm
 void Maze::generateMaze() {
     // add random cell to maze
     int n = getRandomEmptyCell();
+//    std::cout << "first: " << n << std::endl;
     cells[n].type = CellType::Open;
     mazeCells.insert(n);
-    std::cout << "first cell: " << n << std::endl;
 
-    while (mazeCells.size() < size()) {
+    while (mazeCells.size() + closedCellsCount < size()) {
         performRandomWalk();
     }
 }
 
 void Maze::performRandomWalk() {
-    std::cout << "walking..." << std::endl;
     // pick random empty cell
     int initial = getRandomEmptyCell();
-    std::cout << "initial: " << initial << std::endl;
+//    std::cout << "walk start: " << initial << std::endl;
 
     // FIRST PASS
     static std::random_device rd; // a seed source for the random number engine
@@ -59,10 +58,10 @@ void Maze::performRandomWalk() {
         Direction dir = directions[distrib(gen)];
         // get new cell and check validity
         int next = getIndexOfCellNeighbor(current, dir);
-        std::cout << "next: " << next << std::endl;
         if (next == -1 || cells[next].type == CellType::Closed) {
             continue;
         }
+//        std::cout << "next: " << next << std::endl;
 
         // if valid, mark direction of previous cell
         cells[current].exitDir = dir;
@@ -72,8 +71,6 @@ void Maze::performRandomWalk() {
         }
         current = next;
     }
-
-    std::cout << "second pass..." << std::endl;
 
     // SECOND PASS
     // start at origin cell and trace directions
@@ -97,6 +94,67 @@ void Maze::performRandomWalk() {
     }
 }
 
+// randomly places closed spaces to be used for decor later
+void Maze::insertClosedSpaces() {
+    static std::random_device rd; // a seed source for the random number engine
+    static std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> distribLoc(0, cells.size()-1);
+
+    // add one closed space to a random location
+    // 1x1 space for small mazes
+    int loc;
+    if (size() < 25) {
+        loc = distribLoc(gen);
+        cells[loc].type = CellType::Closed;
+    //    std::cout << "closed: " << loc << std::endl;
+        closedCellsCount += 1;
+    } else {
+        // 2x2 space for larger mazes
+        // ensure it fits in the space
+        while (true) {
+            loc = distribLoc(gen);
+            auto[x,y] = getCoordFromIndex(loc);
+            if (x+1 > width-1 || y+1 > height-1) {
+                continue;
+            }
+            cells[loc].type = CellType::Closed;
+            cells[getIndexOfCellAt(x+1,y)].type = CellType::Closed;
+            cells[getIndexOfCellAt(x,y+1)].type = CellType::Closed;
+            cells[getIndexOfCellAt(x+1,y+1)].type = CellType::Closed;
+            closedCellsCount += 4;
+            break;
+        }
+    }
+}
+
+// returns the maze in string format
+// "W" for wall, "O" for open space, "C" for closed space
+std::string Maze::toString(bool undensify) {
+    std::string mazeStr;
+    if (undensify) {
+        mazeStr = undensifyMaze();
+    } else {
+        for (int i=0; i<size(); i++) {
+            if (cells[i].type == CellType::Open) {
+                mazeStr += "O";
+            } else if (cells[i].type == CellType::Closed) {
+                mazeStr += "C";
+            } else {
+                mazeStr += "W";
+            }
+            // end of row
+            if ((i+1)%width==0) {
+               mazeStr += "\n";
+            }
+        }
+    }
+    return mazeStr;
+}
+
+// maze is initially generated in "dense" format where only walls don't take up space
+// this function converts maze to string format where walls take up 1 block of space
+// will also enclose entirety in wall
+// and will roughly double size of maze
 std::string Maze::undensifyMaze() {
     std::string mazeStr;
     // first row is all wall
@@ -109,6 +167,8 @@ std::string Maze::undensifyMaze() {
     for (int i=0; i<size(); i++) {
         if (cells[i].type == CellType::Open) {
             mazeStr += "O";
+        } else if (cells[i].type == CellType::Closed) {
+            mazeStr += "C";
         } else {
             mazeStr += "W";
         }
@@ -118,29 +178,37 @@ std::string Maze::undensifyMaze() {
         if ((i+1)%width!=0) {
             if (cells[i].eastOpen) {
                 mazeStr += "O";
+            } else if (cells[i].type == CellType::Closed && cells[i+1].type == CellType::Closed) {
+                mazeStr += "C";
             } else {
                 mazeStr += "W";
             }
         } else {
-            // handle end of row
+            // handle end of row by adding undensified row, i.e. undensify vertical space
             // right wall
             mazeStr += "W\n";
-            // ignore last row
+            // ignore last row since row after that will be all wall
             if (i != size()-1) {
-                // undensify vertical space
                 // left wall
                 mazeStr += "W";
 
-                // look at previous row
+                // look at row just iterated over
+                // "i" is at end of row
                 for (int j=i-width+1; j<i+1; j++) {
                     if (cells[j].southOpen) {
                         mazeStr += "O";
+                    } else if ((cells[j].type == CellType::Closed && cells[j+width].type == CellType::Closed)) {
+                        mazeStr += "C";
                     } else {
                         mazeStr += "W";
                     }
                     // account for horizontal undensification
                     if (j<i) {
-                        mazeStr += "W";
+                        if (cells[j].type == CellType::Closed && cells[j+1+width].type == CellType::Closed) {
+                            mazeStr += "C";
+                        } else {
+                            mazeStr += "W";
+                        }
                     }
                 }
                 // right wall and left wall
@@ -152,34 +220,3 @@ std::string Maze::undensifyMaze() {
     mazeStr += std::string(width*2+1,'W');
     return mazeStr;
 }
-
-// maze is generated in "dense" format where only walls don't take up space
-// convert to format where walls take up 1 block of space
-// also enclose entirety in wall
-// will roughly double size of maze
-void Maze::printMaze(bool undensify) {
-    if (undensify) {
-        std::string mazeStr = undensifyMaze();
-        std::cout << mazeStr << std::endl;
-    } else {
-        for (int i=0; i<size(); i++) {
-            if (cells[i].type == CellType::Open) {
-                std::cout << "O";
-            } else {
-                std::cout << "W";
-            }
-            // end of row
-            if ((i+1)%width==0) {
-                std::cout << "\n";
-            }
-        }
-    }
-}
-
-/*
- * WWWOW
- * WOOOW
- * WOWWW
- * WOOOW
- * WWWOW
- */
