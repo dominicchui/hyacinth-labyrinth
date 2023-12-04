@@ -5,7 +5,6 @@
 #include <set>
 #include <random>
 
-
 class Maze
 {
 public:
@@ -16,6 +15,7 @@ public:
     int height;
     std::vector<Cell> cells;
     std::set<int> mazeCells = std::set<int>();
+    int closedCellsCount = 0;
 
 //    static std::random_device rd;  // a seed source for the random number engine
 //    static std::mt19937 gen; // mersenne_twister_engine
@@ -79,10 +79,12 @@ public:
     int getRandomEmptyCell();
     void generateMaze();
     void performRandomWalk();
-    void visitCell(int index);
+    void insertClosedSpaces();
 
-    // maze is generated in compact fashion, so add unit width walls when printing
-    void printMaze(bool undensify = true);
+    // maze is generated in compact fashion, so add unit width walls when converting to string
+    std::string toString(bool undensify = true);
+
+
 
 private:
     std::string undensifyMaze();
