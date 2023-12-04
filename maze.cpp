@@ -11,6 +11,13 @@ Maze::Maze(int _width, int _height): width(_width), height(_height) {
     cells = std::vector(size(),Cell(CellType::Empty));
 }
 
+Maze::Maze(int _width, int _height, bool _insertClosedSpaces): width(_width), height(_height) {
+    cells = std::vector(size(),Cell(CellType::Empty));
+    if (_insertClosedSpaces) {
+        insertClosedSpaces();
+    }
+}
+
 int Maze::getRandomEmptyCell() {
     if (mazeCells.size() == size()) { return -1; }
     // todo move for performance?
@@ -33,7 +40,7 @@ int Maze::getRandomEmptyCell() {
 void Maze::generateMaze() {
     // add random cell to maze
     int n = getRandomEmptyCell();
-//    std::cout << "first: " << n << std::endl;
+    std::cout << "first: " << n << std::endl;
     cells[n].type = CellType::Open;
     mazeCells.insert(n);
 
@@ -45,7 +52,7 @@ void Maze::generateMaze() {
 void Maze::performRandomWalk() {
     // pick random empty cell
     int initial = getRandomEmptyCell();
-//    std::cout << "walk start: " << initial << std::endl;
+    std::cout << "walk start: " << initial << std::endl;
 
     // FIRST PASS
     static std::random_device rd; // a seed source for the random number engine
@@ -61,7 +68,7 @@ void Maze::performRandomWalk() {
         if (next == -1 || cells[next].type == CellType::Closed) {
             continue;
         }
-//        std::cout << "next: " << next << std::endl;
+        std::cout << "next: " << next << std::endl;
 
         // if valid, mark direction of previous cell
         cells[current].exitDir = dir;
@@ -74,6 +81,7 @@ void Maze::performRandomWalk() {
 
     // SECOND PASS
     // start at origin cell and trace directions
+    std::cout << "second pass" << std::endl;
     current = initial;
     while (true) {
         // add cells to mazeCells
@@ -83,6 +91,7 @@ void Maze::performRandomWalk() {
 
         // find next cell and mark walls
         int next = getIndexOfCellNeighbor(current, currentCell.exitDir);
+        std::cout << "next: " << next << std::endl;
         Cell &nextCell = cells[next];
         makePathBetweenCells(currentCell, nextCell, currentCell.exitDir);
 
