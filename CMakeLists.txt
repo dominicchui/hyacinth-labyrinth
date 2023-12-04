@@ -53,12 +53,17 @@ add_executable(${PROJECT_NAME}
     src/utils/utils.h
     src/gl_kernel.h
     src/extern/tiny_obj_loader.h
+    src/vulkan-device.cpp
+    src/vulkan-device.hpp
 
 )
 
-# VULKAN: Make sure to specify a VULKAN_SDK_PATH
-if (NOT DEFINED ${VULKAN_SDK_PATH})
-    message(FATAL_ERROR "Please define a VULKAN_SDK_PATH!")
+find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
+if (NOT Vulkan_FOUND)
+    message(FATAL_ERROR "Could not find Vulkan library!")
+else()
+    message(STATUS "Using vulkan headers at: ${Vulkan_INCLUDE_DIRS}")
+    message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
 endif()
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
@@ -68,7 +73,7 @@ add_subdirectory(glm)
 add_library(StaticGLEW STATIC glew/src/glew.c)
 include_directories(${PROJECT_NAME} PRIVATE
     glew/include
-    ${VULKAN_SDK_PATH}/include
+    ${Vulkan_INCLUDE_DIRS}
 )
 
 # Specifies libraries to be linked (Qt components, glew, etc)
