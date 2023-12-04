@@ -29,5 +29,7 @@ public:
     bool southOpen = false;
     Direction exitDir;
 
+    std::string toString();
+
 };
 

@@ -38,11 +38,13 @@ int Maze::getRandomEmptyCell() {
 // generates a maze using Wilson's algorithm
 // https://en.wikipedia.org/wiki/Maze_generation_algorithm#Wilson's_algorithm
 void Maze::generateMaze() {
-    // add random cell to maze
-    int n = getRandomEmptyCell();
-    std::cout << "first: " << n << std::endl;
-    cells[n].type = CellType::Open;
-    mazeCells.insert(n);
+    // add random cell to maze if no borders are defined
+    if (!hasDefinedBorderCells()) {
+        int n = getRandomEmptyCell();
+        std::cout << "first: " << n << std::endl;
+        cells[n].type = CellType::Open;
+        mazeCells.insert(n);
+    }
 
     while (mazeCells.size() + closedCellsCount < size()) {
         performRandomWalk();
@@ -144,14 +146,7 @@ std::string Maze::toString(bool undensify) {
         mazeStr = undensifyMaze();
     } else {
         for (int i=0; i<size(); i++) {
-            if (cells[i].type == CellType::Open) {
-                mazeStr += "O";
-            } else if (cells[i].type == CellType::Closed) {
-                mazeStr += "C";
-            } else {
-                mazeStr += "W";
-            }
-            // end of row
+            mazeStr += cells[i].toString();\
             if ((i+1)%width==0) {
                mazeStr += "\n";
             }
@@ -174,13 +169,7 @@ std::string Maze::undensifyMaze() {
     mazeStr += "\nW";
 
     for (int i=0; i<size(); i++) {
-        if (cells[i].type == CellType::Open) {
-            mazeStr += "O";
-        } else if (cells[i].type == CellType::Closed) {
-            mazeStr += "C";
-        } else {
-            mazeStr += "W";
-        }
+        mazeStr += cells[i].toString();
 
         // undensify horizontal space
         // ignore last column
@@ -228,4 +217,38 @@ std::string Maze::undensifyMaze() {
     // last row is all wall
     mazeStr += std::string(width*2+1,'W');
     return mazeStr;
+}
+
+// returns references to the cells on the specified edge of the maze
+// e.g. north is the top side, east is the right side
+// ordered top to bottom, left to right
+std::vector<std::reference_wrapper<Cell>> Maze::getBorderCells(Direction dir) {
+    std::vector<std::reference_wrapper<Cell>> borderCells;
+    switch(dir) {
+    case Direction::N:
+        for (int i=0; i<width; i++) {
+            Cell& ref = cells[i];
+            borderCells.emplace_back(ref);
+        }
+        break;
+    case Direction::E:
+        for (int i=0; i<height; i++) {
+            Cell& ref = cells[(i+1)*width-1];
+            borderCells.emplace_back(ref);
+        }
+        break;
+    case Direction::S:
+        for (int i=size()-width; i<size(); i++) {
+            Cell& ref = cells[i];
+            borderCells.emplace_back(ref);
+        }
+        break;
+    case Direction::W:
+        for (int i=0; i<height; i++) {
+            Cell& ref = cells[i*width];
+            borderCells.emplace_back(ref);
+        }
+        break;
+    }
+    return borderCells;
 }
