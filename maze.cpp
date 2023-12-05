@@ -39,7 +39,7 @@ int Maze::getRandomEmptyCell() {
 // https://en.wikipedia.org/wiki/Maze_generation_algorithm#Wilson's_algorithm
 void Maze::generateMaze() {
     // add random cell to maze if no borders are defined
-    if (!hasDefinedBorderCells()) {
+    if (!hasDefinedExternalBorderCells()) {
         int n = getRandomEmptyCell();
         std::cout << "first: " << n << std::endl;
         cells[n].type = CellType::Open;
@@ -47,6 +47,7 @@ void Maze::generateMaze() {
     }
 
     while (mazeCells.size() + closedCellsCount < size()) {
+//        std::cout << toString() << std::endl;
         performRandomWalk();
     }
 }
@@ -56,28 +57,18 @@ void Maze::performRandomWalk() {
     int initial = getRandomEmptyCell();
     std::cout << "walk start: " << initial << std::endl;
 
-    // FIRST PASS
+    // set up random generation
     static std::random_device rd; // a seed source for the random number engine
     static std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib(0, directions.size());
 
+    // FIRST PASS
     int current = initial;
-    while (true) {
+    int next = 0;
+    while (next > -1) {
         // pick random direction
         Direction dir = directions[distrib(gen)];
-        // get new cell and check validity
-        int next = getIndexOfCellNeighbor(current, dir);
-        if (next == -1 || cells[next].type == CellType::Closed) {
-            continue;
-        }
-        std::cout << "next: " << next << std::endl;
-
-        // if valid, mark direction of previous cell
-        cells[current].exitDir = dir;
-        // repeat until visited cell is in mazeCells
-        if (isCellInMaze(next)) {
-            break;
-        }
+        next = walkOneStepFirstPass(current, dir);
         current = next;
     }
 
@@ -85,24 +76,69 @@ void Maze::performRandomWalk() {
     // start at origin cell and trace directions
     std::cout << "second pass" << std::endl;
     current = initial;
-    while (true) {
-        // add cells to mazeCells
-        Cell &currentCell = cells[current];
-        currentCell.type = CellType::Open;
-        mazeCells.insert(current);
+    next = 0;
+    while (next > -1) {
+        next = walkOneStepSecondPass(current);
+        current = next;
+    }
+}
 
-        // find next cell and mark walls
-        int next = getIndexOfCellNeighbor(current, currentCell.exitDir);
-        std::cout << "next: " << next << std::endl;
+// Walk one step from location loc (as index) in direction Dir
+// if step is valid, will visit that cell, otherwise will do nothing
+// returns index of next cell or -1 if walking is done
+// if direction is not valid, returns same index as start
+int Maze::walkOneStepFirstPass(int loc, Direction dir) {
+    int next = -1;
+    // external case: check borders
+    if (hasExternalBorderInDirection(loc, dir)) {
+        cells[loc].exitDir = dir;
+    } else {
+        // internal case
+        next = getIndexOfCellNeighbor(loc, dir);
+        if (next == -1 || cells[next].type == CellType::Closed) {
+            return loc;
+        }
+
+        // if valid, mark direction of previous cell
+        cells[loc].exitDir = dir;
+        // repeat until visited cell is in mazeCells
+        if (isCellInMaze(next)) {
+            next = -1;
+        }
+    }
+    return next;
+}
+
+int Maze::walkOneStepSecondPass(int loc) {
+    // add cells to mazeCells
+    Cell &currentCell = cells[loc];
+    currentCell.type = CellType::Open;
+    mazeCells.insert(loc);
+    int next = -1;
+
+    // find exit direction and next cell
+    Direction dir = currentCell.exitDir;
+
+    // external case: check borders
+    if (hasExternalBorderInDirection(loc, dir)) {
+        // find correct border cell
+        Cell &nextCell = getCellFromExternalBorder(loc, dir);
+        // mark walls
+        makePathBetweenCells(currentCell, nextCell, dir);
+    } else {
+        // internal case
+        // get next cell and mark walls
+        next = getIndexOfCellNeighbor(loc, dir);
+        //        std::cout << "next: " << next << std::endl;
         Cell &nextCell = cells[next];
-        makePathBetweenCells(currentCell, nextCell, currentCell.exitDir);
+        makePathBetweenCells(currentCell, nextCell, dir);
 
         // continue until all cells in this walk visited
         if (isCellInMaze(next)) {
-            break;
+            next = -1;
         }
-        current = next;
     }
+    return next;
 }
 
 // randomly places closed spaces to be used for decor later
@@ -222,7 +258,7 @@ std::string Maze::undensifyMaze() {
 // returns references to the cells on the specified edge of the maze
 // e.g. north is the top side, east is the right side
 // ordered top to bottom, left to right
-std::vector<std::reference_wrapper<Cell>> Maze::getBorderCells(Direction dir) {
+std::vector<std::reference_wrapper<Cell>> Maze::getInternalBorderCells(Direction dir) {
     std::vector<std::reference_wrapper<Cell>> borderCells;
     switch(dir) {
     case Direction::N:
@@ -251,4 +287,60 @@ std::vector<std::reference_wrapper<Cell>> Maze::getBorderCells(Direction dir) {
         break;
     }
     return borderCells;
+}
+
+// sets the border cells that are external to the actual maze
+void Maze::setExternalBorderCells(std::vector<std::reference_wrapper<Cell>> refCells, Direction dir) {
+    switch(dir) {
+    case Direction::N:
+        topExternalBorderCells = refCells;
+        break;
+    case Direction::E:
+        rightExternalBorderCells = refCells;
+        break;
+    case Direction::S:
+        bottomExternalBorderCells = refCells;
+        break;
+    case Direction::W:
+        leftExternalBorderCells = refCells;
+        break;
+    }
+}
+
+bool Maze::hasExternalBorderInDirection(int index, Direction dir) {
+    if (!hasDefinedExternalBorderCells()) { return false; }
+    auto[x,y] = getCoordFromIndex(index);
+    switch(dir) {
+    case Direction::N:
+        return (y==0 && topExternalBorderCells.size()>0);
+        break;
+    case Direction::E:
+        return (x==width-1 && rightExternalBorderCells.size()>0);
+        break;
+    case Direction::S:
+        return (y==height-1 && bottomExternalBorderCells.size()>0);
+        break;
+    case Direction::W:
+        return (x==0 && leftExternalBorderCells.size()>0);
+        break;
+    }
+}
+
+// assume external border exists in the correct direction and the index is correct
+Cell& Maze::getCellFromExternalBorder(int index, Direction dir) {
+    auto[x,y] = getCoordFromIndex(index);
+    switch(dir) {
+    case Direction::N:
+        return topExternalBorderCells[x];
+        break;
+    case Direction::E:
+        return rightExternalBorderCells[y];
+        break;
+    case Direction::S:
+        return bottomExternalBorderCells[x];
+        break;
+    case Direction::W:
+        return leftExternalBorderCells[y];
+        break;
+    }
 }

@@ -22,10 +22,11 @@ public:
     // used to generate a maze with predefined borders
     // e.g. this maze is being generated to the right of an existing one and will be appended
     // order of cells is left to right, up to down
-    std::vector<Cell*> leftBorderCells;
-    std::vector<Cell*> rightBorderCells;
-    std::vector<Cell*> topBorderCells;
-    std::vector<Cell*> bottomBorderCells;
+    // assumes the size will be width or height (as appropriate)
+    std::vector<std::reference_wrapper<Cell>> leftExternalBorderCells;
+    std::vector<std::reference_wrapper<Cell>> rightExternalBorderCells;
+    std::vector<std::reference_wrapper<Cell>> topExternalBorderCells;
+    std::vector<std::reference_wrapper<Cell>> bottomExternalBorderCells;
 
 //    static std::random_device rd;  // a seed source for the random number engine
 //    static std::mt19937 gen; // mersenne_twister_engine
@@ -62,6 +63,9 @@ public:
         }
         return newIndex;
     }
+
+    bool hasExternalBorderInDirection(int index, Direction dir);
+    Cell& getCellFromExternalBorder(int index, Direction dir);
     bool isCellInMaze(int index) {
         return mazeCells.find(index) != mazeCells.end();
     }
@@ -86,16 +90,27 @@ public:
         }
     }
 
-    bool hasDefinedBorderCells() {
-        return (leftBorderCells.size()!=0 || rightBorderCells.size()!=0 ||
-                topBorderCells.size()!=0 || bottomBorderCells.size()!=0);
+    bool hasDefinedExternalBorderCells() {
+        return (leftExternalBorderCells.size()!=0 || rightExternalBorderCells.size()!=0 ||
+                topExternalBorderCells.size()!=0 || bottomExternalBorderCells.size()!=0);
     }
 
-    std::vector<std::reference_wrapper<Cell>> getBorderCells(Direction dir);
+    /* internal border cells belong to this maze, external ones do not and instead surround the maze
+    e.g. I=internal, E=External, M=other maze cells for this 3x3 maze
+    EEEEE
+    EIIIE
+    EIMIE
+    EIIIE
+    EEEEE
+    */
+    std::vector<std::reference_wrapper<Cell>> getInternalBorderCells(Direction dir);
+    void setExternalBorderCells(std::vector<std::reference_wrapper<Cell>>, Direction Dir);
 
     int getRandomEmptyCell();
     void generateMaze();
     void performRandomWalk();
+    int walkOneStepFirstPass(int loc, Direction dir);
+    int walkOneStepSecondPass(int loc);
     void insertClosedSpaces();
 
     // maze is generated in compact fashion, so add unit width walls when converting to string
