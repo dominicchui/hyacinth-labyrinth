@@ -1,28 +1,25 @@
-#include "mainwindow.h"
+#include "hyacinth-labyrinth.hpp"
 
 #include <QApplication>
 #include <QScreen>
-#include <iostream>
 #include <QSettings>
+#include <iostream>
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    QCoreApplication::setApplicationName("Projects 5 & 6: Lights, Camera & Action!");
-    QCoreApplication::setOrganizationName("CS 2230");
+    QCoreApplication::setApplicationName("Hyacinth Labyrinth");
+    QCoreApplication::setOrganizationName("FEDZ");
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
-    QSurfaceFormat fmt;
-    fmt.setVersion(4, 1);
-    fmt.setProfile(QSurfaceFormat::CoreProfile);
-    QSurfaceFormat::setDefaultFormat(fmt);
+    HyacinthLabyrinth app;
 
-    MainWindow w;
-    w.initialize();
-    w.resize(800, 600);
-    w.show();
+    try {
+        app.run();
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << '\n';
+        return EXIT_FAILURE;
+    }
 
-    int return_val = a.exec();
-    w.finish();
-    return return_val;
+    return EXIT_SUCCESS;
 }
