@@ -1,14 +1,12 @@
+// Code lifted largly from: https://github.com/blurrypiano/littleVulkanEngine
+
 #pragma once
 
-#include "mainWindow.h"
+#include "glfw-window.hpp"
 
 #include <vulkan/vulkan.h>
-
-// std lib headers
 #include <string>
 #include <vector>
-
-namespace lve {
 
 struct SwapChainSupportDetails {
   VkSurfaceCapabilitiesKHR capabilities;
@@ -24,7 +22,7 @@ struct QueueFamilyIndices {
   bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 };
 
-class LveDevice {
+class VKDeviceManager {
  public:
 #ifdef NDEBUG
   const bool enableValidationLayers = false;
@@ -32,14 +30,14 @@ class LveDevice {
   const bool enableValidationLayers = true;
 #endif
 
-  LveDevice(LveWindow &window);
-  ~LveDevice();
+  VKDeviceManager(GlfwWindow& window);
+  ~VKDeviceManager();
 
   // Not copyable or movable
-  LveDevice(const LveDevice &) = delete;
-  LveDevice &operator=(const LveDevice &) = delete;
-  LveDevice(LveDevice &&) = delete;
-  LveDevice &operator=(LveDevice &&) = delete;
+  VKDeviceManager(const VKDeviceManager &) = delete;
+  VKDeviceManager& operator=(const VKDeviceManager &) = delete;
+  VKDeviceManager(VKDeviceManager &&) = delete;
+  VKDeviceManager& operator=(VKDeviceManager &&) = delete;
 
   VkCommandPool getCommandPool() { return commandPool; }
   VkDevice device() { return device_; }
@@ -60,8 +58,6 @@ class LveDevice {
       VkMemoryPropertyFlags properties,
       VkBuffer &buffer,
       VkDeviceMemory &bufferMemory);
-  VkCommandBuffer beginSingleTimeCommands();
-  void endSingleTimeCommands(VkCommandBuffer commandBuffer);
   void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
   void copyBufferToImage(
       VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
@@ -91,11 +87,13 @@ class LveDevice {
   void hasGflwRequiredInstanceExtensions();
   bool checkDeviceExtensionSupport(VkPhysicalDevice device);
   SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+  VkCommandBuffer beginSingleTimeCommands();
+  void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
   VkInstance instance;
   VkDebugUtilsMessengerEXT debugMessenger;
   VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-  LveWindow &window;
+  GlfwWindow& window;
   VkCommandPool commandPool;
 
   VkDevice device_;
@@ -106,5 +104,3 @@ class LveDevice {
   const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
   const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 };
-
-}  // namespace lve

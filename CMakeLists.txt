@@ -55,15 +55,27 @@ add_executable(${PROJECT_NAME}
     src/extern/tiny_obj_loader.h
     src/vulkan-device.cpp
     src/vulkan-device.hpp
+    src/hyacinth-labyrinth.hpp src/vulkan-pipeline.hpp src/glfw-window.hpp
+    src/hyacinth-labyrinth.cpp src/vulkan-pipeline.cpp src/glfw-window.cpp
 
 )
 
+# VULKAN: Tested on VulkanSDK v1.3.268.1
 find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
 if (NOT Vulkan_FOUND)
     message(FATAL_ERROR "Could not find Vulkan library!")
 else()
     message(STATUS "Using vulkan headers at: ${Vulkan_INCLUDE_DIRS}")
     message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
+endif()
+
+# GLFW
+find_package(glfw3 3.3 REQUIRED)
+set(GLFW_LIB glfw)
+if (NOT glfw3_FOUND)
+    message(FATAL_ERROR "Could not find glfw library!")
+else()
+    message(STATUS "Using glfw at: ${glfw3_DIR}")
 endif()
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
@@ -74,6 +86,7 @@ add_library(StaticGLEW STATIC glew/src/glew.c)
 include_directories(${PROJECT_NAME} PRIVATE
     glew/include
     ${Vulkan_INCLUDE_DIRS}
+    
 )
 
 # Specifies libraries to be linked (Qt components, glew, etc)
@@ -84,6 +97,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt::OpenGLWidgets
     Qt::Xml
     StaticGLEW
+    ${Vulkan_LIBRARIES}
+    glfw
 )
 
 # Specifies other files
