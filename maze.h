@@ -1,121 +1,29 @@
 #pragma once
-
-#include "cell.h"
-#include <vector>
-#include <set>
-#include <random>
+#include <mazeblock.h>
 
 class Maze
 {
 public:
-    Maze();
-    Maze(int width, int height);
-    Maze(int width, int height, bool insertClosedSpaces);
-
-    int width;
-    int height;
-    std::vector<Cell> cells;
-    std::set<int> mazeCells = std::set<int>();
-    int closedCellsCount = 0;
-
-    // 4 sets of cells that define the boundaries of this "Maze"
-    // used to generate a maze with predefined borders
-    // e.g. this maze is being generated to the right of an existing one and will be appended
-    // order of cells is left to right, up to down
-    // assumes the size will be width or height (as appropriate)
-    std::vector<std::reference_wrapper<Cell>> leftExternalBorderCells;
-    std::vector<std::reference_wrapper<Cell>> rightExternalBorderCells;
-    std::vector<std::reference_wrapper<Cell>> topExternalBorderCells;
-    std::vector<std::reference_wrapper<Cell>> bottomExternalBorderCells;
-
-//    static std::random_device rd;  // a seed source for the random number engine
-//    static std::mt19937 gen; // mersenne_twister_engine
-
-    int size() { return width * height; }
-    int getIndexOfCellAt(int x, int y) {
-        // ensure cell is valid
-        if (x<0 || x>=width || y<0 || y>=width) {
-            return -1;
-        }
-        return x + width * y;
-    }
-    std::tuple<int, int> getCoordFromIndex(int index) {
-        int y = index / width;
-        int x = index % width;
-        return std::tuple<int, int> {x,y};
-    }
-    int getIndexOfCellNeighbor(int index, Direction dir) {
-        auto[x,y] = getCoordFromIndex(index);
-        int newIndex;
-        switch(dir) {
-        case Direction::N:
-            newIndex = getIndexOfCellAt(x,y-1);
-            break;
-        case Direction::E:
-            newIndex = getIndexOfCellAt(x+1,y);
-            break;
-        case Direction::S:
-            newIndex = getIndexOfCellAt(x,y+1);
-            break;
-        case Direction::W:
-            newIndex = getIndexOfCellAt(x-1,y);
-            break;
-        }
-        return newIndex;
-    }
-
-    bool hasExternalBorderInDirection(int index, Direction dir);
-    Cell& getCellFromExternalBorder(int index, Direction dir);
-    bool isCellInMaze(int index) {
-        return mazeCells.find(index) != mazeCells.end();
-    }
-    void makePathBetweenCells(Cell &first, Cell &second, Direction dir) {
-        switch(dir) {
-        case Direction::N:
-            first.northOpen = true;
-            second.southOpen = true;
-            break;
-        case Direction::E:
-            first.eastOpen = true;
-            second.westOpen = true;
-            break;
-        case Direction::S:
-            first.southOpen = true;
-            second.northOpen = true;
-            break;
-        case Direction::W:
-            first.westOpen = true;
-            second.eastOpen = true;
-            break;
-        }
-    }
-
-    bool hasDefinedExternalBorderCells() {
-        return (leftExternalBorderCells.size()!=0 || rightExternalBorderCells.size()!=0 ||
-                topExternalBorderCells.size()!=0 || bottomExternalBorderCells.size()!=0);
-    }
-
-    /* internal border cells belong to this maze, external ones do not and instead surround the maze
-    e.g. I=internal, E=External, M=other maze cells for this 3x3 maze
-    EEEEE
-    EIIIE
-    EIMIE
-    EIIIE
-    EEEEE
-    */
-    std::vector<std::reference_wrapper<Cell>> getInternalBorderCells(Direction dir);
-    void setExternalBorderCells(std::vector<std::reference_wrapper<Cell>>, Direction Dir);
-
-    int getRandomEmptyCell();
-    void generateMaze();
-    void performRandomWalk();
-    int walkOneStepFirstPass(int loc, Direction dir);
-    int walkOneStepSecondPass(int loc);
-    void insertClosedSpaces();
-
-    // maze is generated in compact fashion, so add unit width walls when converting to string
-    std::string toString(bool undensify = true);
+    Maze(int _width, int _height): width(_width), height(_height) {
+        mazeBlocks.resize(9);
+    };
+    void generate();
+    std::string toString();
 
 private:
-    std::string undensifyMaze();
+    // height and width of constituent maze blocks, not the maze itself
+    // actual maze height ≈ 3*height
+    int width;
+    int height;
+    // block width and height are affected by undensification
+    int blockWidth = width * 2 - 1;
+    int blockHeight = height * 2 - 1;
+    // the 3x3 grid of maze blocks that compose this maze
+    std::vector<MazeBlock> mazeBlocks;
+
+    void generateMazeBlock(int index);
+    void replaceMazeBlock(int index);
+
+    std::string composeBlocks(std::vector<std::string> &mazeBlockStrs, int startingIndex);
+    std::string getVerticalUndensificationString(int topBlockIndex);
 };
