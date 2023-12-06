@@ -1,346 +1,185 @@
 #include "maze.h"
 #include <iostream>
 
+// creates the 9 maze blocks
+void Maze::generate() {
+    // start with center
+//    std::cout << "center" << std::endl;
+    MazeBlock center = MazeBlock(width, height);
+    center.generate();
+    mazeBlocks[4] = center;
 
-Maze::Maze()
-{
+    // generate left, right, top, and bottom blocks
+    std::cout << "left" << std::endl;
+    MazeBlock left = MazeBlock(width, height);
+    left.setExternalBorderCells(center.getInternalBorderCells(Direction::W), Direction::E);
+    left.generate();
+    mazeBlocks[3] = left;
 
+//    std::cout << "right" << std::endl;
+    MazeBlock right = MazeBlock(width, height);
+    right.setExternalBorderCells(center.getInternalBorderCells(Direction::E), Direction::W);
+    right.generate();
+    mazeBlocks[5] = right;
+
+//    std::cout << "top" << std::endl;
+    MazeBlock top = MazeBlock(width, height);
+    top.setExternalBorderCells(center.getInternalBorderCells(Direction::N), Direction::S);
+    top.generate();
+    mazeBlocks[1] = top;
+
+//    std::cout << "bottom" << std::endl;
+    MazeBlock bottom = MazeBlock(width, height);
+    bottom.setExternalBorderCells(center.getInternalBorderCells(Direction::S), Direction::N);
+    bottom.generate();
+    mazeBlocks[7] = bottom;
+
+    // generate top left, top right, bottom left, and bottom right blocks
+//    std::cout << "top left" << std::endl;
+    MazeBlock topleft = MazeBlock(width, height);
+    topleft.setExternalBorderCells(top.getInternalBorderCells(Direction::W), Direction::E);
+    topleft.setExternalBorderCells(left.getInternalBorderCells(Direction::N), Direction::S);
+    topleft.generate();
+    mazeBlocks[0] = topleft;
+
+//    std::cout << "top right" << std::endl;
+    MazeBlock topRight = MazeBlock(width, height);
+    topRight.setExternalBorderCells(top.getInternalBorderCells(Direction::E), Direction::W);
+    topRight.setExternalBorderCells(right.getInternalBorderCells(Direction::N), Direction::S);
+    topRight.generate();
+    mazeBlocks[2] = topRight;
+
+//    std::cout << "bottom left" << std::endl;
+    MazeBlock bottomLeft = MazeBlock(width, height);
+    bottomLeft.setExternalBorderCells(left.getInternalBorderCells(Direction::S), Direction::N);
+    bottomLeft.setExternalBorderCells(bottom.getInternalBorderCells(Direction::W), Direction::E);
+    bottomLeft.generate();
+    mazeBlocks[6] = bottomLeft;
+
+//    std::cout << "bottom right" << std::endl;
+    MazeBlock bottomRight = MazeBlock(width, height);
+    bottomRight.setExternalBorderCells(right.getInternalBorderCells(Direction::S), Direction::N);
+    bottomRight.setExternalBorderCells(bottom.getInternalBorderCells(Direction::E), Direction::W);
+    bottomRight.generate();
+    mazeBlocks[8] = bottomRight;
 }
 
-Maze::Maze(int _width, int _height): width(_width), height(_height) {
-    cells = std::vector(size(),Cell(CellType::Empty));
-}
+// composes the string representation of the 9 constituent blocks
+std::string Maze::toString() {
+    std::string mazeStr = "";
+    std::vector<std::string> mazeBlockStrs;
 
-Maze::Maze(int _width, int _height, bool _insertClosedSpaces): width(_width), height(_height) {
-    cells = std::vector(size(),Cell(CellType::Empty));
-    if (_insertClosedSpaces) {
-        insertClosedSpaces();
-    }
-}
-
-int Maze::getRandomEmptyCell() {
-    if (mazeCells.size() == size()) { return -1; }
-    // todo move for performance?
-    static std::random_device rd;
-    static std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
-    std::uniform_int_distribution<> distrib(0, size()-1);
-    // todo maybe don't rely on luck
-    // idea: shuffle cells and iterate
-    while (true) {
-        int n = distrib(gen);
-        // check cell is valid target
-        if (!isCellInMaze(n) && cells[n].type==CellType::Empty) {
-            return n;
-        }
-    }
-}
-
-// generates a maze using Wilson's algorithm
-// https://en.wikipedia.org/wiki/Maze_generation_algorithm#Wilson's_algorithm
-void Maze::generateMaze() {
-    // add random cell to maze if no borders are defined
-    if (!hasDefinedExternalBorderCells()) {
-        int n = getRandomEmptyCell();
-        std::cout << "first: " << n << std::endl;
-        cells[n].type = CellType::Open;
-        mazeCells.insert(n);
+    for (int i=0; i<mazeBlocks.size(); i++) {
+        mazeBlockStrs.emplace_back(mazeBlocks[i].toString());
+//        mazeStr += mazeBlocks[i].toString() + "\n\n";
     }
 
-    while (mazeCells.size() + closedCellsCount < size()) {
-//        std::cout << toString() << std::endl;
-        performRandomWalk();
-    }
-}
+    // temp testing
+//    std::cout <<"top: " << std::endl;
+//    std::cout << mazeBlocks[1].toString(true, true) << std::endl;
+//    std::cout <<"center: " << std::endl;
+//    std::cout << mazeBlocks[4].toString(true, true) << std::endl;
+//    std::cout <<"right: " << std::endl;
+//    std::cout << mazeBlocks[5].toString(true, true) << std::endl;
 
-void Maze::performRandomWalk() {
-    // pick random empty cell
-    int initial = getRandomEmptyCell();
-    std::cout << "walk start: " << initial << std::endl;
 
-    // set up random generation
-    static std::random_device rd; // a seed source for the random number engine
-    static std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
-    std::uniform_int_distribution<> distrib(0, directions.size());
+    // compose top three blocks
+    mazeStr += composeBlocks(mazeBlockStrs, 0);
 
-    // FIRST PASS
-    int current = initial;
-    int next = 0;
-    while (next > -1) {
-        // pick random direction
-        Direction dir = directions[distrib(gen)];
-        next = walkOneStepFirstPass(current, dir);
-        current = next;
-    }
+    // vertical undensification
+    mazeStr += getVerticalUndensificationString(0);
 
-    // SECOND PASS
-    // start at origin cell and trace directions
-    std::cout << "second pass" << std::endl;
-    current = initial;
-    next = 0;
-    while (next > -1) {
-        next = walkOneStepSecondPass(current);
-        current = next;
-    }
-}
+    // compose middle three blocks
+    mazeStr += composeBlocks(mazeBlockStrs, 3);
 
-// Walk one step from location loc (as index) in direction Dir
-// if step is valid, will visit that cell, otherwise will do nothing
-// returns index of next cell or -1 if walking is done
-// if direction is not valid, returns same index as start
-int Maze::walkOneStepFirstPass(int loc, Direction dir) {
-    int next = -1;
-    // external case: check borders
-    if (hasExternalBorderInDirection(loc, dir)) {
-        cells[loc].exitDir = dir;
-    } else {
-        // internal case
-        next = getIndexOfCellNeighbor(loc, dir);
-        if (next == -1 || cells[next].type == CellType::Closed) {
-            return loc;
-        }
+    // vertical undensification
+    mazeStr += getVerticalUndensificationString(3);
 
-        // if valid, mark direction of previous cell
-        cells[loc].exitDir = dir;
-        // repeat until visited cell is in mazeCells
-        if (isCellInMaze(next)) {
-            next = -1;
-        }
-    }
-    return next;
-}
+    // compose bottom three blocks
+    mazeStr += composeBlocks(mazeBlockStrs, 6);
 
-int Maze::walkOneStepSecondPass(int loc) {
-    // add cells to mazeCells
-    Cell &currentCell = cells[loc];
-    currentCell.type = CellType::Open;
-    mazeCells.insert(loc);
-    int next = -1;
-
-    // find exit direction and next cell
-    Direction dir = currentCell.exitDir;
-
-    // external case: check borders
-    if (hasExternalBorderInDirection(loc, dir)) {
-        // find correct border cell
-        Cell &nextCell = getCellFromExternalBorder(loc, dir);
-        // mark walls
-        makePathBetweenCells(currentCell, nextCell, dir);
-    } else {
-        // internal case
-        // get next cell and mark walls
-        next = getIndexOfCellNeighbor(loc, dir);
-        //        std::cout << "next: " << next << std::endl;
-        Cell &nextCell = cells[next];
-        makePathBetweenCells(currentCell, nextCell, dir);
-
-        // continue until all cells in this walk visited
-        if (isCellInMaze(next)) {
-            next = -1;
-        }
-    }
-    return next;
-}
-
-// randomly places closed spaces to be used for decor later
-void Maze::insertClosedSpaces() {
-    static std::random_device rd; // a seed source for the random number engine
-    static std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
-    std::uniform_int_distribution<> distribLoc(0, cells.size()-1);
-
-    // add one closed space to a random location
-    // 1x1 space for small mazes
-    int loc;
-    if (size() < 25) {
-        loc = distribLoc(gen);
-        cells[loc].type = CellType::Closed;
-    //    std::cout << "closed: " << loc << std::endl;
-        closedCellsCount += 1;
-    } else {
-        // 2x2 space for larger mazes
-        // ensure it fits in the space
-        while (true) {
-            loc = distribLoc(gen);
-            auto[x,y] = getCoordFromIndex(loc);
-            if (x+1 > width-1 || y+1 > height-1) {
-                continue;
-            }
-            cells[loc].type = CellType::Closed;
-            cells[getIndexOfCellAt(x+1,y)].type = CellType::Closed;
-            cells[getIndexOfCellAt(x,y+1)].type = CellType::Closed;
-            cells[getIndexOfCellAt(x+1,y+1)].type = CellType::Closed;
-            closedCellsCount += 4;
-            break;
-        }
-    }
-}
-
-// returns the maze in string format
-// "W" for wall, "O" for open space, "C" for closed space
-std::string Maze::toString(bool undensify) {
-    std::string mazeStr;
-    if (undensify) {
-        mazeStr = undensifyMaze();
-    } else {
-        for (int i=0; i<size(); i++) {
-            mazeStr += cells[i].toString();\
-            if ((i+1)%width==0) {
-               mazeStr += "\n";
-            }
-        }
-    }
     return mazeStr;
 }
 
-// maze is initially generated in "dense" format where only walls don't take up space
-// this function converts maze to string format where walls take up 1 block of space
-// will also enclose entirety in wall
-// and will roughly double size of maze
-std::string Maze::undensifyMaze() {
-    std::string mazeStr;
-    // first row is all wall
-    for (int i=0; i<width*2+1; i++) {
-        mazeStr += "W";
-    }
-    // left wall
-    mazeStr += "\nW";
 
-    for (int i=0; i<size(); i++) {
-        mazeStr += cells[i].toString();
-
-        // undensify horizontal space
-        // ignore last column
-        if ((i+1)%width!=0) {
-            if (cells[i].eastOpen) {
+// composes string representaiton of three horizontal blocks together
+std::string Maze::composeBlocks(std::vector<std::string> &mazeBlockStrs, int startingIndex) {
+    // handle row by row
+    std::string mazeStr = "";
+    int cellRow = 0;
+    for (int i=0; i<blockHeight; i++) {
+        // grab row from top left
+        mazeStr += mazeBlockStrs[startingIndex].substr(i*blockWidth, blockWidth);
+        int last = (cellRow+1)*width-1;
+        // figure out horizontal undensification
+        // if i is even, then cell row, if i is odd, then vertical undensification row
+        if (i%2==0) {
+            // index of last cell in the row
+            if (mazeBlocks[0].cells[last].eastOpen) {
                 mazeStr += "O";
-            } else if (cells[i].type == CellType::Closed && cells[i+1].type == CellType::Closed) {
-                mazeStr += "C";
             } else {
                 mazeStr += "W";
             }
         } else {
-            // handle end of row by adding undensified row, i.e. undensify vertical space
-            // right wall
-            mazeStr += "W\n";
-            // ignore last row since row after that will be all wall
-            if (i != size()-1) {
-                // left wall
-                mazeStr += "W";
-
-                // look at row just iterated over
-                // "i" is at end of row
-                for (int j=i-width+1; j<i+1; j++) {
-                    if (cells[j].southOpen) {
-                        mazeStr += "O";
-                    } else if ((cells[j].type == CellType::Closed && cells[j+width].type == CellType::Closed)) {
-                        mazeStr += "C";
-                    } else {
-                        mazeStr += "W";
-                    }
-                    // account for horizontal undensification
-                    if (j<i) {
-                        if (cells[j].type == CellType::Closed && cells[j+1+width].type == CellType::Closed) {
-                            mazeStr += "C";
-                        } else {
-                            mazeStr += "W";
-                        }
-                    }
-                }
-                // right wall and left wall
-                mazeStr += "W\nW";
-            }
+            mazeStr += "W";
         }
+
+        // grab row from top
+        mazeStr += mazeBlockStrs[startingIndex+1].substr(i*blockWidth, blockWidth);
+        // horizontal undensification
+        if (i%2==0) {
+            // index of last cell in the row
+            if (mazeBlocks[0].cells[last].eastOpen) {
+                mazeStr += "O";
+            } else {
+                mazeStr += "W";
+            }
+            cellRow += 1;
+        } else {
+            mazeStr += "W";
+        }
+        // grab row from top right
+        mazeStr += mazeBlockStrs[startingIndex+2].substr(i*blockWidth, blockWidth);
+        mazeStr += "\n";
     }
-    // last row is all wall
-    mazeStr += std::string(width*2+1,'W');
     return mazeStr;
 }
 
-// returns references to the cells on the specified edge of the maze
-// e.g. north is the top side, east is the right side
-// ordered top to bottom, left to right
-std::vector<std::reference_wrapper<Cell>> Maze::getInternalBorderCells(Direction dir) {
-    std::vector<std::reference_wrapper<Cell>> borderCells;
-    switch(dir) {
-    case Direction::N:
-        for (int i=0; i<width; i++) {
-            Cell& ref = cells[i];
-            borderCells.emplace_back(ref);
-        }
-        break;
-    case Direction::E:
-        for (int i=0; i<height; i++) {
-            Cell& ref = cells[(i+1)*width-1];
-            borderCells.emplace_back(ref);
-        }
-        break;
-    case Direction::S:
-        for (int i=size()-width; i<size(); i++) {
-            Cell& ref = cells[i];
-            borderCells.emplace_back(ref);
-        }
-        break;
-    case Direction::W:
-        for (int i=0; i<height; i++) {
-            Cell& ref = cells[i*width];
-            borderCells.emplace_back(ref);
-        }
-        break;
-    }
-    return borderCells;
-}
+std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
+    std::string mazeStr = "";
+    // iterate through the three top blocks
 
-// sets the border cells that are external to the actual maze
-void Maze::setExternalBorderCells(std::vector<std::reference_wrapper<Cell>> refCells, Direction dir) {
-    switch(dir) {
-    case Direction::N:
-        topExternalBorderCells = refCells;
-        break;
-    case Direction::E:
-        rightExternalBorderCells = refCells;
-        break;
-    case Direction::S:
-        bottomExternalBorderCells = refCells;
-        break;
-    case Direction::W:
-        leftExternalBorderCells = refCells;
-        break;
+    // upper left block
+    for (int i=0; i<width; i++) {
+        if (mazeBlocks[topBlockIndex].cells[i].southOpen) {
+            mazeStr += "O";
+        } else {
+            mazeStr += "W";
+        }
+        mazeStr += "W";
     }
-}
+    // upper center block
+    for (int i=0; i<width; i++) {
+        if (mazeBlocks[topBlockIndex+1].cells[i].southOpen) {
+            mazeStr += "O";
+        } else {
+            mazeStr += "W";
+        }
+        mazeStr += "W";
+    }
+    // upper right block
+    for (int i=0; i<width; i++) {
+        if (mazeBlocks[topBlockIndex+2].cells[i].southOpen) {
+            mazeStr += "O";
+        } else {
+            mazeStr += "W";
+        }
+        // ignore last cell
+        if (i!=width-1) {
+            mazeStr += "W";
+        }
+    }
+    mazeStr += "\n";
 
-bool Maze::hasExternalBorderInDirection(int index, Direction dir) {
-    if (!hasDefinedExternalBorderCells()) { return false; }
-    auto[x,y] = getCoordFromIndex(index);
-    switch(dir) {
-    case Direction::N:
-        return (y==0 && topExternalBorderCells.size()>0);
-        break;
-    case Direction::E:
-        return (x==width-1 && rightExternalBorderCells.size()>0);
-        break;
-    case Direction::S:
-        return (y==height-1 && bottomExternalBorderCells.size()>0);
-        break;
-    case Direction::W:
-        return (x==0 && leftExternalBorderCells.size()>0);
-        break;
-    }
-}
-
-// assume external border exists in the correct direction and the index is correct
-Cell& Maze::getCellFromExternalBorder(int index, Direction dir) {
-    auto[x,y] = getCoordFromIndex(index);
-    switch(dir) {
-    case Direction::N:
-        return topExternalBorderCells[x];
-        break;
-    case Direction::E:
-        return rightExternalBorderCells[y];
-        break;
-    case Direction::S:
-        return bottomExternalBorderCells[x];
-        break;
-    case Direction::W:
-        return leftExternalBorderCells[y];
-        break;
-    }
+    return mazeStr;
 }
