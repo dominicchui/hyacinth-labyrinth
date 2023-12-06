@@ -1,8 +1,8 @@
-bpy = None
+import bpy
 import os
 import numpy as np
 
-def get_cross_section_vertices(position, orientation, num_vertices):
+def get_cross_section_vertices(position, orientation, tesselation_level):
     '''
     Returns coords of vertices arranged in a regular polygon around position,
     in a plane whose normal is aligned with orientation
@@ -25,18 +25,27 @@ def generate_lsystem(axiom, rules, iters):
     return string
 
 def forward(pos, rot, step_size):
-    heading = rot[:, 0]
+    heading = rot[:, 0].reshape((3))
+    new_pos = pos + heading * step_size
+    return new_pos
 
-    return None
+def yaw(rot, alpha):
+    R_U = np.array([[np.cos(alpha), np.sin(alpha), 0],
+                   [-np.sin(alpha), np.cos(alpha), 0],
+                   [0,           0,             1]])
+    return rot @ R_U
 
-def yaw(rot, angle_incr):
-    return None
+def pitch(rot, alpha):
+    R_L = np.array([[np.cos(alpha), 0, -np.sin(alpha)],
+                   [0,           1,             0],
+                   [np.sin(alpha), 0, np.cos(alpha)]])
+    return rot * R_L
 
-def pitch(rot, angle_incr):
-    return None
-
-def roll(rot, angle_incr):
-    return None
+def roll(rot, alpha):
+    R_H = np.array([[1,           0,             0],
+                   [0, np.cos(alpha), -np.sin(alpha)],
+                   [0, np.sin(alpha), np.cos(alpha)]])
+    return rot * R_H
 
 def create_geometry(lstring, step_size, angle_incr, tesselation_level):
     # Track current position
@@ -57,7 +66,8 @@ def create_geometry(lstring, step_size, angle_incr, tesselation_level):
             curr_pos = forward(curr_pos, curr_rot, step_size)
             # Add vertices at the end of the segment
             vertices.append(get_cross_section_vertices(curr_pos,
-                                                       curr_rot))
+                                                       curr_rot,
+                                                       tesselation_level))
             # Add faces to connect to previous cross-section
             # TODO
         elif symbol == '+':
@@ -77,6 +87,28 @@ def create_geometry(lstring, step_size, angle_incr, tesselation_level):
         else:
             print('Encountered unknown symbol: {}'.format(symbol))
             continue
+
+    return vertices, faces
+    
+def add_geometry_to_scene(vertices, faces):
+    # Clear existing mesh objects
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete()
+
+    # Create mesh data
+    mesh = bpy.data.meshes.new('MyMesh')
+    obj = bpy.data.objects.new('MyObject', mesh)
+
+    # Link object to the scene
+    scene = bpy.context.scene
+    scene.collection.objects.link(obj) 
+
+    # Set vertices to the mesh
+    # Vertices, edges, faces
+    mesh.from_pydata(vertices, [], faces)
+
+    # Update mesh geometry
+    mesh.update()
 
 if __name__ == '__main__':
     # Constants
@@ -102,17 +134,16 @@ if __name__ == '__main__':
     }
 
     # General settings
-    NUM_ITERATIONS = 4
+    NUM_ITERATIONS = 3
 
     # Geometry settings
     STEP_SIZE = 5
-    ANGLE_INCR = np.radians(30)
+    ANGLE_INCR = np.radians(90)
     TESSELATION_LEVEL = 1
 
     # L-system definition
-    axiom = 'F'
-    rules = [('F', 'F+G'),
-             ('G', 'F-G')]
+    axiom = 'F-F-F-F'
+    rules = [('F', 'F-F+F+FF-F-F+F')]
     
     # Validate settings
     assert(all(symbol in ALPHABET for symbol in axiom))
@@ -124,4 +155,7 @@ if __name__ == '__main__':
     lstring = generate_lsystem(axiom, rules, NUM_ITERATIONS)
 
     # Apply geometric interpretation
-    create_geometry(lstring, STEP_SIZE, ANGLE_INCR, TESSELATION_LEVEL)
+    vertices, faces = create_geometry(lstring, STEP_SIZE, ANGLE_INCR, TESSELATION_LEVEL)
+
+    # Add the geometry to the scene as a mesh
+    add_geometry_to_scene(vertices, faces)
