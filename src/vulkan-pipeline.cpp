@@ -10,8 +10,8 @@
 #include <iostream>
 #include <stdexcept>
 
-#ifndef ENGINE_DIR
-#define ENGINE_DIR "../"
+#ifndef SHADER_DIR
+#define SHADER_DIR "../resources/shaders/"
 #endif
 
 VulkanPipeline::VulkanPipeline(
@@ -31,7 +31,7 @@ VulkanPipeline::~VulkanPipeline() {
 }
 
 std::vector<char> VulkanPipeline::readFile(const std::string& filepath) {
-  std::string enginePath = ENGINE_DIR + filepath;
+  std::string enginePath = SHADER_DIR + filepath;
   std::ifstream file{enginePath, std::ios::ate | std::ios::binary};
 
   if (!file.is_open()) {
@@ -165,7 +165,7 @@ void VulkanPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
 
   configInfo.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
   configInfo.multisampleInfo.sampleShadingEnable = VK_FALSE;
-  configInfo.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_4_BIT;
+  configInfo.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
   configInfo.multisampleInfo.minSampleShading = 1.0f;           // Optional
   configInfo.multisampleInfo.pSampleMask = nullptr;             // Optional
   configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE;  // Optional
@@ -210,8 +210,8 @@ void VulkanPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
       static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
   configInfo.dynamicStateInfo.flags = 0;
 
-  configInfo.bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
-  configInfo.attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
+  configInfo.bindingDescriptions = VKModel::Vertex::getBindingDescriptions();
+  configInfo.attributeDescriptions = VKModel::Vertex::getAttributeDescriptions();
 }
 
 void VulkanPipeline::enableAlphaBlending(PipelineConfigInfo& configInfo) {

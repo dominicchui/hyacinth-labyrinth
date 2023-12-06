@@ -5,8 +5,6 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 
-namespace lve {
-
 class LveCamera {
  public:
   void setOrthographicProjection(
@@ -29,4 +27,3 @@ class LveCamera {
   glm::mat4 viewMatrix{1.f};
   glm::mat4 inverseViewMatrix{1.f};
 };
-}  // namespace lve

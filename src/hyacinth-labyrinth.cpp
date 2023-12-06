@@ -18,22 +18,26 @@
 #include <chrono>
 #include <stdexcept>
 
-HyacinthLabyrinth::HyacinthLabyrinth() {
+HyacinthLabyrinth::HyacinthLabyrinth()
+  : m_window(WIDTH, HEIGHT, "Hyacinth Labrynth"),
+    m_device(m_window),
+    m_renderer(m_window, m_device)
+{
   globalPool =
-      LveDescriptorPool::Builder(lveDevice)
-          .setMaxSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT)
-          .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, LveSwapChain::MAX_FRAMES_IN_FLIGHT)
+      VK_DP_Mgr::Builder(m_device)
+          .setMaxSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .build();
   loadGameObjects();
 }
 
-FirstApp::~FirstApp() {}
+HyacinthLabyrinth::~HyacinthLabyrinth() {}
 
-void FirstApp::run() {
-  std::vector<std::unique_ptr<LveBuffer>> uboBuffers(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+void HyacinthLabyrinth::run() {
+  std::vector<std::unique_ptr<VKBufferMgr>> uboBuffers(VKSwapChain::MAX_FRAMES_IN_FLIGHT);
   for (int i = 0; i < uboBuffers.size(); i++) {
-    uboBuffers[i] = std::make_unique<LveBuffer>(
-        lveDevice,
+    uboBuffers[i] = std::make_unique<VKBufferMgr>(
+        m_device,
         sizeof(GlobalUbo),
         1,
         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -42,26 +46,29 @@ void FirstApp::run() {
   }
 
   auto globalSetLayout =
-      LveDescriptorSetLayout::Builder(lveDevice)
+      VK_DSL_Mgr::Builder(m_device)
           .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
           .build();
 
-  std::vector<VkDescriptorSet> globalDescriptorSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+  std::vector<VkDescriptorSet> globalDescriptorSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT);
   for (int i = 0; i < globalDescriptorSets.size(); i++) {
     auto bufferInfo = uboBuffers[i]->descriptorInfo();
-    LveDescriptorWriter(*globalSetLayout, *globalPool)
+    VKDescriptorWriter(*globalSetLayout, *globalPool)
         .writeBuffer(0, &bufferInfo)
         .build(globalDescriptorSets[i]);
   }
 
   SimpleRenderSystem simpleRenderSystem{
-      lveDevice,
-      lveRenderer.getSwapChainRenderPass(),
-      globalSetLayout->getDescriptorSetLayout()};
+      m_device,
+      m_renderer.getSwapChainRenderPass(),
+      globalSetLayout->getDescriptorSetLayout()
+  };
+
   PointLightSystem pointLightSystem{
-      lveDevice,
-      lveRenderer.getSwapChainRenderPass(),
-      globalSetLayout->getDescriptorSetLayout()};
+      m_device,
+      m_renderer.getSwapChainRenderPass(),
+      globalSetLayout->getDescriptorSetLayout()
+  };
   LveCamera camera{};
 
   auto viewerObject = LveGameObject::createGameObject();
@@ -69,7 +76,7 @@ void FirstApp::run() {
   KeyboardMovementController cameraController{};
 
   auto currentTime = std::chrono::high_resolution_clock::now();
-  while (!lveWindow.shouldClose()) {
+  while (!m_window.shouldClose()) {
     glfwPollEvents();
 
     auto newTime = std::chrono::high_resolution_clock::now();
@@ -77,14 +84,14 @@ void FirstApp::run() {
         std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
     currentTime = newTime;
 
-    cameraController.moveInPlaneXZ(lveWindow.getGLFWwindow(), frameTime, viewerObject);
+    cameraController.moveInPlaneXZ(m_window.getGLFWwindow(), frameTime, viewerObject);
     camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
-    float aspect = lveRenderer.getAspectRatio();
+    float aspect = m_renderer.getAspectRatio();
     camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
 
-    if (auto commandBuffer = lveRenderer.beginFrame()) {
-      int frameIndex = lveRenderer.getFrameIndex();
+    if (auto commandBuffer = m_renderer.beginFrame()) {
+      int frameIndex = m_renderer.getFrameIndex();
       FrameInfo frameInfo{
           frameIndex,
           frameTime,
@@ -103,39 +110,39 @@ void FirstApp::run() {
       uboBuffers[frameIndex]->flush();
 
       // render
-      lveRenderer.beginSwapChainRenderPass(commandBuffer);
+      m_renderer.beginSwapChainRenderPass(commandBuffer);
 
       // order here matters
       simpleRenderSystem.renderGameObjects(frameInfo);
       pointLightSystem.render(frameInfo);
 
-      lveRenderer.endSwapChainRenderPass(commandBuffer);
-      lveRenderer.endFrame();
+      m_renderer.endSwapChainRenderPass(commandBuffer);
+      m_renderer.endFrame();
     }
   }
 
-  vkDeviceWaitIdle(lveDevice.device());
+  vkDeviceWaitIdle(m_device.device());
 }
 
-void FirstApp::loadGameObjects() {
-  std::shared_ptr<LveModel> lveModel =
-      LveModel::createModelFromFile(lveDevice, "models/flat_vase.obj");
+void HyacinthLabyrinth::loadGameObjects() {
+  std::shared_ptr<VKModel> model =
+      VKModel::createModelFromFile(m_device, "models/flat_vase.obj");
   auto flatVase = LveGameObject::createGameObject();
-  flatVase.model = lveModel;
+  flatVase.model = model;
   flatVase.transform.translation = {-.5f, .5f, 0.f};
   flatVase.transform.scale = {3.f, 1.5f, 3.f};
   gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
-  lveModel = LveModel::createModelFromFile(lveDevice, "models/smooth_vase.obj");
+  model = VKModel::createModelFromFile(m_device, "models/smooth_vase.obj");
   auto smoothVase = LveGameObject::createGameObject();
-  smoothVase.model = lveModel;
+  smoothVase.model = model;
   smoothVase.transform.translation = {.5f, .5f, 0.f};
   smoothVase.transform.scale = {3.f, 1.5f, 3.f};
   gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
-  lveModel = LveModel::createModelFromFile(lveDevice, "models/quad.obj");
+  model = VKModel::createModelFromFile(m_device, "models/quad.obj");
   auto floor = LveGameObject::createGameObject();
-  floor.model = lveModel;
+  floor.model = model;
   floor.transform.translation = {0.f, .5f, 0.f};
   floor.transform.scale = {3.f, 1.f, 3.f};
   gameObjects.emplace(floor.getId(), std::move(floor));
@@ -160,5 +167,3 @@ void FirstApp::loadGameObjects() {
     gameObjects.emplace(pointLight.getId(), std::move(pointLight));
   }
 }
-
-}  // namespace lve

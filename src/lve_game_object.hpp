@@ -50,7 +50,7 @@ class LveGameObject {
   TransformComponent transform{};
 
   // Optional pointer components
-  std::shared_ptr<VKModel> m_model{};
+  std::shared_ptr<VKModel> model{};
   std::unique_ptr<PointLightComponent> pointLight = nullptr;
 
  private:

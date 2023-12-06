@@ -1,9 +1,10 @@
 #include <stdexcept>
+#include <sstream>
 
 #include "Triangle.h"
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "extern/tiny_obj_loader.h"
+// #define TINYOBJLOADER_IMPLEMENTATION
+// #include "extern/tiny_obj_loader.h"
 
 TriangleMesh::TriangleMesh(
     const std::string& mesh_file,
