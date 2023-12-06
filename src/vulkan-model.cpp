@@ -1,7 +1,5 @@
 #include "vulkan-model.hpp"
 
-#include "lve_utils.hpp"
-
 // libs
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <extern/tiny_obj_loader.h>
@@ -25,7 +23,7 @@ static void hashCombine(std::size_t& seed, const T& v, const Rest&... rest) {
 };
 
 template <>
-struct hash<VKModel::Vertex> {
+struct std::hash<VKModel::Vertex> {
   size_t operator()(VKModel::Vertex const &vertex) const {
     size_t seed = 0;
     hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);

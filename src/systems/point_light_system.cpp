@@ -12,8 +12,6 @@
 #include <map>
 #include <stdexcept>
 
-namespace lve {
-
 struct PointLightPushConstants {
   glm::vec4 position{};
   glm::vec4 color{};
@@ -21,14 +19,17 @@ struct PointLightPushConstants {
 };
 
 PointLightSystem::PointLightSystem(
-    LveDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
-    : lveDevice{device} {
+    VKDeviceManager& device,
+    VkRenderPass renderPass,
+    VkDescriptorSetLayout globalSetLayout
+  ) : m_device(device)
+{
   createPipelineLayout(globalSetLayout);
   createPipeline(renderPass);
 }
 
 PointLightSystem::~PointLightSystem() {
-  vkDestroyPipelineLayout(lveDevice.device(), pipelineLayout, nullptr);
+  vkDestroyPipelineLayout(m_device.device(), pipelineLayout, nullptr);
 }
 
 void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
@@ -45,7 +46,7 @@ void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayou
   pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
   pipelineLayoutInfo.pushConstantRangeCount = 1;
   pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-  if (vkCreatePipelineLayout(lveDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
+  if (vkCreatePipelineLayout(m_device.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
       VK_SUCCESS) {
     throw std::runtime_error("failed to create pipeline layout!");
   }
@@ -55,16 +56,16 @@ void PointLightSystem::createPipeline(VkRenderPass renderPass) {
   assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
   PipelineConfigInfo pipelineConfig{};
-  LvePipeline::defaultPipelineConfigInfo(pipelineConfig);
-  LvePipeline::enableAlphaBlending(pipelineConfig);
+  VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
+  VulkanPipeline::enableAlphaBlending(pipelineConfig);
   pipelineConfig.attributeDescriptions.clear();
   pipelineConfig.bindingDescriptions.clear();
   pipelineConfig.renderPass = renderPass;
   pipelineConfig.pipelineLayout = pipelineLayout;
-  lvePipeline = std::make_unique<LvePipeline>(
-      lveDevice,
-      "shaders/point_light.vert.spv",
-      "shaders/point_light.frag.spv",
+  m_pipeline = std::make_unique<VulkanPipeline>(
+      m_device,
+      "point_light.vert.spv",
+      "point_light.frag.spv",
       pipelineConfig);
 }
 
@@ -102,7 +103,7 @@ void PointLightSystem::render(FrameInfo& frameInfo) {
     sorted[disSquared] = obj.getId();
   }
 
-  lvePipeline->bind(frameInfo.commandBuffer);
+  m_pipeline->bind(frameInfo.commandBuffer);
 
   vkCmdBindDescriptorSets(
       frameInfo.commandBuffer,
@@ -134,5 +135,3 @@ void PointLightSystem::render(FrameInfo& frameInfo) {
     vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
   }
 }
-
-}  // namespace lve

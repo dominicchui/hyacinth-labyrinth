@@ -4,8 +4,6 @@
 #include <cassert>
 #include <limits>
 
-namespace lve {
-
 void LveCamera::setOrthographicProjection(
     float left, float right, float top, float bottom, float near, float far) {
   projectionMatrix = glm::mat4{1.0f};
@@ -104,5 +102,3 @@ void LveCamera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
   inverseViewMatrix[3][1] = position.y;
   inverseViewMatrix[3][2] = position.z;
 }
-
-}  // namespace lve

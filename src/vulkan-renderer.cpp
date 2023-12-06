@@ -45,7 +45,7 @@ void VKRenderer::createCommandBuffers() {
   allocInfo.commandPool = m_device.getCommandPool();
   allocInfo.commandBufferCount = static_cast<uint32_t>(m_commandBuffers.size());
 
-  if (vkAllocateCommandBuffers(m_evice.device(), &allocInfo, m_commandBuffers.data()) !=
+  if (vkAllocateCommandBuffers(m_device.device(), &allocInfo, m_commandBuffers.data()) !=
       VK_SUCCESS) {
     throw std::runtime_error("failed to allocate command buffers!");
   }

@@ -116,18 +116,21 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     PREFIX
         "/"
     FILES
-    resources/shaders/shape.frag
-    resources/shaders/shape.vert
-    resources/shaders/invert.frag
-    resources/shaders/invert.vert
-    resources/shaders/grayscale.frag
-    resources/shaders/grayscale.vert
-    resources/shaders/blur.frag
-    resources/shaders/blur.vert
-    resources/shaders/sobel.vert
-    resources/shaders/sobel.frag
+    # resources/shaders/shape.frag
+    # resources/shaders/shape.vert
+    # resources/shaders/invert.frag
+    # resources/shaders/invert.vert
+    # resources/shaders/grayscale.frag
+    # resources/shaders/grayscale.vert
+    # resources/shaders/blur.frag
+    # resources/shaders/blur.vert
+    # resources/shaders/sobel.vert
+    # resources/shaders/sobel.frag
+    resources/shaders/point_light.frag
+    resources/shaders/point_light.vert
+    resources/shaders/simple_shader.frag
+    resources/shaders/simple_shader.vert
 )
-
 
 # GLEW: this provides support for Windows (including 64-bit)
 if (WIN32)
@@ -146,3 +149,39 @@ endif()
 if (APPLE)
   set(CMAKE_CXX_FLAGS "-Wno-deprecated-volatile")
 endif()
+
+###### Build Sahders
+# Find all vertex and fragment sources within shaders directory
+# taken from VBlancos vulkan tutorial
+# https://github.com/vblanco20-1/vulkan-guide/blob/all-chapters/CMakeLists.txt
+find_program(GLSL_VALIDATOR glslangValidator HINTS
+  ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}
+  /usr/bin
+  /usr/local/bin
+  ${VULKAN_SDK_PATH}/Bin
+  ${VULKAN_SDK_PATH}/Bin32
+  $ENV{VULKAN_SDK}/Bin/
+  $ENV{VULKAN_SDK}/Bin32/
+)
+
+set (SHADER_DIR ${PROJECT_SOURCE_DIR}/resources/shaders)
+# get all .vert and .frag files in shaders directory
+file(GLOB_RECURSE GLSL_SOURCE_FILES
+  "${SHADER_DIR}/*.frag"
+  "${SHADER_DIR}/*.vert"
+)
+
+foreach(GLSL ${GLSL_SOURCE_FILES})
+  get_filename_component(FILE_NAME ${GLSL} NAME)
+  set(SPIRV "${SHADER_DIR}/${FILE_NAME}.spv")
+  add_custom_command(
+    OUTPUT ${SPIRV}
+    COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV}
+    DEPENDS ${GLSL})
+  list(APPEND SPIRV_BINARY_FILES ${SPIRV})
+endforeach(GLSL)
+
+add_custom_target(
+    Shaders
+    DEPENDS ${SPIRV_BINARY_FILES}
+)

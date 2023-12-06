@@ -6,8 +6,6 @@
 // lib
 #include <vulkan/vulkan.h>
 
-namespace lve {
-
 #define MAX_LIGHTS 10
 
 struct PointLight {
@@ -32,4 +30,3 @@ struct FrameInfo {
   VkDescriptorSet globalDescriptorSet;
   LveGameObject::Map &gameObjects;
 };
-}  // namespace lve
