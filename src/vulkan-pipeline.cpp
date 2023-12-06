@@ -2,7 +2,7 @@
 
 #include "vulkan-pipeline.hpp"
 
-//#include "lve_model.hpp"
+#include "vulkan-model.hpp"
 
 // std
 #include <cassert>
@@ -156,7 +156,7 @@ void VulkanPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
   configInfo.rasterizationInfo.rasterizerDiscardEnable = VK_FALSE;
   configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
   configInfo.rasterizationInfo.lineWidth = 1.0f;
-  configInfo.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
+  configInfo.rasterizationInfo.cullMode = VK_CULL_MODE_BACK_BIT;
   configInfo.rasterizationInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
   configInfo.rasterizationInfo.depthBiasEnable = VK_FALSE;
   configInfo.rasterizationInfo.depthBiasConstantFactor = 0.0f;  // Optional
@@ -165,7 +165,7 @@ void VulkanPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
 
   configInfo.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
   configInfo.multisampleInfo.sampleShadingEnable = VK_FALSE;
-  configInfo.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+  configInfo.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_4_BIT;
   configInfo.multisampleInfo.minSampleShading = 1.0f;           // Optional
   configInfo.multisampleInfo.pSampleMask = nullptr;             // Optional
   configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE;  // Optional
@@ -210,9 +210,8 @@ void VulkanPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
       static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
   configInfo.dynamicStateInfo.flags = 0;
 
-  //WORK HERE
-  //configInfo.bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
-  //configInfo.attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
+  configInfo.bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
+  configInfo.attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
 }
 
 void VulkanPipeline::enableAlphaBlending(PipelineConfigInfo& configInfo) {

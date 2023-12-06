@@ -26,11 +26,11 @@ class HyacinthLabyrinth {
  private:
   void loadGameObjects();
 
-  GlfwWindow m_window(WIDTH, HEIGHT, "Hyacinth Labyrinth");
-  VKDeviceManager m_device(m_window);
-  LveRenderer m_renderer{lveWindow, lveDevice};
+  // GlfwWindow m_window(WIDTH, HEIGHT, "Hyacinth Labyrinth");
+  // VKDeviceManager m_device(m_window);
+  // LveRenderer m_renderer{lveWindow, lveDevice};
 
-  // note: order of declarations matters
-  std::unique_ptr<LveDescriptorPool> globalPool{};
-  LveGameObject::Map gameObjects;
+  // // note: order of declarations matters
+  // std::unique_ptr<LveDescriptorPool> globalPool{};
+  // LveGameObject::Map gameObjects;
 };

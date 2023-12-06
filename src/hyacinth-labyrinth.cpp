@@ -1,7 +1,7 @@
 #include "hyacinth-labyrinth.hpp"
 
 #include "keyboard_movement_controller.hpp"
-#include "lve_buffer.hpp"
+#include "vulkan-buffer.hpp"
 #include "lve_camera.hpp"
 #include "systems/point_light_system.hpp"
 #include "systems/simple_render_system.hpp"
@@ -18,9 +18,7 @@
 #include <chrono>
 #include <stdexcept>
 
-namespace lve {
-
-FirstApp::FirstApp() {
+HyacinthLabyrinth::HyacinthLabyrinth() {
   globalPool =
       LveDescriptorPool::Builder(lveDevice)
           .setMaxSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT)
