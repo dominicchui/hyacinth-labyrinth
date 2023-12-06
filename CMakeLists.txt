@@ -57,6 +57,12 @@ add_executable(${PROJECT_NAME}
     src/vulkan-device.hpp
     src/hyacinth-labyrinth.hpp src/vulkan-pipeline.hpp src/glfw-window.hpp
     src/hyacinth-labyrinth.cpp src/vulkan-pipeline.cpp src/glfw-window.cpp
+    src/vulkan-buffer.hpp src/vulkan-descriptors.hpp src/vulkan-renderer.hpp
+    src/vulkan-buffer.cpp src/vulkan-descriptors.cpp src/vulkan-renderer.cpp
+    src/vulkan-swapchain.hpp
+    src/vulkan-swapchain.cpp
+    src/vulkan-model.cpp
+    src/vulkan-model.hpp
 
 )
 

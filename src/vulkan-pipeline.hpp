@@ -56,7 +56,10 @@ class VulkanPipeline {
       const PipelineConfigInfo& configInfo
   );
 
-  void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
+  void createShaderModule(
+      const std::vector<char>& code,
+      VkShaderModule* shaderModule
+  );
 
   VKDeviceManager& m_device;
   VkPipeline graphicsPipeline;
