@@ -63,6 +63,10 @@ add_executable(${PROJECT_NAME}
     src/vulkan-swapchain.cpp
     src/vulkan-model.cpp
     src/vulkan-model.hpp
+    src/vulkan-frame-info.hpp
+    src/keyboard_movement_controller.cpp src/keyboard_movement_controller.hpp src/lve_game_object.cpp src/lve_game_object.hpp
+    src/lve_camera.cpp src/lve_camera.hpp
+    src/systems/point_light_system.cpp src/systems/point_light_system.hpp src/systems/simple_render_system.cpp src/systems/simple_render_system.hpp
 
 )
 

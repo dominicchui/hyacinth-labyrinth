@@ -1,9 +1,9 @@
 #pragma once
 
-// #include "lve_descriptors.hpp"
+#include "vulkan-descriptors.hpp"
 #include "vulkan-device.hpp"
-// #include "lve_game_object.hpp"
-// #include "lve_renderer.hpp"
+#include "lve_game_object.hpp"
+#include "vulkan-renderer.hpp"
 #include "glfw-window.hpp"
 
 // std
@@ -26,11 +26,11 @@ class HyacinthLabyrinth {
  private:
   void loadGameObjects();
 
-  // GlfwWindow m_window(WIDTH, HEIGHT, "Hyacinth Labyrinth");
-  // VKDeviceManager m_device(m_window);
-  // LveRenderer m_renderer{lveWindow, lveDevice};
+  GlfwWindow m_window;
+  VKDeviceManager m_device;
+  VKRenderer m_renderer;
 
-  // // note: order of declarations matters
-  // std::unique_ptr<LveDescriptorPool> globalPool{};
-  // LveGameObject::Map gameObjects;
+  // note: order of declarations matters
+  std::unique_ptr<VK_DP_Mgr> globalPool{};
+  LveGameObject::Map gameObjects;
 };
