@@ -67,17 +67,36 @@ add_executable(${PROJECT_NAME}
     src/keyboard_movement_controller.cpp src/keyboard_movement_controller.hpp src/lve_game_object.cpp src/lve_game_object.hpp
     src/lve_camera.cpp src/lve_camera.hpp
     src/systems/point_light_system.cpp src/systems/point_light_system.hpp src/systems/simple_render_system.cpp src/systems/simple_render_system.hpp
+    src/maze/cell.h
+    src/maze/cell.cpp
+    src/maze/maze.h
+    src/maze/maze.cpp
+    src/maze/mazeblock.cpp
+    src/maze/mazeblock.h
 
 )
 
+add_executable(MazeTest
+    src/maze/cell.h
+    src/maze/cell.cpp
+    src/maze/maze.h
+    src/maze/maze.cpp
+    src/maze/mazeblock.cpp
+    src/maze/mazeblock.h
+    src/maze/mazetest.cpp
+)
+
 # VULKAN: Tested on VulkanSDK v1.3.268.1
-find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
-if (NOT Vulkan_FOUND)
-    message(FATAL_ERROR "Could not find Vulkan library!")
-else()
-    message(STATUS "Using vulkan headers at: ${Vulkan_INCLUDE_DIRS}")
-    message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
-endif()
+#find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
+#if (NOT Vulkan_FOUND)
+#    message(FATAL_ERROR "Could not find Vulkan library!")
+#else()
+#    message(STATUS "Using vulkan headers at: ${Vulkan_INCLUDE_DIRS}")
+#    message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
+#endif()
+
+set(Vulkan_LIBRARIES "/usr/local/lib")
+set(Vulkan_INCLUDE_DIRS "/usr/local/include")
 
 # GLFW
 find_package(glfw3 3.3 REQUIRED)
@@ -96,8 +115,9 @@ add_library(StaticGLEW STATIC glew/src/glew.c)
 include_directories(${PROJECT_NAME} PRIVATE
     glew/include
     ${Vulkan_INCLUDE_DIRS}
-    
+
 )
+
 
 # Specifies libraries to be linked (Qt components, glew, etc)
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -107,7 +127,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt::OpenGLWidgets
     Qt::Xml
     StaticGLEW
-    ${Vulkan_LIBRARIES}
+    ${Vulkan_LIBRARIES}/libvulkan.1.dylib
     glfw
 )
 

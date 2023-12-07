@@ -1,5 +1,5 @@
 #pragma once
-#include <mazeblock.h>
+#include "mazeblock.h"
 
 class Maze
 {

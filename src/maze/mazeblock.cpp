@@ -55,7 +55,7 @@ void MazeBlock::generate() {
 void MazeBlock::performRandomWalk() {
     // pick random empty cell
     int initial = getRandomEmptyCell();
-//    std::cout << "walk start: " << initial << std::endl;
+    std::cout << "walk start: " << initial << std::endl;
 
     // set up random generation
     static std::random_device rd; // a seed source for the random number engine
@@ -79,6 +79,7 @@ void MazeBlock::performRandomWalk() {
     next = 0;
     while (next > -1) {
         next = walkOneStepSecondPass(current);
+        std::cout<<"next: " << next << std::endl;
         current = next;
     }
 }
@@ -91,6 +92,7 @@ int MazeBlock::walkOneStepFirstPass(int loc, Direction dir) {
     int next = -1;
     // external case: check borders
     if (hasExternalBorderInDirection(loc, dir)) {
+        std::cout << "external" << std::endl;
         cells[loc].exitDir = dir;
     } else {
         // internal case

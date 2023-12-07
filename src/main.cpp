@@ -1,3 +1,4 @@
+
 #define VULKAN_PROJ 0
 
 #if VULKAN_PROJ == 1
@@ -33,6 +34,7 @@ int main(int argc, char *argv[]) {
 #include <QScreen>
 #include <iostream>
 #include <QSettings>
+#include "maze/maze.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
