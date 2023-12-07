@@ -1,4 +1,4 @@
-import bpy
+# import bpy
 import os
 import numpy as np
 
@@ -7,14 +7,44 @@ def get_cross_section_vertices(pos, rot, tesselation_level):
     Returns coords of vertices arranged in a regular polygon around position,
     in a plane whose normal is aligned with heading
     '''
-    # Get the heading
+    # Set radius of stem
+    stem_radius = 1
+
+    # Get the heading, left, and up vectors
     heading = rot[:, 0].reshape((3))
-    
+    left = rot[:, 1].reshape((3))
+    up = rot[:, 2].reshape((3))
+
+    vertices = []
 
     # Get regularly spaced vertices in the plane p spanned by left and up
+    theta_step = 2 * np.pi / tesselation_level
+    theta = 0
+    for i in range(tesselation_level):
+        vertices.append(pos +
+                        stem_radius * np.cos(theta) * left +
+                        stem_radius * np.sin(theta) * up)
+        theta += theta_step
 
+    return [tuple(vertex) for vertex in vertices]
 
-    return tuple(pos)
+def get_faces(vertices, tesselation_level):
+    '''
+    Returns faces connecting the most recently added set of vertices to
+    the set of vertices added before that.
+    '''
+    vertex_indices = list(range(len(vertices)))
+    curr_vertices = vertex_indices[-tesselation_level:]
+    prev_vertices = vertex_indices[-2*tesselation_level:-tesselation_level]
+    faces = []
+    for i in range(tesselation_level):
+        next_i = i + 1
+        # Wrap around to first index
+        if next_i >= tesselation_level:
+            next_i = 0
+        faces.append((prev_vertices[i], curr_vertices[i],
+                      curr_vertices[next_i], prev_vertices[next_i]))
+    return faces
 
 def rewrite(string, rules):
     '''
@@ -71,21 +101,28 @@ def create_geometry(lstring, step_size, angle_incr, tesselation_level):
         [0, 1, 0],
         [1, 0, 0],
     ])
-    # Use a stack (list) to track pushed states to return to
+    # Use a stack (list) to track pushed states to return to.
+    # TODO: Also use a stack to remember the order of cross-sections added.
     states = []
 
     # Store the vertices and faces generated as we go
     vertices = []
     faces = []
 
+    # Add initial vertices
+    vertices.extend(get_cross_section_vertices(curr_pos, curr_rot, tesselation_level))
+
     # Process the string symbol by symbol
     for symbol in lstring:
         if symbol == 'F':
             curr_pos = forward(curr_pos, curr_rot, step_size)
             # Add vertices at the end of the segment
-            vertices.append(get_cross_section_vertices(curr_pos,
+            vertices.extend(get_cross_section_vertices(curr_pos,
                                                        curr_rot,
                                                        tesselation_level))
+            # Add faces connecting the new cross section to
+            #   the previous one
+            faces.extend(get_faces(vertices, tesselation_level))
             # Add faces to connect to previous cross-section
             # TODO
         elif symbol == '+':
@@ -109,7 +146,7 @@ def create_geometry(lstring, step_size, angle_incr, tesselation_level):
             curr_pos = state[0]
             curr_rot = state[1]
         else:
-            # Symbols with no geometric interpretation is skipped
+            # Symbols with no geometric interpretation are skipped
             continue
 
     return vertices, faces
@@ -129,7 +166,7 @@ def add_geometry_to_scene(vertices, faces):
 
     # Link object to the scene
     scene = bpy.context.scene
-    scene.collection.objects.link(obj) 
+    scene.collection.objects.link(obj)
 
     # Set vertices to the mesh
     # Vertices, edges, faces
@@ -157,12 +194,12 @@ if __name__ == '__main__':
     #   but they won't have any geometric interpretation
 
     # General settings
-    NUM_ITERATIONS = 7
+    NUM_ITERATIONS = 1
 
     # Geometry settings
-    STEP_SIZE = 0.5
+    STEP_SIZE = 5
     ANGLE_INCR = np.radians(22.5)
-    TESSELATION_LEVEL = 1
+    TESSELATION_LEVEL = 3
 
     # L-system definition
     axiom = "A"
@@ -173,8 +210,10 @@ if __name__ == '__main__':
     # Generate the L-system string by repeatedly applying rules
     lstring = generate_lsystem(axiom, rules, NUM_ITERATIONS)
 
+    print(lstring)
+
     # Apply geometric interpretation
     vertices, faces = create_geometry(lstring, STEP_SIZE, ANGLE_INCR, TESSELATION_LEVEL)
 
     # Add the geometry to the scene as a mesh
-    add_geometry_to_scene(vertices, faces)
+    # add_geometry_to_scene(vertices, faces)
