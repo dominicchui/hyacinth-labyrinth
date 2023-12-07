@@ -1,14 +1,12 @@
-# import bpy
+import bpy
 import os
 import numpy as np
 
-def get_cross_section_vertices(pos, rot, tesselation_level):
+def get_cross_section_vertices(pos, rot, stem_radius, tesselation_level):
     '''
     Returns coords of vertices arranged in a regular polygon around position,
     in a plane whose normal is aligned with heading
     '''
-    # Set radius of stem
-    stem_radius = 1
 
     # Get the heading, left, and up vectors
     heading = rot[:, 0].reshape((3))
@@ -87,7 +85,7 @@ def roll(rot, alpha):
                    [0, np.sin(alpha), np.cos(alpha)]])
     return rot @ R_H
 
-def create_geometry(lstring, step_size, angle_incr, tesselation_level):
+def create_geometry(lstring, step_size, stem_radius, angle_incr, tesselation_level):
     '''
     Creates a list of vertices and faces from the L-system string.
     This is the "geometric interpretation" of the string.
@@ -109,22 +107,23 @@ def create_geometry(lstring, step_size, angle_incr, tesselation_level):
     vertices = []
     faces = []
 
-    # Add initial vertices
-    vertices.extend(get_cross_section_vertices(curr_pos, curr_rot, tesselation_level))
-
     # Process the string symbol by symbol
     for symbol in lstring:
         if symbol == 'F':
+            # Add vertices at the beginning of the segment
+            vertices.extend(get_cross_section_vertices(curr_pos,
+                                                       curr_rot,
+                                                       stem_radius,
+                                                       tesselation_level))
+            # Move forward
             curr_pos = forward(curr_pos, curr_rot, step_size)
             # Add vertices at the end of the segment
             vertices.extend(get_cross_section_vertices(curr_pos,
                                                        curr_rot,
+                                                       stem_radius,
                                                        tesselation_level))
-            # Add faces connecting the new cross section to
-            #   the previous one
+            # Add faces connecting the sets of vertices
             faces.extend(get_faces(vertices, tesselation_level))
-            # Add faces to connect to previous cross-section
-            # TODO
         elif symbol == '+':
             curr_rot = yaw(curr_rot, angle_incr)
         elif symbol == '-':
@@ -178,28 +177,28 @@ def add_geometry_to_scene(vertices, faces):
 if __name__ == '__main__':
     # Constants
     # (see http://algorithmicbotany.org/papers/abop/abop.pdf):
-    ALPHABET = {
-        'F', # Move forward in the direction of heading by step size.
-        '+', # Turn left by angle δ, using rotation matrix RU(δ).
-        '-', # Turn right by angle δ, using rotation matrix RU(−δ).
-        '&', # Pitch down by angle δ, using rotation matrix RL(δ).
-        '^', # Pitch up by angle δ, using rotation matrix RL(−δ).
-        '~', # Roll left by angle δ, using rotation matrix RH(δ). (~ used in place of \)
-        '/', # Roll right by angle δ, using rotation matrix RH(−δ).
-        '|', # Turn around, using rotation matrix RU(180◦).
-        '[', # Push current position and orientation to stack.
-        ']', # Set current position and orientation to stack top and pop.
-    }
+    # ALPHABET:
+    #     'F'   move forward in the direction of heading by step size.
+    #     '+'   turn left by angle δ, using rotation matrix RU(δ).
+    #     '-'   turn right by angle δ, using rotation matrix RU(−δ).
+    #     '&'   pitch down by angle δ, using rotation matrix RL(δ).
+    #     '^'   pitch up by angle δ, using rotation matrix RL(−δ).
+    #     '~'   roll left by angle δ, using rotation matrix RH(δ). (~ used in place of \)
+    #     '/'   roll right by angle δ, using rotation matrix RH(−δ).
+    #     '|'   turn around, using rotation matrix RU(180◦).
+    #     '['   push current position and orientation to stack.
+    #     ']'   set current position and orientation to stack top and pop.
     # NOTE: symbols outside the alphabet may also be used,
-    #   but they won't have any geometric interpretation
+    #     but they won't have any geometric interpretation
 
     # General settings
-    NUM_ITERATIONS = 1
+    NUM_ITERATIONS = 6
 
     # Geometry settings
-    STEP_SIZE = 5
+    STEP_SIZE = 1
+    STEM_RADIUS = 1
     ANGLE_INCR = np.radians(22.5)
-    TESSELATION_LEVEL = 3
+    TESSELATION_LEVEL = 50
 
     # L-system definition
     axiom = "A"
@@ -210,10 +209,8 @@ if __name__ == '__main__':
     # Generate the L-system string by repeatedly applying rules
     lstring = generate_lsystem(axiom, rules, NUM_ITERATIONS)
 
-    print(lstring)
-
     # Apply geometric interpretation
-    vertices, faces = create_geometry(lstring, STEP_SIZE, ANGLE_INCR, TESSELATION_LEVEL)
+    vertices, faces = create_geometry(lstring, STEP_SIZE, STEM_RADIUS, ANGLE_INCR, TESSELATION_LEVEL)
 
     # Add the geometry to the scene as a mesh
-    # add_geometry_to_scene(vertices, faces)
+    add_geometry_to_scene(vertices, faces)
