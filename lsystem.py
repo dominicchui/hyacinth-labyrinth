@@ -39,23 +39,27 @@ def pitch(rot, alpha):
     R_L = np.array([[np.cos(alpha), 0, -np.sin(alpha)],
                    [0,           1,             0],
                    [np.sin(alpha), 0, np.cos(alpha)]])
-    return rot * R_L
+    return rot @ R_L
 
 def roll(rot, alpha):
     R_H = np.array([[1,           0,             0],
                    [0, np.cos(alpha), -np.sin(alpha)],
                    [0, np.sin(alpha), np.cos(alpha)]])
-    return rot * R_H
+    return rot @ R_H
 
 def create_geometry(lstring, step_size, angle_incr, tesselation_level):
     # Track current position
     curr_pos = np.array([0, 0, 0])
     # Use a 3x3 matrix to track our current rotation.
+    # Start facing towards +z axis
     curr_rot = np.array([
-        [1, 0, 0],
-        [0, 1, 0],
         [0, 0, 1],
+        [0, 1, 0],
+        [1, 0, 0],
     ])
+    # Use a stack (list) to track pushed states to return to
+    states = []
+
     # Store the vertices and faces generated as we go
     vertices = []
     faces = []
@@ -84,8 +88,14 @@ def create_geometry(lstring, step_size, angle_incr, tesselation_level):
             curr_rot = roll(curr_rot, -angle_incr)
         elif symbol == '|':
             curr_rot = yaw(curr_rot, np.radians(180))
+        elif symbol == '[':
+            states.append((curr_pos, curr_rot))
+        elif symbol == ']':
+            state = states.pop()
+            curr_pos = state[0]
+            curr_rot = state[1]
         else:
-            print('Encountered unknown symbol: {}'.format(symbol))
+            # A symbol with no geometric interpretation is skipped
             continue
 
     return vertices, faces
@@ -113,43 +123,35 @@ def add_geometry_to_scene(vertices, faces):
 if __name__ == '__main__':
     # Constants
 
-    # From ABOP (http://algorithmicbotany.org/papers/abop/abop.pdf):
-    #   + Turn left by angle δ, using rotation matrix RU(δ).
-    #   − Turn right by angle δ, using rotation matrix RU(−δ).
-    #   & Pitch down by angle δ, using rotation matrix RL(δ).
-    #   ∧ Pitch up by angle δ, using rotation matrix RL(−δ).
-    #   \ Roll left by angle δ, using rotation matrix RH(δ).
-    #       NOTE: ~ used in place of \ to avoid escape char issues
-    #   / Roll right by angle δ, using rotation matrix RH(−δ).
-    #   | Turn around, using rotation matrix RU(180◦).
+    # See ABOP (http://algorithmicbotany.org/papers/abop/abop.pdf):
     ALPHABET = {
-        'F',
-        '+',
-        '-',
-        '&',
-        '^',
-        '~',
-        '/',
-        '|'
+        'F', # Move forward in the direction of heading by step size.
+        '+', # Turn left by angle δ, using rotation matrix RU(δ).
+        '-', # Turn right by angle δ, using rotation matrix RU(−δ).
+        '&', # Pitch down by angle δ, using rotation matrix RL(δ).
+        '^', # Pitch up by angle δ, using rotation matrix RL(−δ).
+        '~', # Roll left by angle δ, using rotation matrix RH(δ). (~ used in place of \)
+        '/', # Roll right by angle δ, using rotation matrix RH(−δ).
+        '|', # Turn around, using rotation matrix RU(180◦).
+        '[', # Push current position and orientation to stack.
+        ']', # Set current position and orientation to stack top and pop.
     }
+    # NOTE: symbols outside the alphabet may also be used,
+    #   but they won't have any geometric interpretation
 
     # General settings
-    NUM_ITERATIONS = 3
+    NUM_ITERATIONS = 7
 
     # Geometry settings
-    STEP_SIZE = 5
-    ANGLE_INCR = np.radians(90)
+    STEP_SIZE = 0.5
+    ANGLE_INCR = np.radians(22.5)
     TESSELATION_LEVEL = 1
 
     # L-system definition
-    axiom = 'F-F-F-F'
-    rules = [('F', 'F-F+F+FF-F-F+F')]
-    
-    # Validate settings
-    assert(all(symbol in ALPHABET for symbol in axiom))
-    for rule in rules:
-        assert(all(symbol in ALPHABET for symbol in rule[0]))
-        assert(all(symbol in ALPHABET for symbol in rule[1]))
+    axiom = 'A'
+    rules = [('A', '[&FL!A]/////’[&FL!A]///////’[&FL!A]'),
+             ('F', 'S/////F'),
+             ('S', 'FL')]
 
     # Generate the L-system string by repeatedly applying rules
     lstring = generate_lsystem(axiom, rules, NUM_ITERATIONS)
@@ -158,4 +160,4 @@ if __name__ == '__main__':
     vertices, faces = create_geometry(lstring, STEP_SIZE, ANGLE_INCR, TESSELATION_LEVEL)
 
     # Add the geometry to the scene as a mesh
-    add_geometry_to_scene(vertices, faces)
+    add_geometry_to_scene(vertices, faces)g
