@@ -80,12 +80,18 @@ else()
 endif()
 
 # GLFW
-find_package(glfw3 3.3 REQUIRED)
-set(GLFW_LIB glfw)
-if (NOT glfw3_FOUND)
-    message(FATAL_ERROR "Could not find glfw library!")
-else()
-    message(STATUS "Using glfw at: ${glfw3_DIR}")
+if (WIN32)
+  set(GLFW_PATH "C:/Program Files/glfw-3.3.8")
+  set(GLFW_INCLUDE_DIRS "${GLFW_PATH}/include")
+  set(GLFW_LIB "${GLFW_PATH}/lib-mingw-w64")
+else ()
+  find_package(glfw3 3.3 REQUIRED)
+  set(GLFW_LIB glfw)
+  if (NOT glfw3_FOUND)
+      message(FATAL_ERROR "Could not find glfw library! ${GLFW_LIB}")
+  else()
+      message(STATUS "Using glfw at: ${glfw3_DIR}")
+  endif()
 endif()
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
@@ -96,7 +102,6 @@ add_library(StaticGLEW STATIC glew/src/glew.c)
 include_directories(${PROJECT_NAME} PRIVATE
     glew/include
     ${Vulkan_INCLUDE_DIRS}
-    
 )
 
 # Specifies libraries to be linked (Qt components, glew, etc)
@@ -108,8 +113,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt::Xml
     StaticGLEW
     ${Vulkan_LIBRARIES}
-    glfw
 )
+if (WIN32)
+  target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)
+else ()
+  target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
+endif ()
 
 # Specifies other files
 qt6_add_resources(${PROJECT_NAME} "Resources"
@@ -138,6 +147,15 @@ if (WIN32)
   target_link_libraries(${PROJECT_NAME} PRIVATE
     opengl32
     glu32
+  )
+
+  target_include_directories(${PROJECT_NAME} PUBLIC
+    ${GLFW_INCLUDE_DIRS}
+  )
+
+  target_link_directories(${PROJECT_NAME} PUBLIC
+    ${Vulkan_LIBRARIES}
+    ${GLFW_LIB}
   )
 endif()
 
