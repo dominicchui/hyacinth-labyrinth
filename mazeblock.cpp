@@ -129,6 +129,7 @@ int MazeBlock::walkOneStepSecondPass(int loc) {
         // internal case
         // get next cell and mark walls
         next = getIndexOfCellNeighbor(loc, dir);
+        if (next == -1) { return next; }
         //        std::cout << "next: " << next << std::endl;
         Cell &nextCell = cells[next];
         makePathBetweenCells(currentCell, nextCell, dir);
@@ -235,7 +236,7 @@ std::string MazeBlock::undensifyMaze(bool includeNewLines) {
             } else if (cells[i].type == CellType::Closed && cells[i+1].type == CellType::Closed) {
                 mazeStr += "C";
             } else {
-                mazeStr += "W";
+                mazeStr += " ";
             }
         } else {
             // handle end of row by adding undensified row, i.e. undensify vertical space
@@ -257,14 +258,14 @@ std::string MazeBlock::undensifyMaze(bool includeNewLines) {
                     } else if ((cells[j].type == CellType::Closed && cells[j+width].type == CellType::Closed)) {
                         mazeStr += "C";
                     } else {
-                        mazeStr += "W";
+                        mazeStr += " ";
                     }
                     // account for horizontal undensification
                     if (j<i) {
                         if (cells[j].type == CellType::Closed && cells[j+1+width].type == CellType::Closed) {
-                            mazeStr += "C";
+                            mazeStr += "O";
                         } else {
-                            mazeStr += "W";
+                            mazeStr += " ";
                         }
                     }
                 }

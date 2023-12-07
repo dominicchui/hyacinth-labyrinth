@@ -118,10 +118,10 @@ std::string Maze::composeBlocks(std::vector<std::string> &mazeBlockStrs, int sta
             if (mazeBlocks[0].cells[last].eastOpen) {
                 mazeStr += "O";
             } else {
-                mazeStr += "W";
+                mazeStr += " ";
             }
         } else {
-            mazeStr += "W";
+            mazeStr += " ";
         }
 
         // grab row from top
@@ -132,11 +132,11 @@ std::string Maze::composeBlocks(std::vector<std::string> &mazeBlockStrs, int sta
             if (mazeBlocks[0].cells[last].eastOpen) {
                 mazeStr += "O";
             } else {
-                mazeStr += "W";
+                mazeStr += " ";
             }
             cellRow += 1;
         } else {
-            mazeStr += "W";
+            mazeStr += " ";
         }
         // grab row from top right
         mazeStr += mazeBlockStrs[startingIndex+2].substr(i*blockWidth, blockWidth);
@@ -154,29 +154,29 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
         if (mazeBlocks[topBlockIndex].cells[i].southOpen) {
             mazeStr += "O";
         } else {
-            mazeStr += "W";
+            mazeStr += " ";
         }
-        mazeStr += "W";
+        mazeStr += " ";
     }
     // upper center block
     for (int i=0; i<width; i++) {
         if (mazeBlocks[topBlockIndex+1].cells[i].southOpen) {
             mazeStr += "O";
         } else {
-            mazeStr += "W";
+            mazeStr += " ";
         }
-        mazeStr += "W";
+        mazeStr += " ";
     }
     // upper right block
     for (int i=0; i<width; i++) {
         if (mazeBlocks[topBlockIndex+2].cells[i].southOpen) {
             mazeStr += "O";
         } else {
-            mazeStr += "W";
+            mazeStr += " ";
         }
         // ignore last cell
         if (i!=width-1) {
-            mazeStr += "W";
+            mazeStr += " ";
         }
     }
     mazeStr += "\n";
