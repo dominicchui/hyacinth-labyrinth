@@ -106,8 +106,8 @@ void Realtime::initializeGL() {
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
     m_shader = ShaderLoader::createShaderProgram(
-        ":/resources/shaders/shape.vert",
-        ":/resources/shaders/shape.frag"
+        ":/resources/proj6_shaders/shape.vert",
+        ":/resources/proj6_shaders/shape.frag"
     );
     glErrorCheck();
 

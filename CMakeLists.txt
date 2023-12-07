@@ -116,16 +116,16 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     PREFIX
         "/"
     FILES
-    # resources/shaders/shape.frag
-    # resources/shaders/shape.vert
-    # resources/shaders/invert.frag
-    # resources/shaders/invert.vert
-    # resources/shaders/grayscale.frag
-    # resources/shaders/grayscale.vert
-    # resources/shaders/blur.frag
-    # resources/shaders/blur.vert
-    # resources/shaders/sobel.vert
-    # resources/shaders/sobel.frag
+    resources/proj6_shaders/shape.frag
+    resources/proj6_shaders/shape.vert
+    resources/proj6_shaders/invert.frag
+    resources/proj6_shaders/invert.vert
+    resources/proj6_shaders/grayscale.frag
+    resources/proj6_shaders/grayscale.vert
+    resources/proj6_shaders/blur.frag
+    resources/proj6_shaders/blur.vert
+    resources/proj6_shaders/sobel.vert
+    resources/proj6_shaders/sobel.frag
     resources/shaders/point_light.frag
     resources/shaders/point_light.vert
     resources/shaders/simple_shader.frag

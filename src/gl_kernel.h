@@ -131,26 +131,26 @@ public:
         switch (m_pp_effect) {
         case PP_INVERT:
             m_shader = ShaderLoader::createShaderProgram(
-                ":/resources/shaders/invert.vert",
-                ":/resources/shaders/invert.frag"
+                ":/resources/proj6_shaders/invert.vert",
+                ":/resources/proj6_shaders/invert.frag"
                 );
             break;
         case PP_GRAYSCALE:
             m_shader = ShaderLoader::createShaderProgram(
-                ":/resources/shaders/grayscale.vert",
-                ":/resources/shaders/grayscale.frag"
+                ":/resources/proj6_shaders/grayscale.vert",
+                ":/resources/proj6_shaders/grayscale.frag"
                 );
             break;
         case PP_BLUR:
             m_shader = ShaderLoader::createShaderProgram(
-                  ":/resources/shaders/blur.vert",
-                  ":/resources/shaders/blur.frag"
+                  ":/resources/proj6_shaders/blur.vert",
+                  ":/resources/proj6_shaders/blur.frag"
             );
             break;
         case PP_SOBEL:
             m_shader = ShaderLoader::createShaderProgram(
-                ":/resources/shaders/sobel.vert",
-                ":/resources/shaders/sobel.frag"
+                ":/resources/proj6_shaders/sobel.vert",
+                ":/resources/proj6_shaders/sobel.frag"
                 );
             break;
         default:
