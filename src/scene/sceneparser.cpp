@@ -28,10 +28,10 @@ void dfsScene(SceneNode* node, glm::mat4 ctm, std::vector<RenderShapeData> &shap
     applyTrans(ctm, node->transformations);
 
     for (ScenePrimitive *shape : node->primitives) {
-        shapes.push_back(RenderShapeData(*shape, ctm));
+        shapes.push_back(RenderShapeData{*shape, ctm});
     }
     for (SceneLight *light : node->lights) {
-        lights.push_back(SceneLightData(
+        lights.push_back(SceneLightData{
             light->id,
             light->type,
             light->color,
@@ -42,7 +42,7 @@ void dfsScene(SceneNode* node, glm::mat4 ctm, std::vector<RenderShapeData> &shap
             light->angle,
             light->width,
             light->height
-            ));
+        });
     }
 
     for (SceneNode *child : node->children) {
