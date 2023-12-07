@@ -341,7 +341,7 @@ void MainWindow::onSaveImage() {
                                                         .append(QDir::separator())
                                                         .append("required")
                                                         .append(QDir::separator())
-                                                        .append(sceneName), tr("Image Files (*.png)"));
+                                                        .append(QString::fromStdString(sceneName)), tr("Image Files (*.png)"));
     std::cout << "Saving image to: \"" << filePath.toStdString() << "\"." << std::endl;
     realtime->saveViewportImage(filePath.toStdString());
 }
