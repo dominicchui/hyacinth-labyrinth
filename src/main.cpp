@@ -1,4 +1,4 @@
-#define VULKAN_PROJ 0
+#define VULKAN_PROJ 1
 
 #if VULKAN_PROJ == 1
 #include "hyacinth-labyrinth.hpp"
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 #else
-#include "mainwindow.h"
+#include "window/mainwindow.h"
 
 #include <QApplication>
 #include <QScreen>

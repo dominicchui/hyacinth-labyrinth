@@ -1,8 +1,8 @@
 #include "hyacinth-labyrinth.hpp"
 
-#include "keyboard_movement_controller.hpp"
-#include "vulkan-buffer.hpp"
-#include "lve_camera.hpp"
+#include "game/keyboard_movement_controller.hpp"
+#include "vulkan/vulkan-buffer.hpp"
+#include "game/lve_camera.hpp"
 #include "systems/point_light_system.hpp"
 #include "systems/simple_render_system.hpp"
 
@@ -126,21 +126,21 @@ void HyacinthLabyrinth::run() {
 
 void HyacinthLabyrinth::loadGameObjects() {
   std::shared_ptr<VKModel> model =
-      VKModel::createModelFromFile(m_device, "models/flat_vase.obj");
+      VKModel::createModelFromFile(m_device, "resources/models/flat_vase.obj");
   auto flatVase = LveGameObject::createGameObject();
   flatVase.model = model;
   flatVase.transform.translation = {-.5f, .5f, 0.f};
   flatVase.transform.scale = {3.f, 1.5f, 3.f};
   gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
-  model = VKModel::createModelFromFile(m_device, "models/smooth_vase.obj");
+  model = VKModel::createModelFromFile(m_device, "resources/models/smooth_vase.obj");
   auto smoothVase = LveGameObject::createGameObject();
   smoothVase.model = model;
   smoothVase.transform.translation = {.5f, .5f, 0.f};
   smoothVase.transform.scale = {3.f, 1.5f, 3.f};
   gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
-  model = VKModel::createModelFromFile(m_device, "models/quad.obj");
+  model = VKModel::createModelFromFile(m_device, "resources/models/quad.obj");
   auto floor = LveGameObject::createGameObject();
   floor.model = model;
   floor.transform.translation = {0.f, .5f, 0.f};
