@@ -2,6 +2,7 @@
 
 #include "renderer/camera.h"
 #include "shapes/shapes.h"
+#include "scene/scenedata.h"
 
 // Container for a renderable scene
 class Scene {
@@ -36,15 +37,17 @@ public:
     void add(Shape *s) {
         shapes.push_back(s);
         manual_add = true;
-        auto c = SceneCameraData(
-            {5,5,0,1},
-            {-1,-1,0,0},
-            {0,1,0,0},
-            M_PI / 2.f
-            );
+        SceneCameraData c {
+            glm::vec4(5,5,0,1),
+            glm::vec4(-1,-1,0,0),
+            glm::vec4(0,1,0,0),
+            M_PI / 2.f,
+            0.f,
+            0.f
+        };
         cam->init(c);
 
-        data.lights = {SceneLightData(0, LightType::LIGHT_DIRECTIONAL, {1,1,1,1}, glm::vec3(0), glm::vec4(0), {0,-1,0,0})};
+        data.lights = {SceneLightData{0, LightType::LIGHT_DIRECTIONAL, {1,1,1,1}, glm::vec3(0), glm::vec4(0), {0,-1,0,0}}};
         data.globalData = {0.5,0.5,0.5,1};
 
         update();

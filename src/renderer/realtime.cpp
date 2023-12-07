@@ -117,11 +117,11 @@ void Realtime::initializeGL() {
 
     glm::vec4 cyan = {0,1,1,1};
     glm::mat4 flctm = {{9.000000, 0.000000, 0.000000, 0.000000}, {0.000000, 0.100000, 0.000000, 0.000000}, {0.000000, 0.000000, 9.000000, 0.000000}, {0.000000, -0.900000, 0.000000, 1.000000}};
-    RenderShapeData fl_data = RenderShapeData(
-        ScenePrimitive(
+    RenderShapeData fl_data = RenderShapeData{
+        ScenePrimitive{
             PrimitiveType::PRIMITIVE_CUBE,
-            SceneMaterial(cyan,cyan,cyan,2),
-            ""), flctm);
+            SceneMaterial{cyan,cyan,cyan,2},
+            ""}, flctm};
     Cube *flr = new Cube(fl_data);
     m_scene->add(flr);
 
@@ -143,11 +143,11 @@ void Realtime::initializeGL() {
     for (auto row : map) {
         for (auto cell : row) {
             if (cell) {
-                RenderShapeData wl_data = RenderShapeData(
-                    ScenePrimitive(
+                RenderShapeData wl_data{
+                    ScenePrimitive{
                         PrimitiveType::PRIMITIVE_CUBE,
-                        SceneMaterial(yellow,yellow,yellow,2),
-                        ""), glm::translate(glm::mat4(1), coord));
+                        SceneMaterial{yellow,yellow,yellow,2},
+                        ""}, glm::translate(glm::mat4(1), coord)};
 
                 Cube *wall = new Cube(wl_data);
                 m_scene->add(wall);
@@ -160,11 +160,11 @@ void Realtime::initializeGL() {
     }
 
     glm::vec4 purp = {1,0,1,1};
-    RenderShapeData sp_data = RenderShapeData(
-        ScenePrimitive(
+    RenderShapeData sp_data{
+        ScenePrimitive{
             PrimitiveType::PRIMITIVE_SPHERE,
-            SceneMaterial(purp,purp,purp,2),
-            ""), glm::mat4(1));
+            SceneMaterial{purp,purp,purp,2},
+            ""}, glm::mat4(1)};
     ball = new Sphere(sp_data);
     ball->setBall(-0.5, walls);
     m_scene->add(ball);
