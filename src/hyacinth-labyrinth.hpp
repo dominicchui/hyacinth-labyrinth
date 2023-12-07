@@ -1,10 +1,10 @@
 #pragma once
 
-#include "vulkan-descriptors.hpp"
-#include "vulkan-device.hpp"
-#include "lve_game_object.hpp"
-#include "vulkan-renderer.hpp"
-#include "glfw-window.hpp"
+#include "vulkan/vulkan-descriptors.hpp"
+#include "vulkan/vulkan-device.hpp"
+#include "game/lve_game_object.hpp"
+#include "vulkan/vulkan-renderer.hpp"
+#include "window/glfw-window.hpp"
 
 // std
 #include <memory>
