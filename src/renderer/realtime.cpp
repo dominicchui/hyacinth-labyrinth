@@ -336,31 +336,20 @@ void Realtime::timerEvent(QTimerEvent *event) {
     forward.y = 0;
 
 //    float delta = 0;
-//    if (m_keyMap[Qt::Key_W]) incVel(0.02);
-//    if (m_keyMap[Qt::Key_S]) incVel(-0.02);
-//    ball->move(dist, vel * m_camera->getLook());
+    if (m_keyMap[Qt::Key_W]) incVel(0.02);
+    if (m_keyMap[Qt::Key_S]) incVel(-0.02);
+    ball->move(dist, vel * m_camera->getLook());
 
 //    delta = 0;
-//    if (m_keyMap[Qt::Key_A]) incVel(0.02);
-//    if (m_keyMap[Qt::Key_D]) incVel(-0.02);
-//    ball->move(dist, vel * m_camera->getSide());
-
-//    if (m_keyMap[Qt::Key_Space]) ball->move(dist, m_camera->getUp());
-
-    if (m_keyMap[Qt::Key_W]) ball->move(dist, m_camera->getLook());
-    if (m_keyMap[Qt::Key_S]) ball->move(dist, -m_camera->getLook());
-
-
-    //    delta = 0;
-    if (m_keyMap[Qt::Key_A]) ball->move(dist, m_camera->getSide());
-    if (m_keyMap[Qt::Key_D]) ball->move(dist, -m_camera->getSide());
-
+    if (m_keyMap[Qt::Key_A]) incVel(0.02);
+    if (m_keyMap[Qt::Key_D]) incVel(-0.02);
+    ball->move(dist, vel * m_camera->getSide());
 
     if (m_keyMap[Qt::Key_Space]) ball->move(dist, m_camera->getUp());
 
     // gravity
     if (!ball->onFloor()) ball->move(dist, -m_camera->getUp() / 2.f);
-//    zeroVel(0.015);
+    zeroVel(0.015);
 
 //    if (m_keyMap[Qt::Key_Space])  m_camera->moveVertical(dist);
 //    if (m_keyMap[Qt::Key_Control]) m_camera->moveVertical(-dist);
