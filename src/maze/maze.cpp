@@ -12,54 +12,78 @@ void Maze::generate() {
     // generate left, right, top, and bottom blocks
     std::cout << "left" << std::endl;
     MazeBlock left = MazeBlock(width, height);
-    left.setExternalBorderCells(center.getInternalBorderCells(Direction::W), Direction::E);
+    left.rightNeighbor = &center;
+    center.leftNeighbor = &left;
+//    left.setExternalBorderCells(center.getInternalBorderCells(Direction::W), Direction::E);
     left.generate();
     mazeBlocks[3] = left;
 
 //    std::cout << "right" << std::endl;
     MazeBlock right = MazeBlock(width, height);
-    right.setExternalBorderCells(center.getInternalBorderCells(Direction::E), Direction::W);
+    right.leftNeighbor = &center;
+    center.rightNeighbor = &right;
+//    right.setExternalBorderCells(center.getInternalBorderCells(Direction::E), Direction::W);
     right.generate();
     mazeBlocks[5] = right;
 
 //    std::cout << "top" << std::endl;
     MazeBlock top = MazeBlock(width, height);
-    top.setExternalBorderCells(center.getInternalBorderCells(Direction::N), Direction::S);
+    top.bottomNeighbor = &center;
+    center.topNeighbor = &top;
+//    top.setExternalBorderCells(center.getInternalBorderCells(Direction::N), Direction::S);
     top.generate();
     mazeBlocks[1] = top;
 
 //    std::cout << "bottom" << std::endl;
     MazeBlock bottom = MazeBlock(width, height);
-    bottom.setExternalBorderCells(center.getInternalBorderCells(Direction::S), Direction::N);
+    bottom.topNeighbor = &center;
+    center.bottomNeighbor = &bottom;
+//    bottom.setExternalBorderCells(center.getInternalBorderCells(Direction::S), Direction::N);
     bottom.generate();
     mazeBlocks[7] = bottom;
 
     // generate top left, top right, bottom left, and bottom right blocks
 //    std::cout << "top left" << std::endl;
-    MazeBlock topleft = MazeBlock(width, height);
-    topleft.setExternalBorderCells(top.getInternalBorderCells(Direction::W), Direction::E);
-    topleft.setExternalBorderCells(left.getInternalBorderCells(Direction::N), Direction::S);
-    topleft.generate();
-    mazeBlocks[0] = topleft;
+    MazeBlock topLeft = MazeBlock(width, height);
+    topLeft.rightNeighbor = &top;
+    top.leftNeighbor = &topLeft;
+    topLeft.bottomNeighbor = &left;
+    left.topNeighbor = &topLeft;
+//    topleft.setExternalBorderCells(top.getInternalBorderCells(Direction::W), Direction::E);
+//    topleft.setExternalBorderCells(left.getInternalBorderCells(Direction::N), Direction::S);
+    topLeft.generate();
+    mazeBlocks[0] = topLeft;
 
 //    std::cout << "top right" << std::endl;
     MazeBlock topRight = MazeBlock(width, height);
-    topRight.setExternalBorderCells(top.getInternalBorderCells(Direction::E), Direction::W);
-    topRight.setExternalBorderCells(right.getInternalBorderCells(Direction::N), Direction::S);
+    topRight.leftNeighbor = &top;
+    top.rightNeighbor = &topRight;
+    topRight.bottomNeighbor = &right;
+    right.topNeighbor = &topRight;
+//    topRight.setExternalBorderCells(top.getInternalBorderCells(Direction::E), Direction::W);
+//    topRight.setExternalBorderCells(right.getInternalBorderCells(Direction::N), Direction::S);
     topRight.generate();
     mazeBlocks[2] = topRight;
 
 //    std::cout << "bottom left" << std::endl;
     MazeBlock bottomLeft = MazeBlock(width, height);
-    bottomLeft.setExternalBorderCells(left.getInternalBorderCells(Direction::S), Direction::N);
-    bottomLeft.setExternalBorderCells(bottom.getInternalBorderCells(Direction::W), Direction::E);
+    bottomLeft.topNeighbor = &left;
+    left.bottomNeighbor = &bottomLeft;
+    bottomLeft.rightNeighbor = &bottom;
+    bottom.leftNeighbor = &bottomLeft;
+//    bottomLeft.setExternalBorderCells(left.getInternalBorderCells(Direction::S), Direction::N);
+//    bottomLeft.setExternalBorderCells(bottom.getInternalBorderCells(Direction::W), Direction::E);
     bottomLeft.generate();
     mazeBlocks[6] = bottomLeft;
 
 //    std::cout << "bottom right" << std::endl;
     MazeBlock bottomRight = MazeBlock(width, height);
-    bottomRight.setExternalBorderCells(right.getInternalBorderCells(Direction::S), Direction::N);
-    bottomRight.setExternalBorderCells(bottom.getInternalBorderCells(Direction::E), Direction::W);
+    bottomRight.topNeighbor = &right;
+    right.bottomNeighbor = &bottomRight;
+    bottomRight.leftNeighbor = &bottom;
+    bottom.rightNeighbor = &bottomRight;
+//    bottomRight.setExternalBorderCells(right.getInternalBorderCells(Direction::S), Direction::N);
+//    bottomRight.setExternalBorderCells(bottom.getInternalBorderCells(Direction::E), Direction::W);
     bottomRight.generate();
     mazeBlocks[8] = bottomRight;
 }
@@ -148,10 +172,11 @@ std::string Maze::composeBlocks(std::vector<std::string> &mazeBlockStrs, int sta
 std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
     std::string mazeStr = "";
     // iterate through the three top blocks
-
+    int index;
     // upper left block
     for (int i=0; i<width; i++) {
-        if (mazeBlocks[topBlockIndex].cells[i].southOpen) {
+        index = i + width * (height-1);
+        if (mazeBlocks[topBlockIndex].cells[index].southOpen) {
             mazeStr += "O";
         } else {
             mazeStr += " ";
@@ -160,7 +185,8 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
     }
     // upper center block
     for (int i=0; i<width; i++) {
-        if (mazeBlocks[topBlockIndex+1].cells[i].southOpen) {
+        index = i + width * (height-1);
+        if (mazeBlocks[topBlockIndex+1].cells[index].southOpen) {
             mazeStr += "O";
         } else {
             mazeStr += " ";
@@ -169,7 +195,8 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
     }
     // upper right block
     for (int i=0; i<width; i++) {
-        if (mazeBlocks[topBlockIndex+2].cells[i].southOpen) {
+        index = i + width * (height-1);
+        if (mazeBlocks[topBlockIndex+2].cells[index].southOpen) {
             mazeStr += "O";
         } else {
             mazeStr += " ";
