@@ -12,10 +12,16 @@ MazeBlock::MazeBlock(int _width, int _height): width(_width), height(_height) {
 }
 
 MazeBlock::MazeBlock(int _width, int _height, bool _insertClosedSpaces): width(_width), height(_height) {
-    cells = std::vector(size(),Cell(CellType::Empty));
+    cells = std::vector(size(),Cell(CellType::Empty, WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION));
     if (_insertClosedSpaces) {
         insertClosedSpaces();
     }
+}
+
+void MazeBlock::assignStringRepresentations(char wall, char path, char closed) {
+    WALL_REPRESENTATION = wall;
+    PATH_REPRESENTATION = path;
+    CLOSED_AREA_REPRESENTATION = closed;
 }
 
 int MazeBlock::getRandomEmptyCell() {
@@ -91,7 +97,7 @@ void MazeBlock::performRandomWalk() {
 int MazeBlock::walkOneStepFirstPass(int loc, Direction dir) {
     int next = -1;
     // external case: check borders
-    if (hasExternalBorderInDirection(loc, dir)) {
+    if (hasExternalCellInDirection(loc, dir)) {
         cells[loc].exitDir = dir;
     } else {
         // internal case
@@ -121,10 +127,8 @@ int MazeBlock::walkOneStepSecondPass(int loc) {
     Direction dir = currentCell.exitDir;
 
     // external case: check borders
-    if (hasExternalBorderInDirection(loc, dir)) {
+    if (hasExternalCellInDirection(loc, dir)) {
         // find correct border cell
-        // todo figure out why cell is being updated by ref
-//        Cell &nextCell = getCellFromExternalBorder(loc, dir);
         makePathBetweenCells(currentCell, getCellFromExternalBorder(loc, dir), dir);
     } else {
         // internal case
@@ -254,11 +258,11 @@ std::string MazeBlock::undensifyMaze(bool includeNewLines) {
         // ignore last column
         if ((i+1)%width!=0) {
             if (cells[i].eastOpen) {
-                mazeStr += "O";
+                mazeStr += PATH_REPRESENTATION;
             } else if (cells[i].type == CellType::Closed && cells[i+1].type == CellType::Closed) {
-                mazeStr += "C";
+                mazeStr += CLOSED_AREA_REPRESENTATION;
             } else {
-                mazeStr += " ";
+                mazeStr += WALL_REPRESENTATION;
             }
         } else {
             // handle end of row by adding undensified row, i.e. undensify vertical space
@@ -276,18 +280,18 @@ std::string MazeBlock::undensifyMaze(bool includeNewLines) {
                 // "i" is at end of row
                 for (int j=i-width+1; j<i+1; j++) {
                     if (cells[j].southOpen) {
-                        mazeStr += "O";
+                        mazeStr += PATH_REPRESENTATION;
                     } else if ((cells[j].type == CellType::Closed && cells[j+width].type == CellType::Closed)) {
-                        mazeStr += "C";
+                        mazeStr += CLOSED_AREA_REPRESENTATION;
                     } else {
-                        mazeStr += " ";
+                        mazeStr += WALL_REPRESENTATION;
                     }
                     // account for horizontal undensification
                     if (j<i) {
                         if (cells[j].type == CellType::Closed && cells[j+1+width].type == CellType::Closed) {
-                            mazeStr += "O";
+                            mazeStr += PATH_REPRESENTATION;
                         } else {
-                            mazeStr += " ";
+                            mazeStr += WALL_REPRESENTATION;
                         }
                     }
                 }
@@ -304,7 +308,8 @@ std::string MazeBlock::undensifyMaze(bool includeNewLines) {
     return mazeStr;
 }
 
-bool MazeBlock::hasExternalBorderInDirection(int index, Direction dir) {
+// todo: properly handle closed spaces
+bool MazeBlock::hasExternalCellInDirection(int index, Direction dir) {
     if (!hasDefinedExternalBorderCells()) { return false; }
     auto[x,y] = getCoordFromIndex(index);
     switch(dir) {

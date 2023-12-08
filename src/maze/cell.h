@@ -21,6 +21,8 @@ class Cell
 public:
     Cell();
     Cell(CellType _type): type(_type){};
+    Cell(CellType _type, char _wallRep, char _pathRep, char _closedRep):
+        type(_type), WALL_REPRESENTATION(_wallRep), PATH_REPRESENTATION(_pathRep), CLOSED_AREA_REPRESENTATION(_closedRep){};
 
     CellType type;
     bool eastOpen = false;
@@ -30,6 +32,12 @@ public:
     Direction exitDir;
 
     std::string toString();
+
+    void assignStringRepresentations(char wall, char path, char closed);
+private:
+    char WALL_REPRESENTATION = ' ';
+    char PATH_REPRESENTATION = 'O';
+    char CLOSED_AREA_REPRESENTATION = 'C';
 
 };
 

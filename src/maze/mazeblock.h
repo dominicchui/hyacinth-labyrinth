@@ -26,6 +26,8 @@ public:
     MazeBlock* topNeighbor = nullptr;
     MazeBlock* bottomNeighbor = nullptr;
 
+    void assignStringRepresentations(char wall, char path, char closed);
+
     void generate();
 
     // maze is generated in compact fashion, so add unit width walls when converting to string
@@ -34,6 +36,10 @@ public:
 private:
     std::set<int> mazeCells = std::set<int>();
     int closedCellsCount = 0;
+
+    char WALL_REPRESENTATION = ' ';
+    char PATH_REPRESENTATION = 'O';
+    char CLOSED_AREA_REPRESENTATION = 'C';
 
     //    static std::random_device rd;  // a seed source for the random number engine
     //    static std::mt19937 gen; // mersenne_twister_engine
@@ -81,7 +87,7 @@ private:
 //    std::vector<std::reference_wrapper<Cell>> bottomExternalBorderCells;
 
 
-    bool hasExternalBorderInDirection(int index, Direction dir);
+    bool hasExternalCellInDirection(int index, Direction dir);
     Cell* getCellFromExternalBorder(int index, Direction dir);
     bool isCellInMaze(int index) {
         return mazeCells.find(index) != mazeCells.end();
