@@ -1,3 +1,4 @@
+import json
 import bpy
 import os
 import numpy as np
@@ -190,6 +191,11 @@ def add_geometry_to_scene(vertices, faces):
     # Update mesh geometry
     mesh.update()
 
+def parse_json(filename):
+    with open(filename, 'r') as json_file:
+        settings = json.load(json_file)
+    return settings
+
 if __name__ == '__main__':
     # Constants
     # (see http://algorithmicbotany.org/papers/abop/abop.pdf):
@@ -207,31 +213,25 @@ if __name__ == '__main__':
     # NOTE: symbols outside the alphabet may also be used,
     #     but they won't have any geometric interpretation
 
-    # General settings
-    NUM_ITERATIONS = 6
+    # Just used for running in Blender
+    os.chdir('/Users/echen/Desktop/csci2230/hyacinth-labyrinth/scripts')
 
-    # Geometry settings
-    STEP_SIZE = 5
-    STEM_RADIUS = 0.5
-    ANGLE_INCR = np.radians(90)
-    TESSELATION_LEVEL = 3
+    # Choose which lsystem we want to generate
+    filename = 'bush.json'
 
-    # L-system definition
-    bush_axiom = "A"
-    bush_rules = {"A": "[&FL!A]/////'[&FL!A]///////'[&FL!A]",
-                  "F": "S/////F",
-                  "S": "FL",
-                  "L": "['''∧∧{-f+f+f-|-f+f+f}]"}
-                     
-    test_axiom = "F"
-    test_rules = {"F": "F+G",
-                  "G": "F-G"}
+    lsystems_dir = os.path.join('lsystems')
+    settings = parse_json(os.path.join(lsystems_dir, filename))
 
     # Generate the L-system string by repeatedly applying rules
-    lstring = generate_lsystem(test_axiom, test_rules, NUM_ITERATIONS)
+    lsystem = settings['lsystem']
+    lstring = generate_lsystem(lsystem['axiom'], lsystem['rules'], settings['num_iters'])
 
     # Apply geometric interpretation
-    vertices, faces = create_geometry(lstring, STEP_SIZE, STEM_RADIUS, ANGLE_INCR, TESSELATION_LEVEL)
+    vertices, faces = create_geometry(lstring, 
+                                      settings['step_size'], 
+                                      settings['stem_radius'], 
+                                      np.radians(settings['angle_incr']), 
+                                      settings['tesselation_level'])
 
     # Add the geometry to the scene as a mesh
     add_geometry_to_scene(vertices, faces)
