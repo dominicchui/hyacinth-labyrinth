@@ -2,6 +2,7 @@
 
 #include "game/lve_game_object.hpp"
 #include "window/glfw-window.hpp"
+#include "renderer/camera.h"
 
 class KeyboardMovementController {
  public:
@@ -19,6 +20,7 @@ class KeyboardMovementController {
   };
 
   void moveInPlaneXZ(GLFWwindow* window, float dt, LveGameObject& gameObject);
+  bool moveCamera(GLFWwindow* window, float dt, Camera& camera);
 
   KeyMappings keys{};
   float moveSpeed{3.f};

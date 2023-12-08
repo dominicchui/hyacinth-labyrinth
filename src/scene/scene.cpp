@@ -52,7 +52,7 @@ void Scene::loadScene() {
         back_inserter(shapes),
         getShape);
 
-    cam->init(data.cameraData);
+    //cam->init(data.cameraData);
     loaded = true;
 
     update();
@@ -74,7 +74,7 @@ void Scene::update() {
     glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(GLfloat), vertexData.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    cam->update();
+    //cam->update();
 }
 
 void setLightData(GLuint shader, std::vector<SceneLightData> lights) {
@@ -120,19 +120,19 @@ void Scene::draw(GLuint shader) {
     glBindVertexArray(vao);
 
     // Set view matrix
-    glUniformMatrix4fv(
-        glGetUniformLocation(shader, "view"),
-        1, GL_FALSE, &cam->getView()[0][0]);
+    // glUniformMatrix4fv(
+    //     glGetUniformLocation(shader, "view"),
+    //     1, GL_FALSE, &cam->getView()[0][0]);
 
-    // Set projection matrix
-    glUniformMatrix4fv(
-        glGetUniformLocation(shader, "proj"),
-        1, GL_FALSE, &cam->getProj()[0][0]);
+    // // Set projection matrix
+    // glUniformMatrix4fv(
+    //     glGetUniformLocation(shader, "proj"),
+    //     1, GL_FALSE, &cam->getProj()[0][0]);
 
-    // Set camera position
-    glm::vec3 camPos = cam->getPos();
-    glUniform3f(glGetUniformLocation(shader, "camPos"),
-                camPos[0], camPos[1], camPos[2]);
+    // // Set camera position
+    // glm::vec3 camPos = cam->getPos();
+    // glUniform3f(glGetUniformLocation(shader, "camPos"),
+    //             camPos[0], camPos[1], camPos[2]);
 
     // Set light data
     setLightData(shader, data.lights);

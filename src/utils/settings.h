@@ -8,7 +8,7 @@ struct Settings {
     int shapeParameter1 = 1;
     int shapeParameter2 = 1;
     float nearPlane = 1;
-    float farPlane = 1;
+    float farPlane = 100;
     bool perPixelFilter = false; // invert colors
     bool kernelBasedFilter = false; // box blur
     bool extraCredit1 = false; // grayscale

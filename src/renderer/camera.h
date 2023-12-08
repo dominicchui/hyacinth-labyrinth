@@ -1,61 +1,102 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include "scene/scenedata.h"
 
+
+// A class representing a virtual camera.
+
+// Feel free to make your own design choices for Camera class, the functions below are all optional / for your convenience.
+// You can either implement and use these getters, or make your own design.
+// If you decide to make your own design, feel free to delete these as TAs won't rely on them to grade your assignments.
+
+enum CameraProjectionType {
+    CAM_PROJ_ORTHO = 0,
+    CAM_PROJ_PERSP = 1
+};
+
 class Camera {
-private:
+    glm::vec4 pos;
+
+    // Unit vecs
     glm::vec3 look;
     glm::vec3 up;
-    glm::vec3 pos;
-    float heightAngle;
+    glm::vec3 right;
 
-    float aspectRatio = 4.f / 3.f; // default ratio
-    glm::mat4 view;
-    glm::mat4 proj;
-    glm::mat4 actionRot = glm::mat4(1); // default as identity
+    // Rotation angles
+    float theta_pitch;
+    static constexpr float theta_pitch_max = M_PI/2.f - 0.001;
+    static constexpr float theta_pitch_min = -M_PI/2.f + 0.001;
 
-    // sets the view matrix according to the currently loaded data.
-    // depends on the camera's look, up, and position vectors
-    void setView();
+    float heightAngle; // The height angle of the camera in RADIANS
 
-    // sets the projection matrix according to the currently loaded
-    // data and the global settings object. depends on near plane,
-    // far plane, height angle, and aspect ratio
-    void setProj();
+    float aperture;    // Only applicable for depth of field
+    float focalLength; // Only applicable for depth of field
+
+    // Scene bounds
+    float width;
+    float height;
+
+    CameraProjectionType proj_type;
 
 public:
-    // initializes the camera data and sets up the internal data
-    void init(SceneCameraData &camdata);
+    float near_plane;
+    float far_plane;
 
-    // updates the camera using data from the global settings object
-    void update();
+    // Speed
+    static constexpr float mov_speed = 5.0f;
+    static constexpr float mouse_sensitivity = 0.01;
 
-    // updates the camera to accound for a new screen size
-    void resize(int w, int h);
+    Camera(void) = delete;
 
-    // gets the view matrix
-    glm::mat4 getView() { return view; }
+public:
+    glm::mat4 view_mat;
+    glm::mat4 view_mat_inv;
 
-    // gets the position of the camera in worlds space
-    glm::vec3 getPos() { return pos; }
+    glm::mat4 proj_mat;
+    glm::mat4 proj_mat_inv;
 
-    // gets the projection matrix
-    glm::mat4 getProj() { return proj; }
+    glm::mat4 vp_mat;
 
-    // Moves the camera in the direction of the look vector
-    void moveLook(float dist);
+    /////// Methods ////////
 
-    // Moves the camera "to the side", which is the vector perpendicular
-    // to the look and up vectors
-    void moveSide(float dist);
+    Camera(CameraProjectionType projType);
 
-    // Moves the camera vertically in terms of world space {0,1,0}
-    void moveVertical(float dist);
+    void initScene(
+        const SceneCameraData& cam_data,
+        size_t width,
+        size_t height,
+        float nearPlane,
+        float farPlane
+    );
 
-    // Rotates the camera's look vector
-    void rotate(float deltaX, float deltaY);
+    // translate camera with 6 degrees of freedom
+    // Returns true if a translation occurred, false otherwise
+    bool translate(bool f, bool b, bool l, bool r, bool u, bool d, float deltaTime);
 
-    glm::vec3 getLook() { return {look.x, 0, look.z}; }
-    glm::vec3 getSide() { auto v = normalize(cross(up, look)); return {v.x, 0, v.z}; }
-    glm::vec3 getUp() { return up; }
+    // rotates camera with 2 degrees of freedom
+    // Returns true if a rotation occurred, false otherwise
+    bool rotate(float delta_x, float delta_y, float deltaTime);
+
+    void recomputeMatrices();
+
+    // Returns the camera position in world coords
+    const glm::vec4& getPosition() const;
+
+    // Returns the aspect ratio of the camera.
+    float getAspectRatio() const;
+
+    // Returns the height angle of the camera in RADIANS.
+    float getHeightAngle() const;
+
+    // Returns the focal length of this camera.
+    // This is for the depth of field extra-credit feature only;
+    // You can ignore if you are not attempting to implement depth of field.
+    float getFocalLength() const;
+
+    // Returns the focal length of this camera.
+    // This is for the depth of field extra-credit feature only;
+    // You can ignore if you are not attempting to implement depth of field.
+    float getAperture() const;
 };

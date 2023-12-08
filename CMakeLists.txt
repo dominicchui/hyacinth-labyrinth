@@ -83,6 +83,8 @@ add_executable(${PROJECT_NAME}
   src/window/aspectratiowidget.hpp
   src/window/glfw-window.hpp                  src/window/glfw-window.cpp
   src/window/mainwindow.h                     src/window/mainwindow.cpp
+  src/utils/utils.h
+  src/utils/debug.h
 )
 
 # VULKAN: Tested on VulkanSDK v1.3.268.1
