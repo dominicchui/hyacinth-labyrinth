@@ -18,8 +18,13 @@ public:
 
     int size() { return width * height; }
 
-    std::vector<std::reference_wrapper<Cell>> getInternalBorderCells(Direction dir);
-    void setExternalBorderCells(std::vector<std::reference_wrapper<Cell>>, Direction Dir);
+//    std::vector<std::reference_wrapper<Cell>> getInternalBorderCells(Direction dir);
+//    void setExternalBorderCells(std::vector<std::reference_wrapper<Cell>>, Direction Dir);
+    // four neighboring mazeBlocks
+    MazeBlock* leftNeighbor = nullptr;
+    MazeBlock* rightNeighbor = nullptr;
+    MazeBlock* topNeighbor = nullptr;
+    MazeBlock* bottomNeighbor = nullptr;
 
     void generate();
 
@@ -70,21 +75,25 @@ private:
     // e.g. this maze is being generated to the right of an existing one and will be appended
     // order of cells is left to right, up to down
     // assumes the size will be width or height (as appropriate)
-    std::vector<std::reference_wrapper<Cell>> leftExternalBorderCells;
-    std::vector<std::reference_wrapper<Cell>> rightExternalBorderCells;
-    std::vector<std::reference_wrapper<Cell>> topExternalBorderCells;
-    std::vector<std::reference_wrapper<Cell>> bottomExternalBorderCells;
+//    std::vector<std::reference_wrapper<Cell>> leftExternalBorderCells;
+//    std::vector<std::reference_wrapper<Cell>> rightExternalBorderCells;
+//    std::vector<std::reference_wrapper<Cell>> topExternalBorderCells;
+//    std::vector<std::reference_wrapper<Cell>> bottomExternalBorderCells;
+
 
     bool hasExternalBorderInDirection(int index, Direction dir);
-    Cell& getCellFromExternalBorder(int index, Direction dir);
+    Cell* getCellFromExternalBorder(int index, Direction dir);
     bool isCellInMaze(int index) {
         return mazeCells.find(index) != mazeCells.end();
     }
     void makePathBetweenCells(Cell &first, Cell &second, Direction dir);
+    void makePathBetweenCells(Cell &first, Cell* second, Direction dir);
 
     bool hasDefinedExternalBorderCells() {
-        return (leftExternalBorderCells.size()!=0 || rightExternalBorderCells.size()!=0 ||
-                topExternalBorderCells.size()!=0 || bottomExternalBorderCells.size()!=0);
+        return (leftNeighbor!= nullptr || rightNeighbor!=nullptr ||
+                topNeighbor!= nullptr || bottomNeighbor!=nullptr);
+//        return (leftExternalBorderCells.size()!=0 || rightExternalBorderCells.size()!=0 ||
+//                topExternalBorderCells.size()!=0 || bottomExternalBorderCells.size()!=0);
     }
     /* internal border cells belong to this maze, external ones do not and instead surround the maze
     e.g. I=internal, E=External, M=other maze cells for this 3x3 maze
