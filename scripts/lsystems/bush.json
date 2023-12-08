@@ -1,0 +1,16 @@
+{
+  "num_iters": 6,
+  "step_size": 1,
+  "stem_radius": 0.2,
+  "angle_incr": 22.5,
+  "tesselation_level": 30,
+  "lsystem": {
+    "axiom": "A",
+    "rules": {
+      "A": "[&FL!A]/////'[&FL!A]///////'[&FL!A]",
+      "F": "S/////F",
+      "S": "FL",
+      "L": "['''∧∧{-f+f+f-|-f+f+f}]"
+    }
+  }
+}
