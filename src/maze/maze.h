@@ -7,6 +7,11 @@ public:
     Maze(int _width, int _height): width(_width), height(_height) {
         mazeBlocks.resize(9);
     };
+
+    char WALL_REPRESENTATION = ' ';
+    char PATH_REPRESENTATION = 'O';
+    char CLOSED_AREA_REPRESENTATION = 'C';
+
     void generate();
     std::string toString();
 
@@ -20,6 +25,8 @@ private:
     int blockHeight = height * 2 - 1;
     // the 3x3 grid of maze blocks that compose this maze
     std::vector<MazeBlock*> mazeBlocks;
+
+
 
     void generateMazeBlock(int index);
     void replaceMazeBlock(int index);

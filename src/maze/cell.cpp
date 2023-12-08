@@ -8,7 +8,7 @@ Cell::Cell()
 
 std::string Cell::toString() {
     if (type == CellType::Open) {
-//        // temp debug
+        // temp debug
 //        switch (exitDir) {
 //        case Direction::N:
 //            return "N";
@@ -19,11 +19,17 @@ std::string Cell::toString() {
 //        case Direction::W:
 //            return "W";
 //        }
-
-        return "O";
+//        return "O";
+        return {PATH_REPRESENTATION};
     } else if (type == CellType::Closed) {
-        return "C";
+        return {CLOSED_AREA_REPRESENTATION};
     } else {
-        return " ";
+        return {WALL_REPRESENTATION};
     }
 };
+
+void Cell::assignStringRepresentations(char wall, char path, char closed) {
+    WALL_REPRESENTATION = wall;
+    PATH_REPRESENTATION = path;
+    CLOSED_AREA_REPRESENTATION = closed;
+}
