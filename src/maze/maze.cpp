@@ -1,90 +1,81 @@
 #include "maze.h"
 #include <iostream>
 
+
+void linkMazeBlocks(MazeBlock* first, MazeBlock* second, Direction dir) {
+    switch(dir) {
+    case Direction::N:
+        first->topNeighbor = second;
+        second->bottomNeighbor = first;
+        break;
+    case Direction::E:
+        first->rightNeighbor = second;
+        second->leftNeighbor = first;
+        break;
+    case Direction::S:
+        first->bottomNeighbor = second;
+        second->topNeighbor = first;
+        break;
+    case Direction::W:
+        first->leftNeighbor = second;
+        second->rightNeighbor = first;
+        break;
+    }
+}
+
 // creates the 9 maze blocks
 void Maze::generate() {
+    mazeBlocks.reserve(9);
     // start with center
-//    std::cout << "center" << std::endl;
-    MazeBlock center = MazeBlock(width, height);
-    center.generate();
+    MazeBlock* center = new MazeBlock(width, height);
+    center->generate();
     mazeBlocks[4] = center;
 
     // generate left, right, top, and bottom blocks
     std::cout << "left" << std::endl;
-    MazeBlock left = MazeBlock(width, height);
-    left.rightNeighbor = &center;
-    center.leftNeighbor = &left;
-//    left.setExternalBorderCells(center.getInternalBorderCells(Direction::W), Direction::E);
-    left.generate();
+    MazeBlock* left = new MazeBlock(width, height);
+    linkMazeBlocks(left, center, Direction::E);
+    left->generate();
     mazeBlocks[3] = left;
 
-//    std::cout << "right" << std::endl;
-    MazeBlock right = MazeBlock(width, height);
-    right.leftNeighbor = &center;
-    center.rightNeighbor = &right;
-//    right.setExternalBorderCells(center.getInternalBorderCells(Direction::E), Direction::W);
-    right.generate();
+    MazeBlock* right = new MazeBlock(width, height);
+    linkMazeBlocks(right, center, Direction::W);
+    right->generate();
     mazeBlocks[5] = right;
 
-//    std::cout << "top" << std::endl;
-    MazeBlock top = MazeBlock(width, height);
-    top.bottomNeighbor = &center;
-    center.topNeighbor = &top;
-//    top.setExternalBorderCells(center.getInternalBorderCells(Direction::N), Direction::S);
-    top.generate();
+    MazeBlock* top = new MazeBlock(width, height);
+    linkMazeBlocks(top, center, Direction::S);
+    top->generate();
     mazeBlocks[1] = top;
 
-//    std::cout << "bottom" << std::endl;
-    MazeBlock bottom = MazeBlock(width, height);
-    bottom.topNeighbor = &center;
-    center.bottomNeighbor = &bottom;
-//    bottom.setExternalBorderCells(center.getInternalBorderCells(Direction::S), Direction::N);
-    bottom.generate();
+    MazeBlock* bottom = new MazeBlock(width, height);
+    linkMazeBlocks(bottom, center, Direction::N);
+    bottom->generate();
     mazeBlocks[7] = bottom;
 
     // generate top left, top right, bottom left, and bottom right blocks
-//    std::cout << "top left" << std::endl;
-    MazeBlock topLeft = MazeBlock(width, height);
-    topLeft.rightNeighbor = &top;
-    top.leftNeighbor = &topLeft;
-    topLeft.bottomNeighbor = &left;
-    left.topNeighbor = &topLeft;
-//    topleft.setExternalBorderCells(top.getInternalBorderCells(Direction::W), Direction::E);
-//    topleft.setExternalBorderCells(left.getInternalBorderCells(Direction::N), Direction::S);
-    topLeft.generate();
+    MazeBlock* topLeft = new  MazeBlock(width, height);
+    linkMazeBlocks(topLeft, top, Direction::E);
+    linkMazeBlocks(topLeft, left, Direction::S);
+    topLeft->generate();
     mazeBlocks[0] = topLeft;
 
-//    std::cout << "top right" << std::endl;
-    MazeBlock topRight = MazeBlock(width, height);
-    topRight.leftNeighbor = &top;
-    top.rightNeighbor = &topRight;
-    topRight.bottomNeighbor = &right;
-    right.topNeighbor = &topRight;
-//    topRight.setExternalBorderCells(top.getInternalBorderCells(Direction::E), Direction::W);
-//    topRight.setExternalBorderCells(right.getInternalBorderCells(Direction::N), Direction::S);
-    topRight.generate();
+    MazeBlock* topRight = new MazeBlock(width, height);
+    linkMazeBlocks(topRight, top, Direction::W);
+    linkMazeBlocks(topRight, right, Direction::S);
+    topRight->generate();
     mazeBlocks[2] = topRight;
 
-//    std::cout << "bottom left" << std::endl;
-    MazeBlock bottomLeft = MazeBlock(width, height);
-    bottomLeft.topNeighbor = &left;
-    left.bottomNeighbor = &bottomLeft;
-    bottomLeft.rightNeighbor = &bottom;
-    bottom.leftNeighbor = &bottomLeft;
-//    bottomLeft.setExternalBorderCells(left.getInternalBorderCells(Direction::S), Direction::N);
-//    bottomLeft.setExternalBorderCells(bottom.getInternalBorderCells(Direction::W), Direction::E);
-    bottomLeft.generate();
+    MazeBlock* bottomLeft = new MazeBlock(width, height);
+    linkMazeBlocks(bottomLeft, bottom, Direction::E);
+    linkMazeBlocks(bottomLeft, left, Direction::N);
+    bottomLeft->generate();
     mazeBlocks[6] = bottomLeft;
 
-//    std::cout << "bottom right" << std::endl;
-    MazeBlock bottomRight = MazeBlock(width, height);
-    bottomRight.topNeighbor = &right;
-    right.bottomNeighbor = &bottomRight;
-    bottomRight.leftNeighbor = &bottom;
-    bottom.rightNeighbor = &bottomRight;
-//    bottomRight.setExternalBorderCells(right.getInternalBorderCells(Direction::S), Direction::N);
-//    bottomRight.setExternalBorderCells(bottom.getInternalBorderCells(Direction::E), Direction::W);
-    bottomRight.generate();
+    MazeBlock* bottomRight = new MazeBlock(width, height);
+    linkMazeBlocks(bottomRight, bottom, Direction::W);
+    linkMazeBlocks(bottomRight, right, Direction::N);
+    bottomRight->generate();
     mazeBlocks[8] = bottomRight;
 }
 
@@ -94,18 +85,9 @@ std::string Maze::toString() {
     std::vector<std::string> mazeBlockStrs;
 
     for (int i=0; i<mazeBlocks.size(); i++) {
-        mazeBlockStrs.emplace_back(mazeBlocks[i].toString());
+        mazeBlockStrs.push_back(mazeBlocks[i]->toString());
 //        mazeStr += mazeBlocks[i].toString() + "\n\n";
     }
-
-    // temp testing
-//    std::cout <<"top: " << std::endl;
-//    std::cout << mazeBlocks[1].toString(true, true) << std::endl;
-//    std::cout <<"center: " << std::endl;
-//    std::cout << mazeBlocks[4].toString(true, true) << std::endl;
-//    std::cout <<"right: " << std::endl;
-//    std::cout << mazeBlocks[5].toString(true, true) << std::endl;
-
 
     // compose top three blocks
     mazeStr += composeBlocks(mazeBlockStrs, 0);
@@ -126,7 +108,7 @@ std::string Maze::toString() {
 }
 
 
-// composes string representaiton of three horizontal blocks together
+// composes string representation of three horizontal blocks together
 std::string Maze::composeBlocks(std::vector<std::string> &mazeBlockStrs, int startingIndex) {
     // handle row by row
     std::string mazeStr = "";
@@ -139,7 +121,7 @@ std::string Maze::composeBlocks(std::vector<std::string> &mazeBlockStrs, int sta
         // if i is even, then cell row, if i is odd, then vertical undensification row
         if (i%2==0) {
             // index of last cell in the row
-            if (mazeBlocks[0].cells[last].eastOpen) {
+            if (mazeBlocks[0]->cells[last].eastOpen) {
                 mazeStr += "O";
             } else {
                 mazeStr += " ";
@@ -153,7 +135,7 @@ std::string Maze::composeBlocks(std::vector<std::string> &mazeBlockStrs, int sta
         // horizontal undensification
         if (i%2==0) {
             // index of last cell in the row
-            if (mazeBlocks[0].cells[last].eastOpen) {
+            if (mazeBlocks[0]->cells[last].eastOpen) {
                 mazeStr += "O";
             } else {
                 mazeStr += " ";
@@ -176,7 +158,7 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
     // upper left block
     for (int i=0; i<width; i++) {
         index = i + width * (height-1);
-        if (mazeBlocks[topBlockIndex].cells[index].southOpen) {
+        if (mazeBlocks[topBlockIndex]->cells[index].southOpen) {
             mazeStr += "O";
         } else {
             mazeStr += " ";
@@ -186,7 +168,7 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
     // upper center block
     for (int i=0; i<width; i++) {
         index = i + width * (height-1);
-        if (mazeBlocks[topBlockIndex+1].cells[index].southOpen) {
+        if (mazeBlocks[topBlockIndex+1]->cells[index].southOpen) {
             mazeStr += "O";
         } else {
             mazeStr += " ";
@@ -196,7 +178,7 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
     // upper right block
     for (int i=0; i<width; i++) {
         index = i + width * (height-1);
-        if (mazeBlocks[topBlockIndex+2].cells[index].southOpen) {
+        if (mazeBlocks[topBlockIndex+2]->cells[index].southOpen) {
             mazeStr += "O";
         } else {
             mazeStr += " ";

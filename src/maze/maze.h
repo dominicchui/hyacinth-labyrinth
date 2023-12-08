@@ -19,7 +19,7 @@ private:
     int blockWidth = width * 2 - 1;
     int blockHeight = height * 2 - 1;
     // the 3x3 grid of maze blocks that compose this maze
-    std::vector<MazeBlock> mazeBlocks;
+    std::vector<MazeBlock*> mazeBlocks;
 
     void generateMazeBlock(int index);
     void replaceMazeBlock(int index);
