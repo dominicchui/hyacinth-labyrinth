@@ -18,10 +18,16 @@ struct TransformComponent {
   // Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)
   // https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
   glm::mat4 mat4;
-
   glm::mat3 normalMatrix;
 
   void update_matrices();
+};
+
+struct PhysicalProperties {
+    float mass;
+    float drag;
+    glm::vec3 cur_velocity;
+    glm::vec3 prev_velocity;
 };
 
 struct PointLightComponent {
@@ -50,10 +56,14 @@ class LveGameObject {
 
   glm::vec3 color{};
   TransformComponent transform{};
+  PhysicalProperties phys{1.f, 0.1f, glm::vec3(0.f), glm::vec3(0.f)};
 
   // Optional pointer components
   std::shared_ptr<VKModel> model{};
   std::unique_ptr<PointLightComponent> pointLight = nullptr;
+
+  bool apply_force(glm::vec3 force, float delta_time);
+  bool update_physics(float delta_time);
 
  private:
   LveGameObject(id_t objId) : id{objId} {}
