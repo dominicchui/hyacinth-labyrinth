@@ -45,7 +45,7 @@ public:
             0.f,
             0.f
         };
-        cam->init(c);
+        // cam->initScene(c);
 
         data.lights = {SceneLightData{0, LightType::LIGHT_DIRECTIONAL, {1,1,1,1}, glm::vec3(0), glm::vec4(0), {0,-1,0,0}}};
         data.globalData = {0.5,0.5,0.5,1};

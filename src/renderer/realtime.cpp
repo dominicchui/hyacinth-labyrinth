@@ -26,7 +26,7 @@ Realtime::Realtime(QWidget *parent)
     m_keyMap[Qt::Key_Space]   = false;
 
     // If you must use this function, do not edit anything above this
-    m_camera = new Camera();
+    m_camera = new Camera(CAM_PROJ_PERSP);
     m_scene = new Scene(m_camera);
 }
 
@@ -258,7 +258,7 @@ void Realtime::resizeGL(int w, int h) {
     glDeleteFramebuffers(1, &m_fbo);
 
     // Update camera and FBO parameters
-    m_camera->resize(w, h);
+   // m_camera->resize(w, h);
     m_screen_width = size().width() * m_devicePixelRatio;
     m_screen_height = size().height() * m_devicePixelRatio;
     m_fbo_width = m_screen_width;
@@ -312,58 +312,58 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
         m_prev_mouse_pos = glm::vec2(posX, posY);
 
         // Use deltaX and deltaY here to rotate
-        m_camera->rotate(-deltaX, -deltaY);
+        //m_camera->rotate(-deltaX, -deltaY);
 
         update();
     }
 }
 
 void Realtime::timerEvent(QTimerEvent *event) {
-    int elapsedms   = m_elapsedTimer.elapsed();
-    float deltaTime = elapsedms * 0.001f;
-    m_elapsedTimer.restart();
+//     int elapsedms   = m_elapsedTimer.elapsed();
+//     float deltaTime = elapsedms * 0.001f;
+//     m_elapsedTimer.restart();
 
-    // Use deltaTime and m_keyMap here to move around
-    float dist = 5.f * deltaTime;
+//     // Use deltaTime and m_keyMap here to move around
+//     float dist = 5.f * deltaTime;
 
-    if (m_scene->loaded) {
-        if (m_keyMap[Qt::Key_W]) m_camera->moveLook(dist);
-        if (m_keyMap[Qt::Key_S]) m_camera->moveLook(-dist);
+//     if (m_scene->loaded) {
+//         if (m_keyMap[Qt::Key_W]) m_camera->moveLook(dist);
+//         if (m_keyMap[Qt::Key_S]) m_camera->moveLook(-dist);
 
-        if (m_keyMap[Qt::Key_A]) m_camera->moveSide(-dist);
-        if (m_keyMap[Qt::Key_D]) m_camera->moveSide(dist);
-    } else {
-        auto forward = m_camera->getLook();
-        forward.y = 0;
-        auto side = m_camera->getSide();
-        side.y = 0;
+//         if (m_keyMap[Qt::Key_A]) m_camera->moveSide(-dist);
+//         if (m_keyMap[Qt::Key_D]) m_camera->moveSide(dist);
+//     } else {
+//         auto forward = m_camera->getLook();
+//         forward.y = 0;
+//         auto side = m_camera->getSide();
+//         side.y = 0;
 
-//        float delta = 0;
-        if (m_keyMap[Qt::Key_W]) ball->move(dist, forward);
-        if (m_keyMap[Qt::Key_S]) ball->move(dist, -forward);
+// //        float delta = 0;
+//         if (m_keyMap[Qt::Key_W]) ball->move(dist, forward);
+//         if (m_keyMap[Qt::Key_S]) ball->move(dist, -forward);
 
-//        if (m_keyMap[Qt::Key_W]) incVel(0.02);
-//        if (m_keyMap[Qt::Key_S]) incVel(-0.02);
-//        ball->move(dist, vel * m_camera->getLook());
+// //        if (m_keyMap[Qt::Key_W]) incVel(0.02);
+// //        if (m_keyMap[Qt::Key_S]) incVel(-0.02);
+// //        ball->move(dist, vel * m_camera->getLook());
 
-//        delta = 0;
-        if (m_keyMap[Qt::Key_A]) ball->move(dist, side);
-        if (m_keyMap[Qt::Key_D]) ball->move(dist, -side);
-//        if (m_keyMap[Qt::Key_A]) incVel(0.02);
-//        if (m_keyMap[Qt::Key_D]) incVel(-0.02);
-//        ball->move(dist, vel * m_camera->getSide());
+// //        delta = 0;
+//         if (m_keyMap[Qt::Key_A]) ball->move(dist, side);
+//         if (m_keyMap[Qt::Key_D]) ball->move(dist, -side);
+// //        if (m_keyMap[Qt::Key_A]) incVel(0.02);
+// //        if (m_keyMap[Qt::Key_D]) incVel(-0.02);
+// //        ball->move(dist, vel * m_camera->getSide());
 
-        if (m_keyMap[Qt::Key_Space]) ball->move(dist, m_camera->getUp());
+//         if (m_keyMap[Qt::Key_Space]) ball->move(dist, m_camera->getUp());
 
-        // gravity
-        if (!ball->onFloor()) ball->move(dist, -m_camera->getUp() / 2.f);
-//        zeroVel(0.015);
+//         // gravity
+//         if (!ball->onFloor()) ball->move(dist, -m_camera->getUp() / 2.f);
+// //        zeroVel(0.015);
 
-//        if (m_keyMap[Qt::Key_Space])  m_camera->moveVertical(dist);
-//        if (m_keyMap[Qt::Key_Control]) m_camera->moveVertical(-dist);
-    }
+// //        if (m_keyMap[Qt::Key_Space])  m_camera->moveVertical(dist);
+// //        if (m_keyMap[Qt::Key_Control]) m_camera->moveVertical(-dist);
+//     }
 
-    update();
+//     update();
 }
 
 // DO NOT EDIT
