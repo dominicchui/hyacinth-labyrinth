@@ -304,124 +304,46 @@ std::string MazeBlock::undensifyMaze(bool includeNewLines) {
     return mazeStr;
 }
 
-// returns references to the cells on the specified edge of the maze
-// e.g. north is the top side, east is the right side
-// ordered top to bottom, left to right
-//std::vector<std::reference_wrapper<Cell>> MazeBlock::getInternalBorderCells(Direction dir) {
-//    std::vector<std::reference_wrapper<Cell>> borderCells;
-//    borderCells.reserve(std::max(width,height));
-//    switch(dir) {
-//    case Direction::N:
-//        for (int i=0; i<width; i++) {
-////            auto ref = (cells[i]);
-//            borderCells.push_back(cells[i]);
-//        }
-//        break;
-//    case Direction::E:
-//        for (int i=0; i<height; i++) {
-////            auto ref = (cells[(i+1)*width-1]);
-//            borderCells.push_back(cells[(i+1)*width-1]);
-//        }
-//        break;
-//    case Direction::S:
-//        for (int i=size()-width; i<size(); i++) {
-////            auto ref = (cells[i]);
-//            borderCells.push_back(cells[i]);
-//        }
-//        break;
-//    case Direction::W:
-//        for (int i=0; i<height; i++) {
-////            auto ref = (cells[i*width]);
-//            borderCells.push_back(cells[i*width]);
-//        }
-//        break;
-//    }
-//    return borderCells;
-//}
-
-//// sets the border cells that are external to the actual maze
-//void MazeBlock::setExternalBorderCells(std::vector<std::reference_wrapper<Cell>> refCells, Direction dir) {
-//    switch(dir) {
-//    case Direction::N:
-//        topExternalBorderCells = refCells;
-//        break;
-//    case Direction::E:
-//        rightExternalBorderCells = refCells;
-//        break;
-//    case Direction::S:
-//        bottomExternalBorderCells = refCells;
-//        break;
-//    case Direction::W:
-//        leftExternalBorderCells = refCells;
-//        break;
-//    }
-//}
-
 bool MazeBlock::hasExternalBorderInDirection(int index, Direction dir) {
     if (!hasDefinedExternalBorderCells()) { return false; }
     auto[x,y] = getCoordFromIndex(index);
     switch(dir) {
     case Direction::N:
         return (y==0 && topNeighbor!=nullptr);
-//        return (y==0 && topExternalBorderCells.size()>0);
         break;
     case Direction::E:
         return (x==width-1 && rightNeighbor!=nullptr);
-//        return (x==width-1 && rightExternalBorderCells.size()>0);
         break;
     case Direction::S:
         return (y==height-1 && bottomNeighbor!=nullptr);
-//        return (y==height-1 && bottomExternalBorderCells.size()>0);
         break;
     case Direction::W:
         return (x==0 && leftNeighbor!=nullptr);
-//        return (x==0 && leftExternalBorderCells.size()>0);
         break;
     }
 }
 
-// assume external border exists in the correct direction and the index is correct
+// assume neighboring MazeBlock exists and is correctly assigned
 Cell* MazeBlock::getCellFromExternalBorder(int index, Direction dir) {
     auto[x,y] = getCoordFromIndex(index);
-
-//    if (dir == Direction::N) {
-//        std::reference_wrapper<Cell> ref = topExternalBorderCells[x];
-//        return std::optional<std::reference_wrapper<Cell>>{ref};
-//    } else if (dir == Direction::E) {
-//        std::reference_wrapper<Cell> ref = rightExternalBorderCells[y];
-//        return std::optional<std::reference_wrapper<Cell>>{ref};
-//    } else if (dir == Direction::S) {
-//        std::reference_wrapper<Cell> ref = bottomExternalBorderCells[x];
-//        return std::optional<std::reference_wrapper<Cell>>{ref};
-//    } else if (dir == Direction::W) {
-//        std::reference_wrapper<Cell> ref = leftExternalBorderCells[y];
-//        return std::optional<std::reference_wrapper<Cell>>{ref};
-//    } else {
-//        // should never happen
-//        return std::nullopt;
-//    }
     MazeBlock* neighborMaze;
     int neighborIndex;
     switch(dir) {
     case Direction::N:
         neighborMaze = topNeighbor;
         neighborIndex = index + width * (height-1);
-//        return topExternalBorderCells[x];;
         break;
     case Direction::E:
         neighborMaze = rightNeighbor;
         neighborIndex = index * width + width-1;
-//        return rightExternalBorderCells[y];
         break;
     case Direction::S:
         neighborMaze = bottomNeighbor;
         neighborIndex = index;
-//        return bottomExternalBorderCells[x];
         break;
     case Direction::W:
         neighborMaze = leftNeighbor;
         neighborIndex = index * width;
-//        return leftExternalBorderCells[y];
         break;
     }
     if (neighborMaze == nullptr) {
