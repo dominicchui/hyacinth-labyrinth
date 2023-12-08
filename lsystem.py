@@ -99,8 +99,11 @@ def create_geometry(lstring, step_size, stem_radius, angle_incr, tesselation_lev
         [0, 1, 0],
         [1, 0, 0],
     ])
+    # Track whether or not we are inside of a leaf and vertices of current leaf
+    in_leaf = False
+    leaf_vertices = []
+
     # Use a stack (list) to track pushed states to return to.
-    # TODO: Also use a stack to remember the order of cross-sections added.
     states = []
 
     # Store the vertices and faces generated as we go
@@ -124,13 +127,20 @@ def create_geometry(lstring, step_size, stem_radius, angle_incr, tesselation_lev
                                                        tesselation_level))
             # Add faces connecting the sets of vertices
             faces.extend(get_faces(vertices, tesselation_level))
+        elif symbol == 'f':
+            if in_leaf:
+                vertices.append(tuple(curr_pos))
+                leaf_vertices.append(len(vertices) - 1)
+                curr_pos = forward(curr_pos, curr_rot, step_size)
+            else:
+                curr_pos = forward(curr_pos, curr_rot, step_size)
         elif symbol == '+':
             curr_rot = yaw(curr_rot, angle_incr)
         elif symbol == '-':
             curr_rot = yaw(curr_rot, -angle_incr)
         elif symbol == '&':
             curr_rot = pitch(curr_rot, angle_incr)
-        elif symbol == '^':
+        elif symbol == '^' or symbol == '∧':
             curr_rot = pitch(curr_rot, -angle_incr)
         elif symbol == '~':
             curr_rot = roll(curr_rot, angle_incr)
@@ -144,6 +154,12 @@ def create_geometry(lstring, step_size, stem_radius, angle_incr, tesselation_lev
             state = states.pop()
             curr_pos = state[0]
             curr_rot = state[1]
+        elif symbol == '{':
+            in_leaf = True
+        elif symbol == '}':
+            faces.append(tuple(leaf_vertices))
+            in_leaf = False
+            leaf_vertices = []
         else:
             # Symbols with no geometric interpretation are skipped
             continue
@@ -192,11 +208,11 @@ if __name__ == '__main__':
     #     but they won't have any geometric interpretation
 
     # General settings
-    NUM_ITERATIONS = 6
+    NUM_ITERATIONS = 3
 
     # Geometry settings
     STEP_SIZE = 1
-    STEM_RADIUS = 1
+    STEM_RADIUS = 0.2
     ANGLE_INCR = np.radians(22.5)
     TESSELATION_LEVEL = 50
 
@@ -204,7 +220,8 @@ if __name__ == '__main__':
     axiom = "A"
     rules = [("A", "[&FL!A]/////'[&FL!A]///////'[&FL!A]"),
              ("F", "S/////F"),
-             ("S", "FL")]
+             ("S", "FL"),
+             ("L", "['''∧∧{-f+f+f-|-f+f+f}]")]
 
     # Generate the L-system string by repeatedly applying rules
     lstring = generate_lsystem(axiom, rules, NUM_ITERATIONS)
