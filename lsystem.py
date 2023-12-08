@@ -49,8 +49,7 @@ def rewrite(string, rules):
     Rewrites the given string according to the given list of production rules.
     Returns the rewritten string.
     '''
-    for rule in rules:
-        string = string.replace(rule[0], rule[1])
+    string = string.translate(rules)
     return string
 
 def generate_lsystem(axiom, rules, iters):
@@ -58,8 +57,9 @@ def generate_lsystem(axiom, rules, iters):
     Generates the string representation of the L-system.
     '''
     string = axiom
+    rules_trans = str.maketrans(rules)
     for i in range(iters):
-        string = rewrite(string, rules)
+        string = rewrite(string, rules_trans)
     return string
 
 def forward(pos, rot, step_size):
@@ -112,7 +112,7 @@ def create_geometry(lstring, step_size, stem_radius, angle_incr, tesselation_lev
 
     # Process the string symbol by symbol
     for symbol in lstring:
-        if symbol == 'F':
+        if symbol == 'F' or symbol == 'G':
             # Add vertices at the beginning of the segment
             vertices.extend(get_cross_section_vertices(curr_pos,
                                                        curr_rot,
@@ -208,23 +208,27 @@ if __name__ == '__main__':
     #     but they won't have any geometric interpretation
 
     # General settings
-    NUM_ITERATIONS = 3
+    NUM_ITERATIONS = 6
 
     # Geometry settings
-    STEP_SIZE = 1
-    STEM_RADIUS = 0.2
-    ANGLE_INCR = np.radians(22.5)
-    TESSELATION_LEVEL = 50
+    STEP_SIZE = 5
+    STEM_RADIUS = 0.5
+    ANGLE_INCR = np.radians(90)
+    TESSELATION_LEVEL = 3
 
     # L-system definition
-    axiom = "A"
-    rules = [("A", "[&FL!A]/////'[&FL!A]///////'[&FL!A]"),
-             ("F", "S/////F"),
-             ("S", "FL"),
-             ("L", "['''∧∧{-f+f+f-|-f+f+f}]")]
+    bush_axiom = "A"
+    bush_rules = {"A": "[&FL!A]/////'[&FL!A]///////'[&FL!A]",
+                  "F": "S/////F",
+                  "S": "FL",
+                  "L": "['''∧∧{-f+f+f-|-f+f+f}]"}
+                     
+    test_axiom = "F"
+    test_rules = {"F": "F+G",
+                  "G": "F-G"}
 
     # Generate the L-system string by repeatedly applying rules
-    lstring = generate_lsystem(axiom, rules, NUM_ITERATIONS)
+    lstring = generate_lsystem(test_axiom, test_rules, NUM_ITERATIONS)
 
     # Apply geometric interpretation
     vertices, faces = create_geometry(lstring, STEP_SIZE, STEM_RADIUS, ANGLE_INCR, TESSELATION_LEVEL)
