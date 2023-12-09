@@ -60,7 +60,7 @@ class LveGameObject {
 
   glm::vec3 color{};
   TransformComponent transform{};
-  PhysicalProperties phys{1.f, 0.1f, glm::vec3(0.f), glm::vec3(0.f)};
+  PhysicalProperties phys{1.f, 1.f, glm::vec3(0.f), glm::vec3(0.f)};
 
   // Optional pointer components
   std::shared_ptr<VKModel> model{};
