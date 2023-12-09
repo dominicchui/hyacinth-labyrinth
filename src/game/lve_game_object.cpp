@@ -16,11 +16,12 @@
 
 void TransformComponent::update_matrices() {
     glm::mat4 tform(1.f);
-    glm::mat4 scale_mat = glm::scale(tform, scale);
-    glm::mat4 rot_x = glm::rotate(tform, rotation.x, x_axis);
-    glm::mat4 rot_y = glm::rotate(tform, rotation.y, y_axis);
-    glm::mat4 rot_z = glm::rotate(tform, rotation.z, z_axis);
-    glm::mat4 trans_mat = glm::translate(tform, translation);
+    glm::mat4 scale_mat = glm::scale(scale);
+    glm::mat4 rot_x = glm::rotate(rotation.x, x_axis);
+    glm::mat4 rot_y = glm::rotate(rotation.y, y_axis);
+    glm::mat4 rot_z = glm::rotate(rotation.z, z_axis);
+
+    glm::mat4 trans_mat = glm::translate(translation);
 
     mat4 = trans_mat * rot_z * rot_y * rot_x * scale_mat;
     normalMatrix = glm::inverse(glm::mat3(tform));
@@ -77,19 +78,24 @@ bool LveGameObject::update_physics(float delta_time) {
         // If we're below some epsilon, call it 0
         phys.prev_velocity = phys.cur_velocity;
         phys.cur_velocity = glm::vec3(0.f);
+
     } else {
         apply_force(drag_function(phys.drag, phys.cur_velocity), delta_time);
     }
 
     // Apply translation
-    glm::vec3 delta_dist = 0.5f * (actual_prev_velocity + phys.cur_velocity) * delta_time;
-   //transform.translation += delta_dist;
+    glm::vec3 halfway_velocity = 0.5f * (actual_prev_velocity + phys.cur_velocity);
+    glm::vec3 delta_dist = halfway_velocity * delta_time;
+    //transform.translation += delta_dist;
 
     // Apply rotation
-    // glm::vec3 rot_axis = glm::cross(glm::normalize(phys.cur_velocity), up_vec);
     float delta_dist_xz = glm::length(glm::vec2(-delta_dist.z, delta_dist.x));
 
-    transform.z_axis += glm::normalize(glm::vec3(phys.cur_velocity.x, 0.f, phys.cur_velocity.z)) * 0.1f;
+    transform.z_axis += glm::normalize(glm::vec3(
+                            halfway_velocity.x,
+                            0.f,
+                            halfway_velocity.z)
+                        ) * 0.1f;
     transform.z_axis = glm::normalize(transform.z_axis);
     transform.x_axis = glm::cross(transform.z_axis, transform.y_axis);
     transform.rotation += glm::vec3(delta_dist_xz, 0.f, 0.f);
