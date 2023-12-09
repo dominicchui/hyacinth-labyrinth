@@ -5,6 +5,7 @@
 #include "game/lve_game_object.hpp"
 #include "vulkan/vulkan-renderer.hpp"
 #include "window/glfw-window.hpp"
+#include "game/maze.h"
 
 // std
 #include <memory>
@@ -27,7 +28,7 @@ class HyacinthLabyrinth {
   void loadGameObjects();
   void generateMazeFromBoolVec(std::vector<std::vector<bool>>& map);
 
-
+  MazeBlock m_maze;
   GlfwWindow m_window;
   VKDeviceManager m_device;
   VKRenderer m_renderer;

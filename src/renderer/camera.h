@@ -46,7 +46,7 @@ public:
 
     // Speed
     static constexpr float mov_speed = 5.0f;
-    static constexpr float mouse_sensitivity = 0.01;
+    static constexpr float mouse_sensitivity = 0.02;
 
     Camera(void) = delete;
 

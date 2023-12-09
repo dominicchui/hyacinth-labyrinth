@@ -1,4 +1,4 @@
-#define VULKAN_PROJ 2
+#define VULKAN_PROJ 1
 
 #if VULKAN_PROJ == 1
 #include "hyacinth-labyrinth.hpp"

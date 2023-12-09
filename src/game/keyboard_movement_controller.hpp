@@ -17,10 +17,13 @@ class KeyboardMovementController {
     int lookRight = GLFW_KEY_RIGHT;
     int lookUp = GLFW_KEY_UP;
     int lookDown = GLFW_KEY_DOWN;
+    int leftShift = GLFW_KEY_LEFT_SHIFT;
+    int rightShift = GLFW_KEY_RIGHT_SHIFT;
   };
 
   void moveInPlaneXZ(GLFWwindow* window, float dt, LveGameObject& gameObject);
   bool moveCamera(GLFWwindow* window, float dt, Camera& camera);
+  bool moveCameraNoRot(GLFWwindow* window, float dt, Camera& camera);
 
   KeyMappings keys{};
   float moveSpeed{20.f};
