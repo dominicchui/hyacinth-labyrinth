@@ -14,6 +14,7 @@ public:
 
     void generate();
     std::string toString();
+    void shift(Direction dir);
 
 private:
     // height and width of constituent maze blocks, not the maze itself
@@ -26,10 +27,7 @@ private:
     // the 3x3 grid of maze blocks that compose this maze
     std::vector<MazeBlock*> mazeBlocks;
 
-
-
     void generateMazeBlock(int index);
-    void replaceMazeBlock(int index);
 
     std::string composeBlocks(std::vector<std::string> &mazeBlockStrs, int startingIndex);
     std::string getVerticalUndensificationString(int topBlockIndex);

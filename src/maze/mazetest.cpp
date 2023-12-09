@@ -9,4 +9,7 @@ int main(int argc, char *argv[]) {
     Maze maze = Maze(3,3);
     maze.generate();
     std::cout << maze.toString() << std::endl;
+
+    maze.shift(Direction::W);
+    std::cout << maze.toString() << std::endl;
 }
