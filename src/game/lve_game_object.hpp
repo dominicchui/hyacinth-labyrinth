@@ -14,6 +14,10 @@ struct TransformComponent {
   glm::vec3 scale{1.f, 1.f, 1.f};
   glm::vec3 rotation{};
 
+  glm::vec3 x_axis{1.f, 0.f, 0.f};
+  glm::vec3 y_axis{0.f, 1.f, 0.f};
+  glm::vec3 z_axis{1.f, 0.f, 1.f};
+
   // Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
   // Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)
   // https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix

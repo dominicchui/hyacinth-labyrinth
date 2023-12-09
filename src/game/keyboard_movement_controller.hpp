@@ -23,6 +23,6 @@ class KeyboardMovementController {
   bool moveCamera(GLFWwindow* window, float dt, Camera& camera);
 
   KeyMappings keys{};
-  float moveSpeed{3.f};
+  float moveSpeed{10.f};
   float lookSpeed{1.5f};
 };
