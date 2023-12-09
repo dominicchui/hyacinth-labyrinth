@@ -28,12 +28,12 @@ void Camera::initScene(
 ) {
     pos  = cam_data.pos;
 
-    look = glm::normalize(glm::vec3(cam_data.look));
-    up   = glm::normalize(glm::vec3(cam_data.up));
+    look  = glm::normalize(glm::vec3(cam_data.look));
+    up    = glm::normalize(glm::vec3(cam_data.up));
     right = glm::cross(-glm::vec3(look), glm::vec3(up)); // Guaranteed to be unit
 
     // Initialize rotation angles
-    theta_pitch = std::asinf(look.y);
+    theta_pitch = std::asin(-look.y);
 
     heightAngle = cam_data.heightAngle;
     aperture    = cam_data.aperture;

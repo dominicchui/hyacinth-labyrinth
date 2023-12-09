@@ -72,10 +72,12 @@ void HyacinthLabyrinth::run() {
   };
 
   // Create camera
+  glm::vec4 cam_pos(-4.f, -6.f, 4.f, 1.f);
+  glm::vec4 focus_at(0.f, 0.f, 0.f, 1.f);
   SceneCameraData scd{
-      glm::vec4(-1.f, -3.f, 1.f, 1.f),   // pos
-      glm::vec4(1.f, 0.f, -1.f, 1.f),  // look
-      glm::vec4(0.f, 1.f, 0.f, 0.f),    // up
+      cam_pos, // pos
+      focus_at - cam_pos,  // look
+      glm::vec4(0.f, 1.f, 0.f, 0.f),   // up
       M_PI/4.f, // height angle
       0, // DoF
       0  // focal length
@@ -83,10 +85,13 @@ void HyacinthLabyrinth::run() {
 
   Camera camera(CAM_PROJ_PERSP);
   camera.initScene(scd, WIDTH, HEIGHT, 0.1f, 100.f);
+  camera.recomputeMatrices();
 
   auto viewerObject = LveGameObject::createGameObject();
   viewerObject.transform.translation.z = -2.5f;
+
   KeyboardMovementController cameraController{};
+  KeyboardMovementController ballController{};
 
   auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -101,12 +106,16 @@ void HyacinthLabyrinth::run() {
 
     // TODO: Update the frame only when something changes
     bool did_move =
-        cameraController.moveCamera(
+        cameraController.moveCameraNoRot(
             m_window.getGLFWwindow(),
             frameTime,
             camera
         );
-
+    ballController.moveInPlaneXZ(
+        m_window.getGLFWwindow(),
+        frameTime,
+        gameObjects.at(0)
+    );
     if (did_move) {
         camera.recomputeMatrices();
     }
@@ -147,40 +156,40 @@ void HyacinthLabyrinth::run() {
   vkDeviceWaitIdle(m_device.device());
 }
 
-void HyacinthLabyrinth::generateMazeFromBoolVec(std::vector<std::vector<bool>>& map) {
-    std::shared_ptr<VKModel> maze_wall_model =
-        VKModel::createModelFromFile(m_device, "resources/models/cube.obj");
+// void HyacinthLabyrinth::generateMazeFromBoolVec(std::vector<std::vector<bool>>& map) {
+//     std::shared_ptr<VKModel> maze_wall_model =
+//         VKModel::createModelFromFile(m_device, "resources/models/cube.obj");
 
-    glm::vec4 cyan = {0,1,1,1};
-    glm::mat4 flctm = {{9.000000, 0.000000, 0.000000, 0.000000}, {0.000000, 0.100000, 0.000000, 0.000000}, {0.000000, 0.000000, 9.000000, 0.000000}, {0.000000, -0.900000, 0.000000, 1.000000}};
+//     glm::vec4 cyan = {0,1,1,1};
+//     glm::mat4 flctm = {{9.000000, 0.000000, 0.000000, 0.000000}, {0.000000, 0.100000, 0.000000, 0.000000}, {0.000000, 0.000000, 9.000000, 0.000000}, {0.000000, -0.900000, 0.000000, 1.000000}};
 
-    glm::vec4 yellow = {1,1,0,1};
+//     glm::vec4 yellow = {1,1,0,1};
 
 
-    float map_height = float(map.size());
-    float map_width  = float(map[0].size()); // Assuming all rows are the same size
+//     float map_height = float(map.size());
+//     float map_width  = float(map[0].size()); // Assuming all rows are the same size
 
-    // Centering maze around 0 (for now)
-    float h_mid = map_height / 2.f;
-    float w_mid = map_width / 2.f;
+//     // Centering maze around 0 (for now)
+//     float h_mid = map_height / 2.f;
+//     float w_mid = map_width / 2.f;
 
-    glm::vec3 coord = {-h_mid, 0.f - 100*epsilon, -w_mid};
-    for (auto row : map) {
-        for (auto cell : row) {
-            if (cell) {
-                auto wall = LveGameObject::createGameObject();
-                wall.model = maze_wall_model;
-                wall.transform.translation = coord;
-                wall.transform.scale = {0.5f, 1.f, 0.5f};
-                wall.transform.update_matrices();
-                gameObjects.emplace(wall.getId(), std::move(wall));
-            }
-            coord.x += 1.f;
-        }
-        coord.z += 1.f;
-        coord.x = -h_mid;
-    }
-}
+//     glm::vec3 coord = {-h_mid, 0.f - 100*epsilon, -w_mid};
+//     for (auto row : map) {
+//         for (auto cell : row) {
+//             if (cell) {
+//                 auto wall = LveGameObject::createGameObject();
+//                 wall.model = maze_wall_model;
+//                 wall.transform.translation = coord;
+//                 wall.transform.scale = {0.5f, 1.f, 0.5f};
+//                 wall.transform.update_matrices();
+//                 gameObjects.emplace(wall.getId(), std::move(wall));
+//             }
+//             coord.x += 1.f;
+//         }
+//         coord.z += 1.f;
+//         coord.x = -h_mid;
+//     }
+// }
 
 void HyacinthLabyrinth::loadGameObjects() {
   std::shared_ptr<VKModel> model =
@@ -220,7 +229,8 @@ void HyacinthLabyrinth::loadGameObjects() {
       {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
       {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
   };
-  generateMazeFromBoolVec(map);
+  m_maze.generateMazeFromBoolVec(m_device, map);
+  m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 
   std::vector<glm::vec3> lightColors{
       {1.f, .1f, .1f},

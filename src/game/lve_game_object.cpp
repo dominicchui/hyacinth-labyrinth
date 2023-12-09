@@ -86,7 +86,7 @@ bool LveGameObject::update_physics(float delta_time) {
     // Apply translation
     glm::vec3 halfway_velocity = 0.5f * (actual_prev_velocity + phys.cur_velocity);
     glm::vec3 delta_dist = halfway_velocity * delta_time;
-    //transform.translation += delta_dist;
+    transform.translation += delta_dist;
 
     // Apply rotation
     float delta_dist_xz = glm::length(glm::vec2(-delta_dist.z, delta_dist.x));
