@@ -3,6 +3,9 @@ import bpy
 import os
 import numpy as np
 
+TYPE_DOL = 'DOL'
+TYPE_PDOL = 'PDOL'
+
 def get_cross_section_vertices(pos, rot, stem_radius, tesselation_level):
     '''
     Returns coords of vertices arranged in a regular polygon around position,
@@ -53,15 +56,21 @@ def rewrite(string, rules):
     string = string.translate(rules)
     return string
 
-def generate_lsystem(axiom, rules, iters):
-    '''
-    Generates the string representation of the L-system.
-    '''
+def generate_lsystem_DOL(axiom, rules, iters):
     string = axiom
     rules_trans = str.maketrans(rules)
     for i in range(iters):
         string = rewrite(string, rules_trans)
     return string
+
+def generate_lsystem(type, axiom, rules, iters):
+    '''
+    Generates the string representation of the L-system.
+    '''
+    if (type == TYPE_DOL):
+        return generate_lsystem_DOL(axiom, rules, iters)
+    else:
+        return None # TODO
 
 def forward(pos, rot, step_size):
     heading = rot[:, 0].reshape((3))
@@ -86,11 +95,18 @@ def roll(rot, alpha):
                    [0, np.sin(alpha), np.cos(alpha)]])
     return rot @ R_H
 
-def create_geometry(lstring, step_size, stem_radius, angle_incr, tesselation_level):
+def create_geometry(type, lstring, step_size, stem_radius, angle_incr, tesselation_level):
     '''
     Creates a list of vertices and faces from the L-system string.
     This is the "geometric interpretation" of the string.
     '''
+    if type == TYPE_DOL:
+        return create_geometry_DOL(lstring, step_size, stem_radius,
+                                   angle_incr, tesselation_level)
+    else:
+        return None # TODO
+
+def create_geometry_DOL(lstring, step_size, stem_radius, angle_incr, tesselation_level):
     # Track current position
     curr_pos = np.array([0, 0, 0])
     # Use a 3x3 matrix to track our current rotation.
@@ -224,10 +240,11 @@ if __name__ == '__main__':
 
     # Generate the L-system string by repeatedly applying rules
     lsystem = settings['lsystem']
-    lstring = generate_lsystem(lsystem['axiom'], lsystem['rules'], settings['num_iters'])
+    lstring = generate_lsystem(settings['type'], lsystem['axiom'], lsystem['rules'], settings['num_iters'])
 
     # Apply geometric interpretation
-    vertices, faces = create_geometry(lstring, 
+    vertices, faces = create_geometry(settings['type'],
+                                      lstring, 
                                       settings['step_size'], 
                                       settings['stem_radius'], 
                                       np.radians(settings['angle_incr']), 

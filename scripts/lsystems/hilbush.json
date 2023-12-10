@@ -1,0 +1,17 @@
+{
+  "type": "DOL",
+  "num_iters": 3,
+  "step_size": 3,
+  "stem_radius": 0.5,
+  "angle_incr": 90,
+  "tesselation_level": 30,
+  "lsystem": {
+    "axiom": "A",
+    "rules": {
+      "A": "B-F+CFC+F-D&F∧D-F+&&CFC+F+B//",
+      "B": "A&F∧CFB∧F∧D∧∧-F-D∧|F∧B|FC∧F∧A//",
+      "C": "|D∧|F∧B-F+C∧F∧A&&FA&F∧C+F+B∧F∧D//",
+      "D": "|CFB-F+B|FA&F∧A&&FB-F+B|FC//"
+    }
+  }
+}
