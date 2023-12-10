@@ -22,13 +22,6 @@ public:
         int rightShift = GLFW_KEY_RIGHT_SHIFT;
     };
 
-
-    void collisionHandler(
-        LveGameObject& gameObject,
-        float dt,
-        MazeBlock& maze
-    );
-
     void moveInPlaneXZ(GLFWwindow* window,
                        float dt,
                        LveGameObject& gameObject,
