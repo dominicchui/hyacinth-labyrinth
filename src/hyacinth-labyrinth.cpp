@@ -178,7 +178,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   model = VKModel::createModelFromFile(m_device, "resources/models/quad.obj");
   auto floor = LveGameObject::createGameObject();
   floor.model = model;
-  floor.transform.translation = {0.f, .5f, 0.f};
+  floor.transform.translation = {0.f, 1.f, 0.f};
   floor.transform.scale = {5.f, 1.f, 5.f};
   floor.transform.update_matrices();
   gameObjects.emplace(floor.getId(), std::move(floor));
