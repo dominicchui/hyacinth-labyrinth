@@ -111,16 +111,16 @@ void HyacinthLabyrinth::run() {
             frameTime,
             camera
         );
-    ballController.moveInPlaneXZ(
-        m_window.getGLFWwindow(),
-        frameTime,
-        gameObjects.at(0)
-    );
     if (did_move) {
         camera.recomputeMatrices();
     }
 
-    //camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
+    ballController.moveInPlaneXZ(
+        m_window.getGLFWwindow(),
+        frameTime,
+        gameObjects.at(m_ball_id),
+        &m_maze
+    );
 
     if (auto commandBuffer = m_renderer.beginFrame()) {
       int frameIndex = m_renderer.getFrameIndex();
@@ -156,50 +156,16 @@ void HyacinthLabyrinth::run() {
   vkDeviceWaitIdle(m_device.device());
 }
 
-// void HyacinthLabyrinth::generateMazeFromBoolVec(std::vector<std::vector<bool>>& map) {
-//     std::shared_ptr<VKModel> maze_wall_model =
-//         VKModel::createModelFromFile(m_device, "resources/models/cube.obj");
-
-//     glm::vec4 cyan = {0,1,1,1};
-//     glm::mat4 flctm = {{9.000000, 0.000000, 0.000000, 0.000000}, {0.000000, 0.100000, 0.000000, 0.000000}, {0.000000, 0.000000, 9.000000, 0.000000}, {0.000000, -0.900000, 0.000000, 1.000000}};
-
-//     glm::vec4 yellow = {1,1,0,1};
-
-
-//     float map_height = float(map.size());
-//     float map_width  = float(map[0].size()); // Assuming all rows are the same size
-
-//     // Centering maze around 0 (for now)
-//     float h_mid = map_height / 2.f;
-//     float w_mid = map_width / 2.f;
-
-//     glm::vec3 coord = {-h_mid, 0.f - 100*epsilon, -w_mid};
-//     for (auto row : map) {
-//         for (auto cell : row) {
-//             if (cell) {
-//                 auto wall = LveGameObject::createGameObject();
-//                 wall.model = maze_wall_model;
-//                 wall.transform.translation = coord;
-//                 wall.transform.scale = {0.5f, 1.f, 0.5f};
-//                 wall.transform.update_matrices();
-//                 gameObjects.emplace(wall.getId(), std::move(wall));
-//             }
-//             coord.x += 1.f;
-//         }
-//         coord.z += 1.f;
-//         coord.x = -h_mid;
-//     }
-// }
-
 void HyacinthLabyrinth::loadGameObjects() {
   std::shared_ptr<VKModel> model =
-      VKModel::createModelFromFile(m_device, "resources/models/flat_vase.obj");
-  auto flatVase = LveGameObject::createGameObject();
-  flatVase.model = model;
-  flatVase.transform.translation = {-.5f, .5f, 0.f};
-  flatVase.transform.scale = {3.f, 1.5f, 3.f};
-  flatVase.transform.update_matrices();
-  gameObjects.emplace(flatVase.getId(), std::move(flatVase));
+      VKModel::createModelFromFile(m_device, "resources/models/ball.obj");
+  auto ball = LveGameObject::createGameObject();
+  ball.model = model;
+  ball.transform.translation = {-.5f, 0.f, 0.f};
+  ball.transform.scale = {0.5f, .5f, 0.5f};
+  ball.transform.update_matrices();
+  m_ball_id = ball.getId();
+  gameObjects.emplace(m_ball_id, std::move(ball));
 
   model = VKModel::createModelFromFile(m_device, "resources/models/smooth_vase.obj");
   auto smoothVase = LveGameObject::createGameObject();
@@ -229,6 +195,11 @@ void HyacinthLabyrinth::loadGameObjects() {
       {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
       {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
   };
+  // std::vector<std::vector<bool>> map = {
+  //     {1, 1, 1,},
+  //     {1, 0, 0,},
+  //     {1, 1, 1,},
+  // };
   m_maze.generateMazeFromBoolVec(m_device, map);
   m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 
@@ -238,7 +209,7 @@ void HyacinthLabyrinth::loadGameObjects() {
       {.1f, 1.f, .1f},
       {1.f, 1.f, .1f},
       {.1f, 1.f, 1.f},
-      {1.f, 1.f, 1.f}  //
+      {1.f, 1.f, 1.f}
   };
 
   for (int i = 0; i < lightColors.size(); i++) {

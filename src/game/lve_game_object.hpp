@@ -30,6 +30,7 @@ struct TransformComponent {
 struct PhysicalProperties {
     float mass;
     float drag;
+    float radius;
     glm::vec3 cur_velocity;
     glm::vec3 prev_velocity;
 };
@@ -60,7 +61,7 @@ class LveGameObject {
 
   glm::vec3 color{};
   TransformComponent transform{};
-  PhysicalProperties phys{1.f, 1.f, glm::vec3(0.f), glm::vec3(0.f)};
+  PhysicalProperties phys{1.f, 5.f, 0.5f, glm::vec3(0.f), glm::vec3(0.f)};
 
   // Optional pointer components
   std::shared_ptr<VKModel> model{};
