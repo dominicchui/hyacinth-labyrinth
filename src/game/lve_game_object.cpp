@@ -56,7 +56,7 @@ static float calc_drag_modifier(const glm::vec3& velocity) {
 
     float drag_modifier = (1.f / velocity_len) + 1.f;
 
-    std::cout << "velocity_len: " << velocity_len << "\t drag_mod: " << drag_modifier << std::endl;
+    //std::cout << "velocity_len: " << velocity_len << "\t drag_mod: " << drag_modifier << std::endl;
 
     return drag_modifier;
 }

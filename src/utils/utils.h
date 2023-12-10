@@ -19,6 +19,11 @@ static constexpr glm::vec4 neg_inf_pt(-INFINITY, -INFINITY, -INFINITY, 1.f);
 static constexpr glm::vec4 neg_inf_dir(-INFINITY, -INFINITY, -INFINITY, 0.f);
 
 
+template <typename T>
+static inline T pow2(T x) {
+    return x * x;
+}
+
 // static GLint myGlGetUniformLocation(GLuint shader, const GLchar* name) {
 //     GLint loc = glGetUniformLocation(shader, name);
 //     if (loc < 0) {
