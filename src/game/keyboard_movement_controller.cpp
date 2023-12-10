@@ -44,19 +44,14 @@ void KeyboardMovementController::moveInPlaneXZ(
     if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS) moveDir -= forwardDir;
     if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS) moveDir += rightDir;
     if (glfwGetKey(window, keys.moveLeft) == GLFW_PRESS) moveDir -= rightDir;
-    if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) moveDir += upDir;
-    if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) moveDir -= upDir;
+    // if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) moveDir += upDir;
+    // if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) moveDir -= upDir;
 
     if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
         gameObject.apply_force(speed_multiplier * moveSpeed * glm::normalize(moveDir), dt);
     }
 
     gameObject.update_physics(dt, maze);
-
-    // // Perform a round of collision detection
-    // if (maze) {
-    //     collisionHandler(gameObject, dt, *maze);
-    // }
 
     gameObject.transform.update_matrices();
 }
@@ -125,12 +120,12 @@ bool KeyboardMovementController::moveCameraNoRot(
     bool u = false;
     bool d = false;
 
-    // if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS) f = true;
-    // if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS) b = true;
-    // if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS) r = true;
-    // if (glfwGetKey(window, keys.moveLeft) == GLFW_PRESS) l = true;
-    if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) u = true;
-    if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) d = true;
+    if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) f = true;
+    if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) b = true;
+    if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) r = true;
+    if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) l = true;
+    // if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) u = true;
+    // if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) d = true;
 
     return camera.translate(f, b, l, r, u, d, dt);
 }
