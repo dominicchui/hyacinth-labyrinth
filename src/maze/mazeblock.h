@@ -27,6 +27,7 @@ public:
     MazeBlock* bottomNeighbor = nullptr;
 
     void assignStringRepresentations(char wall, char path, char closed);
+    static void makePathBetweenCells(Cell* first, Cell* second, Direction dir);
 
     void generate();
 

@@ -14,7 +14,12 @@ public:
 
     void generate();
     std::string toString();
-    void shift(Direction dir);
+    void shiftLeft();
+    void shiftRight();
+    void shiftUp();
+    void shiftDown();
+
+    void addExtraPaths();
 
 private:
     // height and width of constituent maze blocks, not the maze itself
@@ -28,7 +33,9 @@ private:
     std::vector<MazeBlock*> mazeBlocks;
 
     void generateMazeBlock(int index);
+    void shift(Direction dir);
 
     std::string composeBlocks(std::vector<std::string> &mazeBlockStrs, int startingIndex);
     std::string getVerticalUndensificationString(int topBlockIndex);
+    void addExtraPathBetweenBlocks(int first, int second);
 };

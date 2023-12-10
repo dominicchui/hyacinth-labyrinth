@@ -189,6 +189,28 @@ void MazeBlock::makePathBetweenCells(Cell &first, Cell* second, Direction dir) {
     }
 }
 
+
+void MazeBlock::makePathBetweenCells(Cell* first, Cell* second, Direction dir) {
+    switch(dir) {
+    case Direction::N:
+        first->northOpen = true;
+        second->southOpen = true;
+        break;
+    case Direction::E:
+        first->eastOpen = true;
+        second->westOpen = true;
+        break;
+    case Direction::S:
+        first->southOpen = true;
+        second->northOpen = true;
+        break;
+    case Direction::W:
+        first->westOpen = true;
+        second->eastOpen = true;
+        break;
+    }
+}
+
 // randomly places closed spaces to be used for decor later
 void MazeBlock::insertClosedSpaces() {
     static std::random_device rd; // a seed source for the random number engine

@@ -87,6 +87,23 @@ void Maze::generate() {
     mazeBlocks[8] = bottomRight;
 }
 
+void Maze::shiftLeft() {
+    shift(Direction::W);
+}
+
+void Maze::shiftRight() {
+    shift(Direction::E);
+}
+
+void Maze::shiftUp() {
+    shift(Direction::N);
+}
+
+void Maze::shiftDown() {
+    shift(Direction::S);
+}
+
+
 // shifts the entire maze one block in the direction dir
 // this will change the absolute positions of each maze block
 // maze blocks not in the 3x3 centered on the new center will be deleted
@@ -222,6 +239,50 @@ void Maze::shift(Direction dir) {
         bottomRight->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[8] = bottomRight;
     }
+}
+
+// assumes blocks are adjacent and first < second
+void Maze::addExtraPathBetweenBlocks(int first, int second) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    // pick random spot to add an extra path
+    if (second-first==1) {
+        // horizontally adjacent
+        std::uniform_int_distribution<> distrib(0, width);
+        int row = distrib(gen);
+        int firstCellIndex = row * width + (width-1);
+        int secondCellIndex = row * width;
+        auto firstCell = &mazeBlocks[first]->cells[firstCellIndex];
+        auto secondCell = &mazeBlocks[second]->cells[secondCellIndex];
+        MazeBlock::makePathBetweenCells(firstCell, secondCell, Direction::E);
+    } else if (second-first==3) {
+        // vertically adjacent
+        std::uniform_int_distribution<> distrib(0, height);
+        int col = distrib(gen);
+        int firstCellIndex = (height-1)*width+col;
+        int secondCellIndex = col;
+        auto firstCell = &mazeBlocks[first]->cells[firstCellIndex];
+        auto secondCell = &mazeBlocks[second]->cells[secondCellIndex];
+        MazeBlock::makePathBetweenCells(firstCell, secondCell, Direction::S);
+    }
+}
+
+void Maze::addExtraPaths() {
+    // horizontal paths
+    addExtraPathBetweenBlocks(0,1);
+    addExtraPathBetweenBlocks(1,2);
+    addExtraPathBetweenBlocks(3,4);
+    addExtraPathBetweenBlocks(4,5);
+    addExtraPathBetweenBlocks(6,7);
+    addExtraPathBetweenBlocks(7,8);
+
+    // vertical paths
+    addExtraPathBetweenBlocks(0,3);
+    addExtraPathBetweenBlocks(1,4);
+    addExtraPathBetweenBlocks(2,5);
+    addExtraPathBetweenBlocks(3,6);
+    addExtraPathBetweenBlocks(4,7);
+    addExtraPathBetweenBlocks(5,8);
 }
 
 // composes the string representation of the 9 constituent blocks

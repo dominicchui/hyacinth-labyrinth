@@ -10,6 +10,7 @@ int main(int argc, char *argv[]) {
     maze.generate();
     std::cout << maze.toString() << std::endl;
 
-    maze.shift(Direction::W);
+    maze.shiftLeft();
+    maze.addExtraPaths();
     std::cout << maze.toString() << std::endl;
 }
