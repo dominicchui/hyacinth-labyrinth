@@ -1,4 +1,5 @@
 {
+  "type": "DOL",
   "num_iters": 6,
   "step_size": 1,
   "stem_radius": 0.2,
