@@ -8,6 +8,24 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
+static void printVec2(const glm::vec2& vec, bool add_endl=true) {
+    std::cout << "[" << vec[0] << ", " << vec[1] << "]";
+    if (add_endl) {
+        std::cout << std::endl;
+    }
+}
+
+static void printVec3(const glm::vec3& vec, bool add_endl=true) {
+    std::cout << "[" << vec[0];
+    for (int32_t x = 1; x < 3; x++) {
+        std::cout << ", " << vec[x];
+    }
+    std::cout << "]";
+    if (add_endl) {
+        std::cout << std::endl;
+    }
+}
+
 static void printVec4(const glm::vec4& vec) {
     std::cout << "[";
     for (int32_t x = 0; x < 4; x++) {
@@ -80,6 +98,7 @@ static void verifyVAO(
     Debug::verifyVAO(__FILE__, __LINE__, tri_data, index, size, stride, offset)
 
 #else
+#define printVec3(...)
 #define printVec4(...)
 #define printMat4(...)
 #define glErrorCheck()

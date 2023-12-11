@@ -58,6 +58,9 @@ void PointLightSystem::createPipeline(VkRenderPass renderPass) {
   PipelineConfigInfo pipelineConfig{};
   VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
   VulkanPipeline::enableAlphaBlending(pipelineConfig);
+  // Disable backface culling to show the lights from any angle
+  pipelineConfig.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
+
   pipelineConfig.attributeDescriptions.clear();
   pipelineConfig.bindingDescriptions.clear();
   pipelineConfig.renderPass = renderPass;
@@ -98,7 +101,7 @@ void PointLightSystem::render(FrameInfo& frameInfo) {
     if (obj.pointLight == nullptr) continue;
 
     // calculate distance
-    auto offset = frameInfo.camera.getPosition() - obj.transform.translation;
+    auto offset = glm::vec3(frameInfo.camera.getPosition()) - obj.transform.translation;
     float disSquared = glm::dot(offset, offset);
     sorted[disSquared] = obj.getId();
   }
