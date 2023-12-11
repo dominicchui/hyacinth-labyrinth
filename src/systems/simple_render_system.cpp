@@ -81,8 +81,8 @@ void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
     auto& obj = kv.second;
     if (obj.model == nullptr) continue;
     SimplePushConstantData push{};
-    push.modelMatrix = obj.transform.mat4();
-    push.normalMatrix = obj.transform.normalMatrix();
+    push.modelMatrix = obj.transform.mat4;
+    push.normalMatrix = obj.transform.normalMatrix;
 
     vkCmdPushConstants(
         frameInfo.commandBuffer,
