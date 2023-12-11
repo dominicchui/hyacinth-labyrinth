@@ -74,23 +74,17 @@ def generate_regex(module):
     pattern = first_symbol + r'\('
 
     # Match the first parameter
-    pattern += r'(\d+(?:\.\d+)?)'
+    # pattern += r'(\d+(?:\.\d+)?)'
+    pattern += r'([^),]+)'
 
     # Match the rest of the comma-separated parameters
-    pattern += r',(\d+(?:\.\d+)?)' * (n-1)
+    # pattern += r',(\d+(?:\.\d+)?)' * (n-1)
+    pattern += r',([^),]+)' * (n-1)
 
     # Add the closing paren
     pattern += r'\)'
 
     return pattern
-
-def extract_mappings(regex):
-    '''
-    Given a regex match, extracts the mappings from symbols to their
-    values. eg. A(l,w) matched with A(2,3), so we extract the dictionary
-    {l:2, w:3}.
-    '''
-
 
 def generate_lsystem_PDOL(constants, axiom, rules, iters):
     '''
@@ -102,27 +96,47 @@ def generate_lsystem_PDOL(constants, axiom, rules, iters):
     # matching a rule's predecessor
     for i in range(iters):
         new_string = ''
-        for symbol in string:
-            for rule in rules:
-                # If symbol is 
+        for k in range(len(string)):
+            # Determine if the symbol at k is just a single letter
+            letter = string[k]
+            # If it's just a character by itself...
+            if k+1 >= len(string) or string[k+1] != '(':
+                match_found = False
+                for rule in rules:
+                    if rule[0] == letter:
+                        # Add its replacement to the string
+                        new_string += rule[1]
+                        match_found = True
+                # If no matching rule was found, append the letter as-is
+                if not match_found:
+                    new_string += letter
+            # Otherwise, if it's a "module", meaning a character with some params...
+            else:
+                # Extract the entire module
+                l = k + 1
+                module = letter
+                while string[l] != ')':
+                    module += string[l]
+                    l += 1
+                module += ')'
+                # Search for a rule which matches this module
+                match_found = False
+                for rule in rules:
+                    # If starting letter doesn't match, it isn't a match
+                    if rule[0][0] != letter:
+                        continue
 
-                # Check if symbol matches any rules
-                pred = rule[0]   # eg. "A(l,w)"
+                    # If number of commas is not the same, it isn't a match
+                    if rule[0].count(',') != module.count(','):
+                        continue
 
-                # Create a regex, eg. matching any A(number, number)
-                pred_regex = generate_regex(pred)
-
-                # Find all matches within the current string
-                re.search(pred_regex, string)
-
-        # for rule in rules:
-        #     pred = rule[0]   # eg. "A(l,w)"
-        #     # Create a regex, eg. matching any A(number, number)
-        #     pred_regex = generate_regex(pred)
-        #     # Find all matches within the current string
-        #     pred_regex.search()
-        #     # Extract the mappings, eg. l = 2, w = 3
-        #     param_mappings = extract_mappings(pred_regex)
+                    # Otherwise, it is a match so extract the names/values of each param
+                    pred = rule[0]
+                    pred_regex = generate_regex(pred)
+                    param_vals = list(re.match(pred_regex, module).groups())
+                    param_names = list(re.match(pred_regex, pred).groups())
+                    print(param_vals)
+                    print(param_names)
 
 def generate_lsystem(type, lsystem, iters):
     '''
@@ -293,14 +307,6 @@ def parse_json(filename):
     return settings
 
 if __name__ == '__main__':
-    pattern = generate_regex("A(l,w,z)")
-    match = re.match(pattern, "A(1,43,0.9)BC(2)A(1,2)")
-    if match:
-        print(match.groups())
-    else:
-        print("No match found.")
-
-if __name__ == '__mainr__':
     # Constants
     # (see http://algorithmicbotany.org/papers/abop/abop.pdf):
     # ALPHABET:
@@ -321,7 +327,7 @@ if __name__ == '__mainr__':
     os.chdir('/Users/echen/Desktop/csci2230/hyacinth-labyrinth/scripts')
 
     # Choose which lsystem json file we want to use
-    filename = 'bush.json'
+    filename = 'tree.json'
 
     # Parse the json to get a dictionary of all settings
     lsystems_dir = os.path.join('lsystems')
