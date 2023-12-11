@@ -4,6 +4,8 @@
 // libs
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <extern/tiny_obj_loader.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <extern/stb_image.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
@@ -42,11 +44,22 @@ VKModel::VKModel(
     const VKModel::Builder& builder)
     : m_device(device)
 {
-  createVertexBuffers(builder.vertices);
-  createIndexBuffers(builder.indices);
+    createTextureImage();
+    createVertexBuffers(builder.vertices);
+    createIndexBuffers(builder.indices);
 }
 
 VKModel::~VKModel() {}
+
+void VKModel::createTextureImage() {
+    int texWidth, texHeight, texChannels;
+    stbi_uc* pixels = stbi_load("textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    VkDeviceSize imageSize = texWidth * texHeight * 4;
+
+    if (!pixels) {
+        throw std::runtime_error("failed to load texture image!");
+    }
+}
 
 std::unique_ptr<VKModel> VKModel::createModelFromFile(
     VKDeviceManager& device,

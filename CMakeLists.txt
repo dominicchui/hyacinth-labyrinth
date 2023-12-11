@@ -89,6 +89,7 @@ add_executable(${PROJECT_NAME}
   src/game/maze.h
   src/utils/debug.h
   src/maze/cell.cpp src/maze/cell.h src/maze/maze.cpp src/maze/maze.h src/maze/mazeblock.cpp src/maze/mazeblock.h
+  src/extern/stb_image.h
 )
 
 # VULKAN: Tested on VulkanSDK v1.3.268.1
