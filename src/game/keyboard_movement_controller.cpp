@@ -1,4 +1,3 @@
-#include "debug.h"
 #include "keyboard_movement_controller.hpp"
 #include "renderer/camera.h"
 #include "game/maze.h"

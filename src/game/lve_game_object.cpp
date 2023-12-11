@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "utils/debug.h"
 #include "lve_game_object.hpp"
 #include "utils/utils.h"
 #include "game/maze.h"
@@ -27,7 +27,7 @@ void TransformComponent::update_matrices() {
     glm::mat4 trans_mat = glm::translate(translation);
 
     mat4 = trans_mat * rot_z * rot_y * rot_x * scale_mat;
-    normalMatrix = glm::inverse(glm::mat3(tform));
+    normalMatrix = glm::inverse(glm::transpose(glm::mat3(mat4)));
 }
 
 
