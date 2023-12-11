@@ -122,6 +122,7 @@ void HyacinthLabyrinth::run() {
         gameObjects.at(m_ball_id),
         &m_maze
     );
+    gameObjects.at(m_ball_light_id).transform.translation = gameObjects.at(m_ball_id).transform.translation;
 
     if (auto commandBuffer = m_renderer.beginFrame()) {
       int frameIndex = m_renderer.getFrameIndex();
@@ -169,6 +170,16 @@ void HyacinthLabyrinth::loadGameObjects() {
     m_ball_id = ball.getId();
     gameObjects.emplace(m_ball_id, std::move(ball));
 
+
+    // add light to ball
+    auto ballLight = LveGameObject::makePointLight(0.2f);
+    ballLight.transform.scale = {0.5f, 0.5f, 0.5f};
+    ballLight.color = glm::vec3(0.8f);
+    m_ball_light_id = ballLight.getId();
+    gameObjects.emplace(m_ball_light_id, std::move(ballLight));
+
+//    gameObjects.at(m_ball_id).pointLight = std::unique_ptr<PointLightComponent> (ballLight);
+
   model = VKModel::createModelFromFile(m_device, "resources/models/lsys.obj");
   auto smoothVase = LveGameObject::createGameObject();
   smoothVase.model = model;
@@ -186,7 +197,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  Maze maze = Maze(3,3);
+  Maze maze = Maze(5,5);
   maze.generate();
   std::cout << maze.toString() << std::endl;
   std::vector<std::vector<bool>> map = maze.toBoolVector();
