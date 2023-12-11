@@ -87,8 +87,8 @@ add_executable(${PROJECT_NAME}
   src/ball-test.hpp
   src/ball-test.cpp
   src/game/maze.h
-  src/game/maze.cpp
   src/utils/debug.h
+  src/maze/cell.cpp src/maze/cell.h src/maze/maze.cpp src/maze/maze.h src/maze/mazeblock.cpp src/maze/mazeblock.h
 )
 
 # VULKAN: Tested on VulkanSDK v1.3.268.1
