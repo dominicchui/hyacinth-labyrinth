@@ -25,49 +25,70 @@ include_directories(src)
 
 # Specifies .cpp and .h files to be passed to the compiler
 add_executable(${PROJECT_NAME}
-    src/main.cpp
+  # src
+  src/main.cpp
+  src/gl_kernel.h
+  src/hyacinth-labyrinth.hpp                  src/hyacinth-labyrinth.cpp
 
-    src/realtime.cpp
-    src/mainwindow.cpp
-    src/settings.cpp
-    src/utils/scenefilereader.cpp
-    src/utils/sceneparser.cpp
+  # external files
+  src/extern/tiny_obj_loader.h
 
-    src/mainwindow.h
-    src/realtime.h
-    src/settings.h
-    src/utils/scenedata.h
-    src/utils/scenefilereader.h
-    src/utils/sceneparser.h
-    src/utils/shaderloader.h
-    src/utils/aspectratiowidget/aspectratiowidget.hpp
-    src/utils/timer.h
-    src/camera/camera.cpp src/camera/camera.h
-    src/utils/debug.h
-    src/rasterscene.cpp src/rasterscene.h
-    src/shapes/Cone.cpp src/shapes/Cone.h src/shapes/Cube.cpp src/shapes/Cube.h src/shapes/Cylinder.cpp src/shapes/Cylinder.h src/shapes/Sphere.cpp src/shapes/Sphere.h   src/shapes/Triangle.cpp src/shapes/Triangle.h
-    src/texture.cpp src/texture.h
-    src/shapes/shape.h
-    src/utils/rgba.h
-    src/utils/shaderloader.h
-    src/utils/utils.h
-    src/gl_kernel.h
-    src/extern/tiny_obj_loader.h
-    src/vulkan-device.cpp
-    src/vulkan-device.hpp
-    src/hyacinth-labyrinth.hpp src/vulkan-pipeline.hpp src/glfw-window.hpp
-    src/hyacinth-labyrinth.cpp src/vulkan-pipeline.cpp src/glfw-window.cpp
-    src/vulkan-buffer.hpp src/vulkan-descriptors.hpp src/vulkan-renderer.hpp
-    src/vulkan-buffer.cpp src/vulkan-descriptors.cpp src/vulkan-renderer.cpp
-    src/vulkan-swapchain.hpp
-    src/vulkan-swapchain.cpp
-    src/vulkan-model.cpp
-    src/vulkan-model.hpp
-    src/vulkan-frame-info.hpp
-    src/keyboard_movement_controller.cpp src/keyboard_movement_controller.hpp src/lve_game_object.cpp src/lve_game_object.hpp
-    src/lve_camera.cpp src/lve_camera.hpp
-    src/systems/point_light_system.cpp src/systems/point_light_system.hpp src/systems/simple_render_system.cpp src/systems/simple_render_system.hpp
+  # game
+  src/game/keyboard_movement_controller.hpp   src/game/keyboard_movement_controller.cpp
+  src/game/lve_game_object.hpp                src/game/lve_game_object.cpp
+  src/game/lve_camera.hpp                     src/game/lve_camera.cpp
 
+  # realtime renderer
+  src/renderer/camera.h                       src/renderer/camera.cpp
+  src/renderer/realtime.h                     src/renderer/realtime.cpp
+
+  # scene
+  src/scene/scene.h                           src/scene/scene.cpp
+  src/scene/scenedata.h
+  src/scene/scenefilereader.h                 src/scene/scenefilereader.cpp
+  src/scene/sceneparser.h                     src/scene/sceneparser.cpp
+  src/scene/shaderloader.h
+
+  src/scene/objloader.h                       src/scene/objloader.cpp
+
+  # shapes / objects
+                                              src/shapes/cone.cpp
+                                              src/shapes/cube.cpp
+                                              src/shapes/cylinder.cpp
+                                              src/shapes/mesh.cpp
+  src/shapes/shapes.h                         src/shapes/shapes.cpp
+                                              src/shapes/sphere.cpp
+
+  # systems (? faisal give a better name pls)
+  src/systems/point_light_system.hpp          src/systems/point_light_system.cpp
+  src/systems/simple_render_system.hpp        src/systems/simple_render_system.cpp
+
+  # utils
+  src/utils/settings.h                        src/utils/settings.cpp
+  src/utils/texture.h                         src/utils/texture.cpp
+  src/utils/timer.h
+
+  # vulkan files
+  src/vulkan/vulkan-buffer.hpp                src/vulkan/vulkan-buffer.cpp
+  src/vulkan/vulkan-descriptors.hpp           src/vulkan/vulkan-descriptors.cpp
+  src/vulkan/vulkan-device.hpp                src/vulkan/vulkan-device.cpp
+  src/vulkan/vulkan-frame-info.hpp
+  src/vulkan/vulkan-model.hpp                 src/vulkan/vulkan-model.cpp
+  src/vulkan/vulkan-pipeline.hpp              src/vulkan/vulkan-pipeline.cpp
+  src/vulkan/vulkan-renderer.hpp              src/vulkan/vulkan-renderer.cpp
+  src/vulkan/vulkan-swapchain.hpp             src/vulkan/vulkan-swapchain.cpp
+
+  # windowing
+  src/window/aspectratiowidget.hpp
+  src/window/glfw-window.hpp                  src/window/glfw-window.cpp
+  src/window/mainwindow.h                     src/window/mainwindow.cpp
+  src/utils/utils.h
+
+  src/ball-test.hpp
+  src/ball-test.cpp
+  src/game/maze.h
+  src/game/maze.cpp
+  src/utils/debug.h
 )
 
 # VULKAN: Tested on VulkanSDK v1.3.268.1
@@ -80,12 +101,18 @@ else()
 endif()
 
 # GLFW
-find_package(glfw3 3.3 REQUIRED)
-set(GLFW_LIB glfw)
-if (NOT glfw3_FOUND)
-    message(FATAL_ERROR "Could not find glfw library!")
-else()
-    message(STATUS "Using glfw at: ${glfw3_DIR}")
+if (WIN32)
+  set(GLFW_PATH "C:/Program Files/glfw-3.3.8")
+  set(GLFW_INCLUDE_DIRS "${GLFW_PATH}/include")
+  set(GLFW_LIB "${GLFW_PATH}/lib-mingw-w64")
+else ()
+  find_package(glfw3 3.3 REQUIRED)
+  set(GLFW_LIB glfw)
+  if (NOT glfw3_FOUND)
+      message(FATAL_ERROR "Could not find glfw library! ${GLFW_LIB}")
+  else()
+      message(STATUS "Using glfw at: ${glfw3_DIR}")
+  endif()
 endif()
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
@@ -96,7 +123,6 @@ add_library(StaticGLEW STATIC glew/src/glew.c)
 include_directories(${PROJECT_NAME} PRIVATE
     glew/include
     ${Vulkan_INCLUDE_DIRS}
-    
 )
 
 # Specifies libraries to be linked (Qt components, glew, etc)
@@ -108,24 +134,32 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt::Xml
     StaticGLEW
     ${Vulkan_LIBRARIES}
-    glfw
 )
+if (WIN32)
+  target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)
+else ()
+  target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
+endif ()
 
 # Specifies other files
 qt6_add_resources(${PROJECT_NAME} "Resources"
     PREFIX
         "/"
     FILES
-    resources/proj6_shaders/shape.frag
-    resources/proj6_shaders/shape.vert
-    resources/proj6_shaders/invert.frag
-    resources/proj6_shaders/invert.vert
-    resources/proj6_shaders/grayscale.frag
-    resources/proj6_shaders/grayscale.vert
-    resources/proj6_shaders/blur.frag
-    resources/proj6_shaders/blur.vert
-    resources/proj6_shaders/sobel.vert
-    resources/proj6_shaders/sobel.frag
+
+    resources/models/bunny.obj
+    resources/models/colored_cube.obj
+    resources/models/cube.obj
+    resources/models/dragon.obj
+    resources/models/flat_vase.obj
+    resources/models/quad.obj
+    resources/models/smooth_vase.obj
+
+    resources/proj6_shaders/phong.frag
+    resources/proj6_shaders/phong.vert
+    resources/proj6_shaders/texture.frag
+    resources/proj6_shaders/texture.vert
+
     resources/shaders/point_light.frag
     resources/shaders/point_light.vert
     resources/shaders/simple_shader.frag
@@ -138,6 +172,15 @@ if (WIN32)
   target_link_libraries(${PROJECT_NAME} PRIVATE
     opengl32
     glu32
+  )
+
+  target_include_directories(${PROJECT_NAME} PUBLIC
+    ${GLFW_INCLUDE_DIRS}
+  )
+
+  target_link_directories(${PROJECT_NAME} PUBLIC
+    ${Vulkan_LIBRARIES}
+    ${GLFW_LIB}
   )
 endif()
 

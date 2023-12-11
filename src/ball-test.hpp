@@ -5,34 +5,30 @@
 #include "game/lve_game_object.hpp"
 #include "vulkan/vulkan-renderer.hpp"
 #include "window/glfw-window.hpp"
-#include "game/maze.h"
 
 // std
 #include <memory>
 #include <vector>
 
-class HyacinthLabyrinth {
+class BallTest {
  public:
   static constexpr int WIDTH = 800;
   static constexpr int HEIGHT = 600;
 
-  HyacinthLabyrinth();
-  ~HyacinthLabyrinth();
+  BallTest();
+  ~BallTest();
 
-  HyacinthLabyrinth(const HyacinthLabyrinth &) = delete;
-  HyacinthLabyrinth &operator=(const HyacinthLabyrinth &) = delete;
+  BallTest(const BallTest &) = delete;
+  BallTest &operator=(const BallTest &) = delete;
 
   void run();
 
  private:
   void loadGameObjects();
-  void generateMazeFromBoolVec(std::vector<std::vector<bool>>& map);
 
-  MazeBlock m_maze;
   GlfwWindow m_window;
   VKDeviceManager m_device;
   VKRenderer m_renderer;
-  id_t m_ball_id;
 
   // note: order of declarations matters
   std::unique_ptr<VK_DP_Mgr> globalPool{};
