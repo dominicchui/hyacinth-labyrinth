@@ -27,7 +27,6 @@ include_directories(src)
 add_executable(${PROJECT_NAME}
   # src
   src/main.cpp
-  src/debug.h
   src/gl_kernel.h
   src/hyacinth-labyrinth.hpp                  src/hyacinth-labyrinth.cpp
 
@@ -84,6 +83,11 @@ add_executable(${PROJECT_NAME}
   src/window/glfw-window.hpp                  src/window/glfw-window.cpp
   src/window/mainwindow.h                     src/window/mainwindow.cpp
   src/utils/utils.h
+
+  src/ball-test.hpp
+  src/ball-test.cpp
+  src/game/maze.h
+  src/game/maze.cpp
   src/utils/debug.h
 )
 

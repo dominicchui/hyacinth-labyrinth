@@ -23,6 +23,7 @@ class Camera {
     glm::vec3 look;
     glm::vec3 up;
     glm::vec3 right;
+    glm::vec3 unnormLook;
 
     // Rotation angles
     float theta_pitch;
@@ -46,7 +47,7 @@ public:
 
     // Speed
     static constexpr float mov_speed = 5.0f;
-    static constexpr float mouse_sensitivity = 0.01;
+    static constexpr float mouse_sensitivity = 0.02;
 
     Camera(void) = delete;
 
@@ -79,7 +80,7 @@ public:
     // Returns true if a rotation occurred, false otherwise
     bool rotate(float delta_x, float delta_y, float deltaTime);
 
-    void recomputeMatrices();
+    void recomputeMatrices(const glm::vec3 &ballPos);
 
     // Returns the camera position in world coords
     const glm::vec4& getPosition() const;
