@@ -1,5 +1,4 @@
 #define VULKAN_PROJ 1
->>>>>>> faisal-fog-physics
 
 #if VULKAN_PROJ == 1
 #include "hyacinth-labyrinth.hpp"
