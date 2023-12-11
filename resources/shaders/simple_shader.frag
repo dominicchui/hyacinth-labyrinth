@@ -53,10 +53,4 @@ void main() {
   }
 
   outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
-  //outColor = vec4(diffuseLight * fragColor, 1.0);
-
-  // surfaceNormal += vec3(1.f, 1.f, 1.f);
-  // surfaceNormal /= 2.f;
-  // outColor = vec4(surfaceNormal, 1.f);
-
 }

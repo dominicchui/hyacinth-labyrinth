@@ -233,7 +233,7 @@ static void populate_tex_coords(const tinyobj::index_t& idx, const auto& attrib,
 }
 
 static void printVertex(const VKModel::Vertex& v, int32_t idx) {
-#ifndef NDEBUG
+#if DEBUG_LEVEL > 2
     std::cout << "Vertex #" << idx << std::endl;
     std::cout << "\tpos ";
     printVec3(v.position, false);
