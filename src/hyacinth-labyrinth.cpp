@@ -74,7 +74,7 @@ void HyacinthLabyrinth::run() {
   };
 
   // Create camera
-  glm::vec4 cam_pos(-5.f, -8.f, 5.f, 1.f);
+  glm::vec4 cam_pos(-5.f, -12.f, 5.f, 1.f);
   glm::vec4 focus_at(0.f, 0.f, 0.f, 1.f);
   SceneCameraData scd{
       cam_pos, // pos
@@ -162,7 +162,7 @@ void HyacinthLabyrinth::loadGameObjects() {
         VKModel::createModelFromFile(m_device, "resources/models/ball.obj", true);
     auto ball = LveGameObject::createGameObject();
     ball.model = model;
-    ball.transform.translation = {-.5f, 0.25f, 0.f};
+    ball.transform.translation = {-.5f, 0.5f, 0.f};
     ball.transform.scale = {0.25f, .25f, 0.25f};
     ball.transform.update_matrices();
     ball.phys.radius = ball.transform.scale.x;
@@ -186,7 +186,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  Maze maze = Maze(10,10);
+  Maze maze = Maze(3,3);
   maze.generate();
   std::cout << maze.toString() << std::endl;
   std::vector<std::vector<bool>> map = maze.toBoolVector();
