@@ -58,6 +58,9 @@ void PointLightSystem::createPipeline(VkRenderPass renderPass) {
   PipelineConfigInfo pipelineConfig{};
   VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
   VulkanPipeline::enableAlphaBlending(pipelineConfig);
+  // Disable backface culling to show the lights from any angle
+  pipelineConfig.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
+
   pipelineConfig.attributeDescriptions.clear();
   pipelineConfig.bindingDescriptions.clear();
   pipelineConfig.renderPass = renderPass;

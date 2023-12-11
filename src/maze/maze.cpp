@@ -38,19 +38,19 @@ void Maze::generate() {
     left->generate();
     left->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[3] = left;
-
+    
     MazeBlock* right = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(right, center, Direction::W);
     right->generate();
     right->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[5] = right;
-
+    
     MazeBlock* top = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(top, center, Direction::S);
     top->generate();
     top->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[1] = top;
-
+    
     MazeBlock* bottom = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(bottom, center, Direction::N);
     bottom->generate();
@@ -64,21 +64,21 @@ void Maze::generate() {
     topLeft->generate();
     topLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[0] = topLeft;
-
+    
     MazeBlock* topRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(topRight, top, Direction::W);
     linkMazeBlocks(topRight, right, Direction::S);
     topRight->generate();
     topRight->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[2] = topRight;
-
+    
     MazeBlock* bottomLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(bottomLeft, bottom, Direction::E);
     linkMazeBlocks(bottomLeft, left, Direction::N);
     bottomLeft->generate();
     bottomLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[6] = bottomLeft;
-
+    
     MazeBlock* bottomRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(bottomRight, bottom, Direction::W);
     linkMazeBlocks(bottomRight, right, Direction::N);
@@ -126,14 +126,14 @@ void Maze::shift(Direction dir) {
         bottom->generate();
         bottom->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[7] = bottom;
-
+        
         MazeBlock* bottomLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomLeft, bottom, Direction::E);
         linkMazeBlocks(bottomLeft, mazeBlocks[3], Direction::N);
         bottomLeft->generate();
         bottomLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[6] = bottomLeft;
-
+        
         MazeBlock* bottomRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomRight, bottom, Direction::W);
         linkMazeBlocks(bottomRight, mazeBlocks[5], Direction::N);
@@ -159,14 +159,14 @@ void Maze::shift(Direction dir) {
         left->generate();
         left->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[3] = left;
-
+        
         MazeBlock* topLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topLeft, mazeBlocks[1], Direction::E);
         linkMazeBlocks(topLeft, left, Direction::S);
         topLeft->generate();
         topLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[0] = topLeft;
-
+        
         MazeBlock* bottomLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomLeft, mazeBlocks[7], Direction::E);
         linkMazeBlocks(bottomLeft, left, Direction::N);
@@ -190,14 +190,14 @@ void Maze::shift(Direction dir) {
         top->generate();
         top->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[1] = top;
-
+        
         MazeBlock* topLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topLeft, mazeBlocks[1], Direction::E);
         linkMazeBlocks(topLeft, mazeBlocks[3], Direction::S);
         topLeft->generate();
         topLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[0] = topLeft;
-
+        
         MazeBlock* topRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topRight, top, Direction::W);
         linkMazeBlocks(topRight, mazeBlocks[5], Direction::S);
@@ -224,14 +224,14 @@ void Maze::shift(Direction dir) {
         right->generate();
         right->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[5] = right;
-
+        
         MazeBlock* topRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topRight, mazeBlocks[1], Direction::W);
         linkMazeBlocks(topRight, mazeBlocks[5], Direction::S);
         topRight->generate();
         topRight->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[2] = topRight;
-
+        
         MazeBlock* bottomRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomRight, mazeBlocks[7], Direction::W);
         linkMazeBlocks(bottomRight, mazeBlocks[5], Direction::N);

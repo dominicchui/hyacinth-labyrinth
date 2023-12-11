@@ -14,19 +14,32 @@ struct TransformComponent {
   glm::vec3 scale{1.f, 1.f, 1.f};
   glm::vec3 rotation{};
 
+  glm::vec3 x_axis{1.f, 0.f, 0.f};
+  glm::vec3 y_axis{0.f, 1.f, 0.f};
+  glm::vec3 z_axis{1.f, 0.f, 1.f};
+
   // Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
   // Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)
   // https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
   glm::mat4 mat4;
-
   glm::mat3 normalMatrix;
 
   void update_matrices();
 };
 
+struct PhysicalProperties {
+    float mass;
+    float drag;
+    float radius;
+    glm::vec3 cur_velocity;
+    glm::vec3 prev_velocity;
+};
+
 struct PointLightComponent {
   float lightIntensity = 1.0f;
 };
+
+class GameMaze;
 
 class LveGameObject {
  public:
@@ -50,13 +63,18 @@ class LveGameObject {
 
   glm::vec3 color{};
   TransformComponent transform{};
+  PhysicalProperties phys{1.f, 5.f, 0.5f, glm::vec3(0.f), glm::vec3(0.f)};
 
   // Optional pointer components
   std::shared_ptr<VKModel> model{};
   std::unique_ptr<PointLightComponent> pointLight = nullptr;
 
+  bool apply_force(glm::vec3 force, float delta_time);
+  bool update_physics(float delta_time, GameMaze* Maze);
+
  private:
+  id_t id;
   LveGameObject(id_t objId) : id{objId} {}
 
-  id_t id;
+  void collision_handler(GameMaze& maze);
 };

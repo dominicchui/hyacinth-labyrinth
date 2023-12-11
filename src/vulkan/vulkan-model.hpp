@@ -33,6 +33,7 @@ class VKModel {
     std::vector<Vertex> vertices{};
     std::vector<uint32_t> indices{};
 
+    void loadModelWithMaterial(const std::string &filepath);
     void loadModel(const std::string &filepath);
   };
 
@@ -43,7 +44,10 @@ class VKModel {
   VKModel &operator=(const VKModel &) = delete;
 
   static std::unique_ptr<VKModel> createModelFromFile(
-      VKDeviceManager& device, const std::string& filepath);
+      VKDeviceManager& device,
+      const std::string& filepath,
+      bool with_material = false
+  );
 
   void bind(VkCommandBuffer commandBuffer);
   void draw(VkCommandBuffer commandBuffer);
