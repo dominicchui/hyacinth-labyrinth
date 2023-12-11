@@ -83,7 +83,7 @@ void BallTest::run() {
 
   Camera camera(CAM_PROJ_PERSP);
   camera.initScene(scd, WIDTH, HEIGHT, 0.1f, 100.f);
-  camera.recomputeMatrices();
+  camera.recomputeMatrices(glm::vec3(0.f));
 
 
   auto viewerObject = LveGameObject::createGameObject();
