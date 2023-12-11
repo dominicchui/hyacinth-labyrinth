@@ -95,6 +95,7 @@ def generate_lsystem_PDOL(constants, axiom, rules, iters):
     # On each iteration, we want to find all occurrences of patterns
     # matching a rule's predecessor
     for i in range(iters):
+        print(string)
         new_string = ''
         for k in range(len(string)):
             # Determine if the symbol at k is just a single letter
@@ -102,10 +103,10 @@ def generate_lsystem_PDOL(constants, axiom, rules, iters):
             # If it's just a character by itself...
             if k+1 >= len(string) or string[k+1] != '(':
                 match_found = False
-                for rule in rules:
-                    if rule[0] == letter:
+                for pred in rules:
+                    if pred == letter:
                         # Add its replacement to the string
-                        new_string += rule[1]
+                        new_string += rules[pred]
                         match_found = True
                 # If no matching rule was found, append the letter as-is
                 if not match_found:
@@ -121,22 +122,26 @@ def generate_lsystem_PDOL(constants, axiom, rules, iters):
                 module += ')'
                 # Search for a rule which matches this module
                 match_found = False
-                for rule in rules:
+                for pred in rules:
                     # If starting letter doesn't match, it isn't a match
-                    if rule[0][0] != letter:
+                    if pred[0] != letter:
                         continue
 
                     # If number of commas is not the same, it isn't a match
-                    if rule[0].count(',') != module.count(','):
+                    if pred.count(',') != module.count(','):
                         continue
 
                     # Otherwise, it is a match so extract the names/values of each param
-                    pred = rule[0]
                     pred_regex = generate_regex(pred)
                     param_vals = list(re.match(pred_regex, module).groups())
+                    param_vals = [float(val) for val in param_vals]
                     param_names = list(re.match(pred_regex, pred).groups())
-                    print(param_vals)
-                    print(param_names)
+                    param_dict = {k: v for k, v in zip(param_names, param_vals)}
+                    print(param_dict)
+
+                    # Substitute in the param values into the successor
+                    succ = rules[pred]
+                    pj
 
 def generate_lsystem(type, lsystem, iters):
     '''
