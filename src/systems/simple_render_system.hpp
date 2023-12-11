@@ -1,11 +1,11 @@
 #pragma once
 
-#include "lve_camera.hpp"
-#include "lve_game_object.hpp"
+#include "game/lve_camera.hpp"
+#include "game/lve_game_object.hpp"
 
-#include "vulkan-device.hpp"
-#include "vulkan-frame-info.hpp"
-#include "vulkan-pipeline.hpp"
+#include "vulkan/vulkan-device.hpp"
+#include "vulkan/vulkan-frame-info.hpp"
+#include "vulkan/vulkan-pipeline.hpp"
 
 // std
 #include <memory>
