@@ -1,6 +1,7 @@
 #include "hyacinth-labyrinth.hpp"
 
 #include "game/keyboard_movement_controller.hpp"
+#include "maze/maze.h"
 #include "vulkan/vulkan-buffer.hpp"
 #include "renderer/camera.h"
 #include "systems/point_light_system.hpp"
@@ -209,17 +210,21 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  std::vector<std::vector<bool>> map = {
-      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
-      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
-      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-  };
+  Maze maze = Maze(10,10);
+  maze.generate();
+  std::cout << maze.toString() << std::endl;
+  std::vector<std::vector<bool>> map = maze.toBoolVector();
+//  std::vector<std::vector<bool>> map = {
+//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+//      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
+//      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
+//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+//      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+//      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+//      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+//  };
   generateMazeFromBoolVec(map);
 
   std::vector<glm::vec3> lightColors{

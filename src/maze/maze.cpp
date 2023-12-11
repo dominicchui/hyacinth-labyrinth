@@ -27,59 +27,59 @@ void linkMazeBlocks(MazeBlock* first, MazeBlock* second, Direction dir) {
 void Maze::generate() {
     mazeBlocks.reserve(9);
     // start with center
-    MazeBlock* center = new MazeBlock(width, height);
+    MazeBlock* center = new MazeBlock(denseBlockWidth, denseBlockHeight);
     center->generate();
     center->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[4] = center;
 
     // generate left, right, top, and bottom blocks
-    MazeBlock* left = new MazeBlock(width, height);
+    MazeBlock* left = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(left, center, Direction::E);
     left->generate();
     left->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[3] = left;
 
-    MazeBlock* right = new MazeBlock(width, height);
+    MazeBlock* right = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(right, center, Direction::W);
     right->generate();
     right->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[5] = right;
 
-    MazeBlock* top = new MazeBlock(width, height);
+    MazeBlock* top = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(top, center, Direction::S);
     top->generate();
     top->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[1] = top;
 
-    MazeBlock* bottom = new MazeBlock(width, height);
+    MazeBlock* bottom = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(bottom, center, Direction::N);
     bottom->generate();
     bottom->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[7] = bottom;
 
     // generate top left, top right, bottom left, and bottom right blocks
-    MazeBlock* topLeft = new MazeBlock(width, height);
+    MazeBlock* topLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(topLeft, top, Direction::E);
     linkMazeBlocks(topLeft, left, Direction::S);
     topLeft->generate();
     topLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[0] = topLeft;
 
-    MazeBlock* topRight = new MazeBlock(width, height);
+    MazeBlock* topRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(topRight, top, Direction::W);
     linkMazeBlocks(topRight, right, Direction::S);
     topRight->generate();
     topRight->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[2] = topRight;
 
-    MazeBlock* bottomLeft = new MazeBlock(width, height);
+    MazeBlock* bottomLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(bottomLeft, bottom, Direction::E);
     linkMazeBlocks(bottomLeft, left, Direction::N);
     bottomLeft->generate();
     bottomLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
     mazeBlocks[6] = bottomLeft;
 
-    MazeBlock* bottomRight = new MazeBlock(width, height);
+    MazeBlock* bottomRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
     linkMazeBlocks(bottomRight, bottom, Direction::W);
     linkMazeBlocks(bottomRight, right, Direction::N);
     bottomRight->generate();
@@ -121,20 +121,20 @@ void Maze::shift(Direction dir) {
         }
 
         // generate 3 more blocks
-        MazeBlock* bottom = new MazeBlock(width, height);
+        MazeBlock* bottom = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottom, mazeBlocks[4], Direction::N);
         bottom->generate();
         bottom->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[7] = bottom;
 
-        MazeBlock* bottomLeft = new MazeBlock(width, height);
+        MazeBlock* bottomLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomLeft, bottom, Direction::E);
         linkMazeBlocks(bottomLeft, mazeBlocks[3], Direction::N);
         bottomLeft->generate();
         bottomLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[6] = bottomLeft;
 
-        MazeBlock* bottomRight = new MazeBlock(width, height);
+        MazeBlock* bottomRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomRight, bottom, Direction::W);
         linkMazeBlocks(bottomRight, mazeBlocks[5], Direction::N);
         bottomRight->generate();
@@ -154,20 +154,20 @@ void Maze::shift(Direction dir) {
         }
 
         // generate 3 more blocks
-        MazeBlock* left = new MazeBlock(width, height);
+        MazeBlock* left = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(left, mazeBlocks[4], Direction::E);
         left->generate();
         left->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[3] = left;
 
-        MazeBlock* topLeft = new MazeBlock(width, height);
+        MazeBlock* topLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topLeft, mazeBlocks[1], Direction::E);
         linkMazeBlocks(topLeft, left, Direction::S);
         topLeft->generate();
         topLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[0] = topLeft;
 
-        MazeBlock* bottomLeft = new MazeBlock(width, height);
+        MazeBlock* bottomLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomLeft, mazeBlocks[7], Direction::E);
         linkMazeBlocks(bottomLeft, left, Direction::N);
         bottomLeft->generate();
@@ -185,20 +185,20 @@ void Maze::shift(Direction dir) {
         }
 
         // generate three more blocks
-        MazeBlock* top = new MazeBlock(width, height);
+        MazeBlock* top = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(top, mazeBlocks[4], Direction::S);
         top->generate();
         top->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[1] = top;
 
-        MazeBlock* topLeft = new MazeBlock(width, height);
+        MazeBlock* topLeft = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topLeft, mazeBlocks[1], Direction::E);
         linkMazeBlocks(topLeft, mazeBlocks[3], Direction::S);
         topLeft->generate();
         topLeft->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[0] = topLeft;
 
-        MazeBlock* topRight = new MazeBlock(width, height);
+        MazeBlock* topRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topRight, top, Direction::W);
         linkMazeBlocks(topRight, mazeBlocks[5], Direction::S);
         topRight->generate();
@@ -219,20 +219,20 @@ void Maze::shift(Direction dir) {
         }
 
         // generate three more blocks
-        MazeBlock* right = new MazeBlock(width, height);
+        MazeBlock* right = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(right, mazeBlocks[4], Direction::W);
         right->generate();
         right->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[5] = right;
 
-        MazeBlock* topRight = new MazeBlock(width, height);
+        MazeBlock* topRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topRight, mazeBlocks[1], Direction::W);
         linkMazeBlocks(topRight, mazeBlocks[5], Direction::S);
         topRight->generate();
         topRight->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[2] = topRight;
 
-        MazeBlock* bottomRight = new MazeBlock(width, height);
+        MazeBlock* bottomRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomRight, mazeBlocks[7], Direction::W);
         linkMazeBlocks(bottomRight, mazeBlocks[5], Direction::N);
         bottomRight->generate();
@@ -248,18 +248,18 @@ void Maze::addExtraPathBetweenBlocks(int first, int second) {
     // pick random spot to add an extra path
     if (second-first==1) {
         // horizontally adjacent
-        std::uniform_int_distribution<> distrib(0, width);
+        std::uniform_int_distribution<> distrib(0, denseBlockWidth);
         int row = distrib(gen);
-        int firstCellIndex = row * width + (width-1);
-        int secondCellIndex = row * width;
+        int firstCellIndex = row * denseBlockWidth + (denseBlockWidth-1);
+        int secondCellIndex = row * denseBlockWidth;
         auto firstCell = &mazeBlocks[first]->cells[firstCellIndex];
         auto secondCell = &mazeBlocks[second]->cells[secondCellIndex];
         MazeBlock::makePathBetweenCells(firstCell, secondCell, Direction::E);
     } else if (second-first==3) {
         // vertically adjacent
-        std::uniform_int_distribution<> distrib(0, height);
+        std::uniform_int_distribution<> distrib(0, denseBlockHeight);
         int col = distrib(gen);
-        int firstCellIndex = (height-1)*width+col;
+        int firstCellIndex = (denseBlockHeight-1)*denseBlockWidth+col;
         int secondCellIndex = col;
         auto firstCell = &mazeBlocks[first]->cells[firstCellIndex];
         auto secondCell = &mazeBlocks[second]->cells[secondCellIndex];
@@ -321,8 +321,8 @@ std::string Maze::composeBlocks(std::vector<std::string> &mazeBlockStrs, int sta
     for (int i=0; i<blockHeight; i++) {
         // grab row from first (left block)
         mazeStr += mazeBlockStrs[startingIndex].substr(i*blockWidth, blockWidth);
-        int last = (cellRow+1)*width-1;
-        int first = cellRow*width;
+        int last = (cellRow+1)*denseBlockWidth-1;
+        int first = cellRow*denseBlockWidth;
         // figure out horizontal undensification
         // if i is even, then cell row, if i is odd, then vertical undensification row
         if (i%2==0) {
@@ -365,8 +365,8 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
     // iterate through the three top blocks
     int index;
     // upper left block
-    for (int i=0; i<width; i++) {
-        index = i + width * (height-1);
+    for (int i=0; i<denseBlockWidth; i++) {
+        index = i + denseBlockWidth * (denseBlockHeight-1);
         if (mazeBlocks[topBlockIndex]->cells[index].southOpen) {
             mazeStr += PATH_REPRESENTATION;
         } else {
@@ -375,8 +375,8 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
         mazeStr += WALL_REPRESENTATION;
     }
     // upper center block
-    for (int i=0; i<width; i++) {
-        index = i + width * (height-1);
+    for (int i=0; i<denseBlockWidth; i++) {
+        index = i + denseBlockWidth * (denseBlockHeight-1);
         if (mazeBlocks[topBlockIndex+1]->cells[index].southOpen) {
             mazeStr += PATH_REPRESENTATION;
         } else {
@@ -385,19 +385,43 @@ std::string Maze::getVerticalUndensificationString(int topBlockIndex) {
         mazeStr += WALL_REPRESENTATION;
     }
     // upper right block
-    for (int i=0; i<width; i++) {
-        index = i + width * (height-1);
+    for (int i=0; i<denseBlockWidth; i++) {
+        index = i + denseBlockWidth * (denseBlockHeight-1);
         if (mazeBlocks[topBlockIndex+2]->cells[index].southOpen) {
             mazeStr += PATH_REPRESENTATION;
         } else {
             mazeStr += WALL_REPRESENTATION;
         }
         // ignore last cell
-        if (i!=width-1) {
+        if (i!=denseBlockWidth-1) {
             mazeStr += WALL_REPRESENTATION;
         }
     }
     mazeStr += "\n";
 
     return mazeStr;
+}
+
+std::vector<std::vector<bool>> Maze::toBoolVector() {
+//    WALL_REPRESENTATION = 1;
+//    PATH_REPRESENTATION = 0;
+//    CLOSED_AREA_REPRESENTATION = 0;
+    std::string stringRep = toString();
+    std::vector<std::vector<bool>> vectorRep;
+    vectorRep.reserve(denseBlockHeight);
+
+    for (int i=0; i<height; i++) {
+        std::vector<bool> row;
+        row.reserve(width);
+        for (int j=0; j<width; j++) {
+            char c = stringRep[i*width+j+i];
+            if (c=='O') {
+                row.push_back(0);
+            } else {
+                row.push_back(1);
+            }
+        }
+        vectorRep.push_back(row);
+    }
+    return vectorRep;
 }

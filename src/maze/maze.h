@@ -4,7 +4,7 @@
 class Maze
 {
 public:
-    Maze(int _width, int _height): width(_width), height(_height) {
+    Maze(int _width, int _height): denseBlockWidth(_width), denseBlockHeight(_height) {
         mazeBlocks.resize(9);
     };
 
@@ -14,6 +14,8 @@ public:
 
     void generate();
     std::string toString();
+    std::vector<std::vector<bool>> toBoolVector();
+
     void shiftLeft();
     void shiftRight();
     void shiftUp();
@@ -24,11 +26,15 @@ public:
 private:
     // height and width of constituent maze blocks, not the maze itself
     // actual maze height ≈ 3*height
-    int width;
-    int height;
+    int denseBlockWidth;
+    int denseBlockHeight;
     // block width and height are affected by undensification
-    int blockWidth = width * 2 - 1;
-    int blockHeight = height * 2 - 1;
+    int blockWidth = denseBlockWidth * 2 - 1;
+    int blockHeight = denseBlockHeight * 2 - 1;
+    // actual width and height of undensified maze
+    int width = blockWidth*3+2;
+    int height = blockHeight*3+2;
+
     // the 3x3 grid of maze blocks that compose this maze
     std::vector<MazeBlock*> mazeBlocks;
 
