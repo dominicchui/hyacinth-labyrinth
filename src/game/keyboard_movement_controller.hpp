@@ -25,7 +25,7 @@ public:
     void moveInPlaneXZ(GLFWwindow* window,
                        float dt,
                        LveGameObject& gameObject,
-                       MazeBlock* maze = nullptr);
+                       GameMaze* maze = nullptr);
     bool moveCamera(GLFWwindow* window, float dt, Camera& camera);
     bool moveCameraNoRot(GLFWwindow* window, float dt, Camera& camera);
 

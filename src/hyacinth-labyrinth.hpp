@@ -27,8 +27,8 @@ class HyacinthLabyrinth {
  private:
   void loadGameObjects();
   void generateMazeFromBoolVec(std::vector<std::vector<bool>>& map);
-
-  MazeBlock m_maze;
+  
+  GameMaze m_maze;
   GlfwWindow m_window;
   VKDeviceManager m_device;
   VKRenderer m_renderer;

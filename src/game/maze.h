@@ -21,7 +21,7 @@
 //     }
 // };
 
-class MazeBlock {
+class GameMaze {
 private:
     bool maze_valid;
     float map_width;
@@ -32,8 +32,8 @@ public:
     std::vector<LveGameObject> wall_blocks;
    // std::unordered_map<std::pair<int32_t, int32_t>, LveGameObject*, pair_hash> wall_spatial_map;
     std::vector<std::vector<int32_t>> spatial_map;
-    MazeBlock() : maze_valid(false) {}
-    ~MazeBlock(void) {}
+    GameMaze() : maze_valid(false) {}
+    ~GameMaze(void) {}
 
     std::pair<int32_t, int32_t> world_coords_to_indices(float x, float y) {
         // Assumes map is valid!

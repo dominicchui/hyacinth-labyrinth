@@ -93,7 +93,7 @@ static std::pair<bool, glm::vec3> collide(
     return {dmin < r2, normal};
 }
 
-void LveGameObject::collision_handler(MazeBlock& maze) {
+void LveGameObject::collision_handler(GameMaze& maze) {
     glm::vec4 cur_pos = transform.mat4 * glm::vec4(0, 0, 0, 1.f);
 
     float cur_w = cur_pos.x;
@@ -200,7 +200,7 @@ static glm::vec3 drag_function(float drag, const glm::vec3& velocity) {
     return -drag * drag_modifier * velocity;
 }
 
-bool LveGameObject::update_physics(float delta_time, MazeBlock* maze) {
+bool LveGameObject::update_physics(float delta_time, GameMaze* maze) {
     // Account for drag:
     glm::vec3 actual_prev_velocity = phys.prev_velocity;
     float vel_len = glm::length(phys.cur_velocity);

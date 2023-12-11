@@ -9,7 +9,7 @@ void KeyboardMovementController::moveInPlaneXZ(
     GLFWwindow* window,
     float dt,
     LveGameObject& gameObject,
-    MazeBlock* maze
+    GameMaze* maze
 ) {
     float speed_multiplier = 1.f;
     if (glfwGetKey(window, keys.leftShift) == GLFW_PRESS ||
@@ -119,12 +119,12 @@ bool KeyboardMovementController::moveCameraNoRot(
     bool u = false;
     bool d = false;
 
-    if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) f = true;
-    if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) b = true;
-    if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) r = true;
-    if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) l = true;
-    // if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) u = true;
-    // if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) d = true;
+    if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) f = true;
+    if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) b = true;
+    if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS) r = true;
+    if (glfwGetKey(window, keys.moveLeft) == GLFW_PRESS) l = true;
+    if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) u = true;
+    if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) d = true;
 
     return camera.translate(f, b, l, r, u, d, dt);
 }

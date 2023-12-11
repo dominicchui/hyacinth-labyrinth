@@ -1,6 +1,8 @@
 #include "hyacinth-labyrinth.hpp"
 
 #include "game/keyboard_movement_controller.hpp"
+#include "maze/maze.h"
+#include "game/maze.h"
 #include "vulkan/vulkan-buffer.hpp"
 #include "renderer/camera.h"
 #include "systems/point_light_system.hpp"
@@ -83,9 +85,10 @@ void HyacinthLabyrinth::run() {
       0  // focal length
   };
 
+  auto& ball = gameObjects.at(m_ball_id);
   Camera camera(CAM_PROJ_PERSP);
   camera.initScene(scd, WIDTH, HEIGHT, 0.1f, 100.f);
-  camera.recomputeMatrices();
+  camera.recomputeMatrices(ball.transform.translation);
 
   auto viewerObject = LveGameObject::createGameObject();
   viewerObject.transform.translation.z = -2.5f;
@@ -111,9 +114,7 @@ void HyacinthLabyrinth::run() {
             frameTime,
             camera
         );
-    if (did_move) {
-        camera.recomputeMatrices();
-    }
+    camera.recomputeMatrices(ball.transform.translation);
 
     ballController.moveInPlaneXZ(
         m_window.getGLFWwindow(),
@@ -161,9 +162,10 @@ void HyacinthLabyrinth::loadGameObjects() {
         VKModel::createModelFromFile(m_device, "resources/models/ball.obj", true);
     auto ball = LveGameObject::createGameObject();
     ball.model = model;
-    ball.transform.translation = {-.5f, 0.f, 0.f};
-    ball.transform.scale = {0.5f, .5f, 0.5f};
+    ball.transform.translation = {-.5f, 0.25f, 0.f};
+    ball.transform.scale = {0.25f, .25f, 0.25f};
     ball.transform.update_matrices();
+    ball.phys.radius = ball.transform.scale.x;
     m_ball_id = ball.getId();
     gameObjects.emplace(m_ball_id, std::move(ball));
 
@@ -179,27 +181,27 @@ void HyacinthLabyrinth::loadGameObjects() {
   auto floor = LveGameObject::createGameObject();
   floor.model = model;
   floor.transform.translation = {0.f, 1.f, 0.f};
-  floor.transform.scale = {5.f, 1.f, 5.f};
+  floor.transform.scale = {50.f, 1.f, 50.f};
   floor.transform.update_matrices();
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  std::vector<std::vector<bool>> map = {
-      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
-      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
-      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-  };
-  // std::vector<std::vector<bool>> map = {
-  //     {1, 1, 1,},
-  //     {1, 0, 0,},
-  //     {1, 1, 1,},
-  // };
+  Maze maze = Maze(10,10);
+  maze.generate();
+  std::cout << maze.toString() << std::endl;
+  std::vector<std::vector<bool>> map = maze.toBoolVector();
+//  std::vector<std::vector<bool>> map = {
+//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+//      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
+//      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
+//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+//      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+//      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+//      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+//  };
+//  generateMazeFromBoolVec(map);
   m_maze.generateMazeFromBoolVec(m_device, map);
   m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 

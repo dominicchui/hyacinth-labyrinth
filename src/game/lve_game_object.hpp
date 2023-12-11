@@ -39,7 +39,7 @@ struct PointLightComponent {
   float lightIntensity = 1.0f;
 };
 
-class MazeBlock;
+class GameMaze;
 
 class LveGameObject {
  public:
@@ -70,11 +70,11 @@ class LveGameObject {
   std::unique_ptr<PointLightComponent> pointLight = nullptr;
 
   bool apply_force(glm::vec3 force, float delta_time);
-  bool update_physics(float delta_time, MazeBlock* Maze);
+  bool update_physics(float delta_time, GameMaze* Maze);
 
  private:
   id_t id;
   LveGameObject(id_t objId) : id{objId} {}
 
-  void collision_handler(MazeBlock& maze);
+  void collision_handler(GameMaze& maze);
 };

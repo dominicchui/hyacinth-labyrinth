@@ -76,18 +76,18 @@ static void verifyVAO(
 
     std::cerr << fname << ":" << line << ":" << std::endl;
 
-    for (int i = newOffset; i < triangleData.size(); i = i + newStride) {
-        std::cerr << "Group " << groupNum << " of Values for VAO index " << index << std::endl;
-        std::cerr << "[";
-        for (auto j = i; j < i + size; ++j) {
-            if (j != i + size - 1) {
-                std::cerr << triangleData[j]<< ", ";
-            } else {
-                std::cerr << triangleData[j]<< "]" << std::endl;
-            }
-        }
-        groupNum = groupNum + 1;
-    }
+//    for (int i = newOffset; i < triangleData.size(); i = i + newStride) {
+//        std::cerr << "Group " << groupNum << " of Values for VAO index " << index << std::endl;
+//        std::cerr << "[";
+//        for (auto j = i; j < i + size; ++j) {
+//            if (j != i + size - 1) {
+//                std::cerr << triangleData[j]<< ", ";
+//            } else {
+//                std::cerr << triangleData[j]<< "]" << std::endl;
+//            }
+//        }
+//        groupNum = groupNum + 1;
+//    }
     std::cout << "" << std::endl;
 }
 
