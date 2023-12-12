@@ -51,14 +51,19 @@ VKModel::~VKModel() {}
 std::unique_ptr<VKModel> VKModel::createModelFromFile(
     VKDeviceManager& device,
     const std::string& filepath,
-    bool with_material
+    bool override_color,
+    glm::vec3 color
 ) {
     Builder builder{};
-    // if (with_material) {
-    //     builder.loadModelWithMaterial(ENGINE_DIR + filepath);
-    // } else {
-        builder.loadModel(ENGINE_DIR + filepath);
-    // }
+
+    // Use specified color if override is enabled
+    builder.loadModel(ENGINE_DIR + filepath);
+    if (override_color) {
+        for (Vertex &vertex : builder.vertices) {
+            vertex.color = color;
+        }
+    }
+
     return std::make_unique<VKModel>(device, builder);
 }
 

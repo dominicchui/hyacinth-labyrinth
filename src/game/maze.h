@@ -103,7 +103,7 @@ public:
             throw std::runtime_error("exporteMazeVisibleGeometry called without a valid maze!");
         }
         std::shared_ptr<VKModel> maze_wall_model =
-            VKModel::createModelFromFile(device, "resources/models/hedge.obj");
+            VKModel::createModelFromFile(device, "resources/models/hedge.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
 
         // std::for_each(
         //     wall_spatial_map.begin(),

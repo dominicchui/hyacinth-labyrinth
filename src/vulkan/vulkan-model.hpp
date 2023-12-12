@@ -46,7 +46,8 @@ class VKModel {
   static std::unique_ptr<VKModel> createModelFromFile(
       VKDeviceManager& device,
       const std::string& filepath,
-      bool with_material = false
+      bool override_color = false,
+      glm::vec3 color = glm::vec3(0.f,0.f,0.f)
   );
 
   void bind(VkCommandBuffer commandBuffer);
