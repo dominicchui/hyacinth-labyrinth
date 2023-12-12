@@ -48,7 +48,7 @@ void DestroyDebugUtilsMessengerEXT(
 ///////////////////////////////////////////////////////////////////////////////
 
 // class member functions
-VKDeviceManager::VKDeviceManager(GlfwWindow& window) : window(window) {
+VKDeviceManager::VKDeviceManager(GlfwWindow& window) : window(window), cur_texture(0) {
   createInstance();
   setupDebugMessenger();
   createSurface();
@@ -58,6 +58,10 @@ VKDeviceManager::VKDeviceManager(GlfwWindow& window) : window(window) {
 }
 
 VKDeviceManager::~VKDeviceManager() {
+  for (int32_t i = 0; i < MAX_TEXTURES; i++) {
+      vkDestroySampler(device_, textureSampler[i], nullptr);
+      vkDestroyImageView(device_, textureImageView[i], nullptr);
+  }
   vkDestroyCommandPool(device_, commandPool, nullptr);
   vkDestroyDevice(device_, nullptr);
 

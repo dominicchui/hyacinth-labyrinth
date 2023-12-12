@@ -51,10 +51,7 @@ class VKModel {
 
     void bind(VkCommandBuffer commandBuffer);
     void draw(VkCommandBuffer commandBuffer);
-
-    VkImageView textureImageView;
-    VkSampler textureSampler;
-
+    int32_t texture_id;
   private:
     void createImage(
         uint32_t width,

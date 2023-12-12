@@ -11,10 +11,12 @@
 #include <array>
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
 
 struct SimplePushConstantData {
     glm::mat4 modelMatrix{1.f};
     glm::mat4 normalMatrix{1.f};
+    int32_t tex_id;
 };
 
 SimpleRenderSystem::SimpleRenderSystem(
@@ -96,6 +98,7 @@ void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
         SimplePushConstantData push{};
         push.modelMatrix = obj.transform.mat4;
         push.normalMatrix = obj.transform.normalMatrix;
+        push.tex_id = obj.model->texture_id;
 
         vkCmdPushConstants(
             frameInfo.commandBuffer,

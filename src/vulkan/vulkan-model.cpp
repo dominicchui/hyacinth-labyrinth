@@ -43,16 +43,20 @@ VKModel::VKModel(
     const VKModel::Builder& builder)
     : m_device(device)
 {
+    if (m_device.cur_texture >= VKDeviceManager::MAX_TEXTURES) {
+        throw std::runtime_error("TOO MANY TEXTURES!!!");
+    }
     createTextureImage();
     createTextureImageView();
     createTextureSampler();
     createVertexBuffers(builder.vertices);
     createIndexBuffers(builder.indices);
+
+    texture_id = m_device.cur_texture;
+    m_device.cur_texture++;
 }
 
 VKModel::~VKModel() {
-    vkDestroySampler(m_device.device(), textureSampler, nullptr);
-    vkDestroyImageView(m_device.device(), textureImageView, nullptr);
     vkDestroyImage(m_device.device(), textureImage, nullptr);
     vkFreeMemory(m_device.device(), textureImageMemory, nullptr);
 }
@@ -92,7 +96,16 @@ void VKModel::createImage(
 
 void VKModel::createTextureImage(void) {
     int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load("../resources/textures/andyVanDam.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+
+    stbi_uc* pixels = nullptr;
+
+    // JANKTEX
+    static int32_t id = 0;
+    if (id++ % 2) {
+        pixels = stbi_load("../resources/textures/marsTexture.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    } else {
+        pixels = stbi_load("../resources/textures/andyVanDam.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    }
     VkDeviceSize imageSize = texWidth * texHeight * 4;
 
     if (!pixels) {
@@ -169,13 +182,13 @@ void VKModel::createTextureSampler(void) {
     samplerInfo.minLod = 0.0f;
     samplerInfo.maxLod = 0.0f;
 
-    if (vkCreateSampler(m_device.device(), &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+    if (vkCreateSampler(m_device.device(), &samplerInfo, nullptr, &m_device.textureSampler[m_device.cur_texture]) != VK_SUCCESS) {
         throw std::runtime_error("failed to create texture sampler!");
     }
 }
 
 void VKModel::createTextureImageView() {
-    textureImageView =
+    m_device.textureImageView[m_device.cur_texture] =
         m_device.createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
 }
 
