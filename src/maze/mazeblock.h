@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include <random>
+#include <tuple>
 
 class MazeBlock
 {

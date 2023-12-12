@@ -7,6 +7,7 @@
 
 #include <glm/glm.hpp>
 #include <iostream>
+#include <vector>
 
 static void printVec2(const glm::vec2& vec, bool add_endl=true) {
     std::cout << "[" << vec[0] << ", " << vec[1] << "]";
