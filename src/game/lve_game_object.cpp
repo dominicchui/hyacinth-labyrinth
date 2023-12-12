@@ -94,7 +94,7 @@ static std::pair<bool, glm::vec3> collide(
 }
 
 void LveGameObject::collision_handler(GameMaze& maze) {
-    glm::vec4 cur_pos = transform.mat4 * glm::vec4(0, 0, 0, 1.f);
+    glm::vec4 cur_pos = glm::vec4(transform.translation, 1.f);
 
     float cur_w = cur_pos.x;
     float cur_h = cur_pos.z;
@@ -173,7 +173,8 @@ void LveGameObject::collision_handler(GameMaze& maze) {
                     glm::vec3 center_diff = glm::vec3(cur_pos) - glm::vec3(wall.transform.translation);
                     std::cout << "diff: ";
                     printVec3(center_diff);
-                    glm::vec3 bounce_amount = (center_diff - normal) * -glm::abs(normal);
+                    float wallPlusBallLength = wall.phys.radius + phys.radius;
+                    glm::vec3 bounce_amount = (center_diff - normal*wallPlusBallLength) * -glm::abs(normal);
                     std::cout << "bounce amount: ";
                     printVec3(bounce_amount);
                     transform.translation += bounce_amount;

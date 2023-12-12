@@ -1,0 +1,18 @@
+{
+  "type": "DOL",
+  "num_iters": 7,
+  "step_size": 0.05,
+  "leaf_size": 0.05,
+  "stem_radius": 0.1,
+  "angle_incr": 22,
+  "tesselation_level": 7,
+  "lsystem": {
+    "axiom": "A",
+    "rules": {
+      "A": "[&&&FL!A]//'[&&FL!A]///&/'[&&&FL!A]////'[&&FL!A]////'[&&&&FL!A]",
+      "F": "S////F",
+      "S": "FL",
+      "L": "['''∧∧{-f+f+f-|-f+f+f}]"
+    }
+  }
+}

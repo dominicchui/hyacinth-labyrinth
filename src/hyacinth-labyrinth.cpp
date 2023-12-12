@@ -86,7 +86,8 @@ void HyacinthLabyrinth::run() {
   };
 
   // Create camera
-  glm::vec4 cam_pos(-5.f, -8.f, 5.f, 1.f);
+//  glm::vec4 cam_pos(-5.f, -12.f, 5.f, 1.f);
+  glm::vec4 cam_pos(0.f, -10.f, 6.f, 1.f);
   glm::vec4 focus_at(0.f, 0.f, 0.f, 1.f);
   SceneCameraData scd{
       cam_pos, // pos
@@ -103,6 +104,7 @@ void HyacinthLabyrinth::run() {
 
   auto viewerObject = LveGameObject::createGameObject();
   viewerObject.transform.translation.z = -2.5f;
+
 
   KeyboardMovementController cameraController{};
   KeyboardMovementController ballController{};
@@ -133,6 +135,7 @@ void HyacinthLabyrinth::run() {
         gameObjects.at(m_ball_id),
         &m_maze
     );
+    gameObjects.at(m_ball_light_id).transform.translation = gameObjects.at(m_ball_id).transform.translation;
 
     if (auto commandBuffer = m_renderer.beginFrame()) {
       int frameIndex = m_renderer.getFrameIndex();
@@ -173,22 +176,38 @@ void HyacinthLabyrinth::loadGameObjects() {
         VKModel::createModelFromFile(m_device, "resources/models/ball.obj", true);
     auto ball = LveGameObject::createGameObject();
     ball.model = model;
-    ball.transform.translation = {-.5f, 0.25f, 0.f};
-    ball.transform.scale = {0.25f, .25f, 0.25f};
+    ball.transform.translation = {-.5f, 0.5f, 0.f};
+//    ball.transform.scale = {0.25f, 0.25f, 0.25f};
+    ball.transform.scale = {0.3f, 0.3f, 0.3f};
     ball.transform.update_matrices();
-    ball.phys.radius = ball.transform.scale.x;
+//    ball.phys.radius = ball.transform.scale.x;
+    ball.phys.radius = 0.25f;
     m_ball_id = ball.getId();
     gameObjects.emplace(m_ball_id, std::move(ball));
 
-  model = VKModel::createModelFromFile(m_device, "resources/models/smooth_vase.obj");
+
+    // add light to ball
+    auto ballLight = LveGameObject::makePointLight(0.2f);
+    ballLight.transform.scale = {0.5f, 0.5f, 0.5f};
+    ballLight.color = glm::vec3(0.8f);
+    m_ball_light_id = ballLight.getId();
+    gameObjects.emplace(m_ball_light_id, std::move(ballLight));
+
+//    gameObjects.at(m_ball_id).pointLight = std::unique_ptr<PointLightComponent> (ballLight);
+
+  model = VKModel::createModelFromFile(m_device,
+                                        "resources/models/lsys.obj",
+                                         true, glm::vec3(1.f, 0.1f, 0.1f));
   auto smoothVase = LveGameObject::createGameObject();
   smoothVase.model = model;
   smoothVase.transform.translation = {.5f, .5f, 0.f};
-  smoothVase.transform.scale = {3.f, 1.5f, 3.f};
+  smoothVase.transform.scale = {0.08f, -0.08f, 0.08f};
   smoothVase.transform.update_matrices();
   gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
-  model = VKModel::createModelFromFile(m_device, "resources/models/quad.obj");
+  model = VKModel::createModelFromFile(m_device,
+                                       "resources/models/quad.obj",
+                                       true, glm::vec3(0.9f, 0.9f, 1.f));
   auto floor = LveGameObject::createGameObject();
   floor.model = model;
   floor.transform.translation = {0.f, 1.f, 0.f};
@@ -197,7 +216,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  Maze maze = Maze(10,10);
+  Maze maze = Maze(5,5);
   maze.generate();
   std::cout << maze.toString() << std::endl;
   std::vector<std::vector<bool>> map = maze.toBoolVector();
@@ -225,15 +244,23 @@ void HyacinthLabyrinth::loadGameObjects() {
       {1.f, 1.f, 1.f}
   };
 
-  for (int i = 0; i < lightColors.size(); i++) {
-    auto pointLight = LveGameObject::makePointLight(0.2f);
-    pointLight.color = lightColors[i];
-    auto rotateLight = glm::rotate(
-        glm::mat4(1.f),
-        (i * glm::two_pi<float>()) / lightColors.size(),
-        {0.f, 1.f, 0.f});
-    pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-    pointLight.transform.update_matrices();
-    gameObjects.emplace(pointLight.getId(), std::move(pointLight));
-  }
+//  for (int i = 0; i < lightColors.size(); i++) {
+//    auto pointLight = LveGameObject::makePointLight(0.2f);
+//    pointLight.color = lightColors[i];
+//    auto rotateLight = glm::rotate(
+//        glm::mat4(1.f),
+//        (i * glm::two_pi<float>()) / lightColors.size(),
+//        {0.f, 1.f, 0.f});
+//    pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
+//    pointLight.transform.update_matrices();
+//    gameObjects.emplace(pointLight.getId(), std::move(pointLight));
+//  }
+
+// // Sun
+//  auto pointLight = LveGameObject::makePointLight(3.f);
+//  pointLight.color = glm::vec3(1.f, 1.f, 1.f);
+//  pointLight.transform.translation = glm::vec3(0.f, -6.f, 0.f);
+//  pointLight.transform.update_matrices();
+//  gameObjects.emplace(pointLight.getId(), std::move(pointLight));
+
 }

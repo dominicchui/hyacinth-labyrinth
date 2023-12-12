@@ -66,7 +66,11 @@ void MazeBlock::performRandomWalk() {
     // set up random generation
     static std::random_device rd; // a seed source for the random number engine
     static std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
+<<<<<<< HEAD
     std::uniform_int_distribution<> distrib(0, directions.size()-1);
+=======
+    std::uniform_int_distribution<> distrib(0, directions.size() - 1);
+>>>>>>> lsystems2
 
     // FIRST PASS
     int current = initial;

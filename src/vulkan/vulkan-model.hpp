@@ -43,11 +43,12 @@ class VKModel {
     VKModel(const VKModel&) = delete;
     VKModel &operator=(const VKModel &) = delete;
 
-    static std::unique_ptr<VKModel> createModelFromFile(
-        VKDeviceManager& device,
-        const std::string& filepath,
-        bool with_material = false
-        );
+  static std::unique_ptr<VKModel> createModelFromFile(
+      VKDeviceManager& device,
+      const std::string& filepath,
+      bool override_color = false,
+      glm::vec3 color = glm::vec3(0.f,0.f,0.f)
+  );
 
     void bind(VkCommandBuffer commandBuffer);
     void draw(VkCommandBuffer commandBuffer);

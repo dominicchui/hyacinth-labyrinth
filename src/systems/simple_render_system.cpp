@@ -66,15 +66,17 @@ void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLay
 void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
     assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-    PipelineConfigInfo pipelineConfig{};
-    VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
-    pipelineConfig.renderPass = renderPass;
-    pipelineConfig.pipelineLayout = pipelineLayout;
-    m_pipeline = std::make_unique<VulkanPipeline>(
-        m_device,
-        "simple_shader.vert.spv",
-        "simple_shader.frag.spv",
-        pipelineConfig);
+
+  PipelineConfigInfo pipelineConfig{};
+  VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
+  pipelineConfig.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
+  pipelineConfig.renderPass = renderPass;
+  pipelineConfig.pipelineLayout = pipelineLayout;
+  m_pipeline = std::make_unique<VulkanPipeline>(
+      m_device,
+      "simple_shader.vert.spv",
+      "simple_shader.frag.spv",
+      pipelineConfig);
 }
 
 void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {

@@ -1,0 +1,20 @@
+{
+  "type": "DOL",
+  "num_iters": 5,
+  "step_size": 1,
+  "stem_radius": 0.07,
+  "angle_incr": 18,
+  "tesselation_level": 30,
+  "lsystem": {
+    "axiom": "P",
+    "rules": {
+      "P": "I+[P+O]--//[--L]I[++L]-[PO]++PO",
+      "I": "FS[//&&L][//^^L]FS",
+      "S": "SFS",
+      "L": "['{+f-ff-f+|+f-ff-f}]",
+      "O": "[&&&E'/W////W////W////W////W]",
+      "E": "FF",
+      "W": "['^F][{&&&&-f+f|-f+f}]"
+    }
+  }
+}

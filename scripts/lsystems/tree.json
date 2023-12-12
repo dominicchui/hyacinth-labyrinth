@@ -1,0 +1,25 @@
+{
+  "type": "PDOL",
+  "num_iters": 9,
+  "step_size": 1,
+  "leaf_size": 1,
+  "stem_radius": 0.2,
+  "angle_incr": 22.5,
+  "tesselation_level": 30,
+  "lsystem": {
+    "numerical_constants": {
+      "r_1": 0.9,
+      "r_2": 0.6,
+      "a_0": 45,
+      "a_2": 45,
+      "d": 137.5,
+      "w_r": 0.707
+    },
+    "axiom": "A(1,10)",
+    "rules": {
+      "A(l,w)": "!(w)F(l)[&(a_0)B(l*r_2,w*w_r)]/(d)A(l*r_1,w*w_r)",
+      "B(l,w)": "!(w)F(l)[-(a_2)$C(l*r_2,w*w_r)]C(l*r_1,w*w_r)",
+      "C(l,w)": "!(w)F(l)[+(a_2)$B(l*r_2,w*w_r)]B(l*r_1,w*w_r)"
+    }
+  }
+}

@@ -85,7 +85,6 @@ void BallTest::run() {
   camera.initScene(scd, WIDTH, HEIGHT, 0.1f, 100.f);
   camera.recomputeMatrices(glm::vec3(0.f));
 
-
   auto viewerObject = LveGameObject::createGameObject();
   KeyboardMovementController ballController{};
 
