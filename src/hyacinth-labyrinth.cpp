@@ -1,8 +1,6 @@
 #include "hyacinth-labyrinth.hpp"
 
 #include "game/keyboard_movement_controller.hpp"
-#include "maze/maze.h"
-#include "game/maze.h"
 #include "vulkan/vulkan-buffer.hpp"
 #include "renderer/camera.h"
 #include "systems/point_light_system.hpp"
@@ -122,7 +120,48 @@ void HyacinthLabyrinth::run() {
         gameObjects.at(m_ball_id),
         &m_maze
     );
+    // move the ball light with the ball
     gameObjects.at(m_ball_light_id).transform.translation = gameObjects.at(m_ball_id).transform.translation;
+    // check the ball position in the maze
+    glm::vec3 ballPos = gameObjects.at(m_ball_id).transform.translation;
+    float pos_x = ballPos.x;
+    float pos_z = ballPos.z;
+
+    // determine which block we are in
+    int block = maze.getBlockIndexFromPosition(pos_x, pos_z, maze_center_x, maze_center_z);
+//    std::cout << "block " << block << std::endl;
+
+//    if (block!=4) {
+//        // generate more maze
+//        float x_offset=0;
+//        float z_offset=0;
+//        if (block==1) {
+//            std::cout << "move up shift down" << std::endl;
+//            maze.shiftDown();
+////            std::cout << maze.toString() << std::endl;
+//            maze_center_z += -1;
+//        } else if (block == 3) {
+//            std::cout << "move left shift right" << std::endl;
+//            maze.shiftRight();
+////            std::cout << maze.toString() << std::endl;
+//            maze_center_x += -1;
+//        } else if (block == 5) {
+//            std::cout << "move right shift left" << std::endl;
+//            maze.shiftLeft();
+////            std::cout << maze.toString() << std::endl;
+//            maze_center_x += 1;
+//        } else if (block == 7) {
+//            std::cout << "move down shift up" << std::endl;
+//            maze.shiftUp();
+////            std::cout << maze.toString() << std::endl;
+//            maze_center_z += 1;
+//        }
+//        std::cout << "maze center: " << maze_center_x << "," << maze_center_z << std::endl;;
+//        std::vector<std::vector<bool>> map = maze.toBoolVector();
+//        m_maze.generateMazeFromBoolVec(m_device, map, maze_center_x*maze.blockWidth, maze_center_z*maze.blockHeight);
+//        m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
+//    }
+
 
     if (auto commandBuffer = m_renderer.beginFrame()) {
       int frameIndex = m_renderer.getFrameIndex();
@@ -196,7 +235,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  Maze maze = Maze(5,5);
+  maze = Maze(3,3);
   maze.generate();
   std::cout << maze.toString() << std::endl;
   std::vector<std::vector<bool>> map = maze.toBoolVector();
@@ -212,7 +251,7 @@ void HyacinthLabyrinth::loadGameObjects() {
 //      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 //  };
 //  generateMazeFromBoolVec(map);
-  m_maze.generateMazeFromBoolVec(m_device, map);
+  m_maze.generateMazeFromBoolVec(m_device, map, 0.f, 0.f);
   m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 
   std::vector<glm::vec3> lightColors{
@@ -235,4 +274,14 @@ void HyacinthLabyrinth::loadGameObjects() {
     pointLight.transform.update_matrices();
     gameObjects.emplace(pointLight.getId(), std::move(pointLight));
   }
+
+  // add phong total
+  model =
+      VKModel::createModelFromFile(m_device, "resources/models/dragon.obj", true);
+  auto phongTotal = LveGameObject::createGameObject();
+  phongTotal.model = model;
+  phongTotal.transform.translation = {0.f, 5.f, 0.f};
+  phongTotal.transform.scale = {1.f, 1.f, 1.f};
+  phongTotal.transform.update_matrices();
+  gameObjects.emplace(phongTotal.getId(), std::move(ball));
 }

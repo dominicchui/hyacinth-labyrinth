@@ -50,17 +50,23 @@ public:
     }
     void generateMazeFromBoolVec(
         VKDeviceManager& device,
-        std::vector<std::vector<bool>>& map
+        std::vector<std::vector<bool>>& map,
+        float x_offset,
+        float y_offset
     ) {
         std::shared_ptr<VKModel> maze_wall_model =
             VKModel::createModelFromFile(device, "resources/models/cube.obj");
+        // delete old data first
+        spatial_map.clear();
+        wall_blocks.clear();
 
         map_height = float(map.size());
         map_width = float(map[0].size()); // Assuming all rows are the same size
 
         // Centering maze around 0 (for now)
-        float h_mid = map_half_height = map_height / 2.f;
-        float w_mid = map_half_width  = map_width / 2.f;
+        float h_mid = map_half_height = map_height / 2.f + x_offset;
+        float w_mid = map_half_width  = map_width / 2.f + y_offset;
+        std::cout << "w,h mid: " << w_mid << "," << w_mid << std::endl;;
 
         glm::vec3 coord = {-w_mid, 0.f - 100*epsilon, -h_mid};
         for (int32_t y = 0; y < map.size(); y++) {

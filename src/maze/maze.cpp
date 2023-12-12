@@ -1,7 +1,6 @@
 #include "maze.h"
 #include <iostream>
 
-
 void linkMazeBlocks(MazeBlock* first, MazeBlock* second, Direction dir) {
     switch(dir) {
     case Direction::N:
@@ -111,9 +110,9 @@ void Maze::shiftDown() {
 void Maze::shift(Direction dir) {
     if (dir == Direction::N) {
         // delete blocks in first row
-        delete mazeBlocks[0];
-        delete mazeBlocks[1];
-        delete mazeBlocks[2];
+//        delete mazeBlocks[0];
+//        delete mazeBlocks[1];
+//        delete mazeBlocks[2];
 
         // shift all blocks one up and drop first row
         for (int i=0; i<6; i++) {
@@ -142,13 +141,13 @@ void Maze::shift(Direction dir) {
         mazeBlocks[8] = bottomRight;
     } else if (dir == Direction::E) {
         // delete blocks on right side
-        delete mazeBlocks[2];
-        delete mazeBlocks[5];
-        delete mazeBlocks[8];
+//        delete mazeBlocks[2];
+//        delete mazeBlocks[5];
+//        delete mazeBlocks[8];
 
         // shift all blocks one right
         for (int i=8; i>0; i--) {
-            if (i!=3 && i!=6) {
+            if (i!=3 || i!=6) {
                 mazeBlocks[i] = mazeBlocks[i-1];
             }
         }
@@ -175,9 +174,9 @@ void Maze::shift(Direction dir) {
         mazeBlocks[6] = bottomLeft;
     } else if (dir == Direction::S) {
         // delete blocks on bottom side
-        delete mazeBlocks[6];
-        delete mazeBlocks[7];
-        delete mazeBlocks[8];
+//        delete mazeBlocks[6];
+//        delete mazeBlocks[7];
+//        delete mazeBlocks[8];
 
         // shift all blocks one down
         for (int i=8; i>2; i--) {
@@ -207,17 +206,20 @@ void Maze::shift(Direction dir) {
 
     } else if (dir == Direction::W) {
         // delete blocks on left side
-        delete mazeBlocks[0];
-        delete mazeBlocks[3];
-        delete mazeBlocks[6];
+        std::cout<<"deleting" << std::endl;
+//        delete mazeBlocks[0];
+//        delete mazeBlocks[3];
+//        delete mazeBlocks[6];
 
         // shift all blocks one left
+        std::cout<<"shifting" << std::endl;
         for (int i=0; i<8; i++) {
-            if (i!=2 && i!=5) {
+            if (i!=2 || i!=5) {
                 mazeBlocks[i] = mazeBlocks[i+1];
             }
         }
 
+        std::cout<<"generating" << std::endl;
         // generate three more blocks
         MazeBlock* right = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(right, mazeBlocks[4], Direction::W);
@@ -227,17 +229,18 @@ void Maze::shift(Direction dir) {
         
         MazeBlock* topRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(topRight, mazeBlocks[1], Direction::W);
-        linkMazeBlocks(topRight, mazeBlocks[5], Direction::S);
+        linkMazeBlocks(topRight, right, Direction::S);
         topRight->generate();
         topRight->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[2] = topRight;
         
         MazeBlock* bottomRight = new MazeBlock(denseBlockWidth, denseBlockHeight);
         linkMazeBlocks(bottomRight, mazeBlocks[7], Direction::W);
-        linkMazeBlocks(bottomRight, mazeBlocks[5], Direction::N);
+        linkMazeBlocks(bottomRight, right, Direction::N);
         bottomRight->generate();
         bottomRight->assignStringRepresentations(WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION);
         mazeBlocks[8] = bottomRight;
+        std::cout<<"done" << std::endl;
     }
 }
 
@@ -424,4 +427,48 @@ std::vector<std::vector<bool>> Maze::toBoolVector() {
         vectorRep.push_back(row);
     }
     return vectorRep;
+}
+
+
+int Maze::getBlockIndexFromPosition(float x, float z, float center_x, float center_z) {
+//    std::cout << "x " << x << std::endl;
+//    std::cout << "z " << z << std::endl;
+    // determine x and z in terms of blockWidth
+    // center of block 4 at (0,0)
+    // center of block 0 at (-1,-1)
+    // boundaries at 0.5 intervals
+    float blockX = x/blockWidth;
+    float blockZ = z/blockHeight;
+//    std::cout << "absolute block x " << blockX << std::endl;
+//    std::cout << "absolute block z " << blockZ << std::endl;
+    float blockXDiff = blockX - center_x;
+    float blockZDiff = blockZ - center_z;
+//    std::cout << "relative block x " << blockXDiff << std::endl;
+//    std::cout << "relative block z " << blockZDiff << std::endl;
+
+    if (blockXDiff < -0.5 && blockZDiff < -0.5) {
+        return 0;
+    } else if (blockXDiff >= -0.5 && blockXDiff < 0.5 && blockZDiff < -0.5) {
+        return 1;
+    } else if (blockXDiff > 0.5 && blockZDiff < -0.5) {
+        return 2;
+    } else if (blockXDiff < -0.5 &&
+               blockZDiff >= -0.5 && blockZDiff < 0.5) {
+        return 3;
+    } else if (blockXDiff >= -0.5 && blockXDiff < 0.5 &&
+               blockZDiff >= -0.5 && blockZDiff < 0.5) {
+        return 4;
+    } else if (blockXDiff > 0.5 &&
+               blockZDiff >= -0.5 && blockZDiff < 0.5) {
+        return 5;
+    } else if (blockXDiff < -0.5 && blockZDiff > 0.5) {
+        return 6;
+    } else if (blockXDiff >= -0.5 && blockXDiff < 0.5 &&
+               blockZDiff >= 0.5) {
+        return 7;
+    } else if (blockXDiff >= 0.5 && blockZDiff >= 0.5) {
+        return 8;
+    } else {
+        return -1;
+    }
 }

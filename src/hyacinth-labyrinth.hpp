@@ -1,5 +1,7 @@
 #pragma once
 
+#include "maze/maze.h"
+#include "game/maze.h"
 #include "vulkan/vulkan-descriptors.hpp"
 #include "vulkan/vulkan-device.hpp"
 #include "game/lve_game_object.hpp"
@@ -29,6 +31,7 @@ class HyacinthLabyrinth {
   void generateMazeFromBoolVec(std::vector<std::vector<bool>>& map);
   
   GameMaze m_maze;
+  Maze maze;
   GlfwWindow m_window;
   VKDeviceManager m_device;
   VKRenderer m_renderer;
@@ -38,4 +41,7 @@ class HyacinthLabyrinth {
   // note: order of declarations matters
   std::unique_ptr<VK_DP_Mgr> globalPool{};
   LveGameObject::Map gameObjects;
+
+  float maze_center_x = 0.f;
+  float maze_center_z = 0.f;
 };

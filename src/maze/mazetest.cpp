@@ -12,7 +12,16 @@ int main(int argc, char *argv[]) {
 
     maze.toBoolVector();
 
-//    maze.shiftLeft();
+    maze.shiftDown();
 //    maze.addExtraPaths();
-//    std::cout << maze.toString() << std::endl;
+    std::cout << maze.toString() << std::endl;
+    maze.shiftDown();
+    //    maze.addExtraPaths();
+    std::cout << maze.toString() << std::endl;
+    maze.shiftUp();
+    //    maze.addExtraPaths();
+    std::cout << maze.toString() << std::endl;
+    maze.shiftUp();
+    //    maze.addExtraPaths();
+    std::cout << maze.toString() << std::endl;
 }
