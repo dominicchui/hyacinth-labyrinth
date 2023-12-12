@@ -18,6 +18,9 @@ VK_DSL_Mgr::Builder &VK_DSL_Mgr::Builder::addBinding(
   layoutBinding.descriptorType = descriptorType;
   layoutBinding.descriptorCount = count;
   layoutBinding.stageFlags = stageFlags;
+  if (count > 1) {
+      layoutBinding.pImmutableSamplers = 0;
+  }
   m_bindings[binding] = layoutBinding;
   return *this;
 }
@@ -169,25 +172,29 @@ VKDescriptorWriter& VKDescriptorWriter::writeBuffer(
 
 VKDescriptorWriter &VKDescriptorWriter::writeImage(
     uint32_t binding,
-    VkDescriptorImageInfo *imageInfo
+    VkDescriptorImageInfo *imageInfo,
+    uint32_t descriptor_count // = 1
 ) {
-  assert(m_setLayout.m_bindings.count(binding) == 1 && "Layout does not contain specified binding");
+    assert(m_setLayout.m_bindings.count(binding) > 0 && "Layout does not contain specified binding");
 
-  auto &bindingDescription = m_setLayout.m_bindings[binding];
+    auto &bindingDescription = m_setLayout.m_bindings[binding];
 
-  assert(
-      bindingDescription.descriptorCount == 1 &&
-      "Binding single descriptor info, but binding expects multiple");
+    // assert(
+    //   bindingDescription.descriptorCount == 1 &&
+    //   "Binding single descriptor info, but binding expects multiple");
 
-  VkWriteDescriptorSet write{};
-  write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-  write.descriptorType = bindingDescription.descriptorType;
-  write.dstBinding = binding;
-  write.pImageInfo = imageInfo;
-  write.descriptorCount = 1;
+    VkWriteDescriptorSet write{};
+    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write.descriptorType = bindingDescription.descriptorType;
+    write.dstBinding = binding;
+    write.pImageInfo = imageInfo;
+    write.descriptorCount = descriptor_count;
+    if (descriptor_count > 1) {
+        write.dstArrayElement = 0;
+    }
 
-  m_writes.push_back(write);
-  return *this;
+    m_writes.push_back(write);
+    return *this;
 }
 
 bool VKDescriptorWriter::build(VkDescriptorSet &set) {

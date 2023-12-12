@@ -92,7 +92,13 @@ void VKModel::createImage(
 
 void VKModel::createTextureImage(void) {
     int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load("../resources/textures/andyVanDam.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    stbi_uc* pixels = nullptr;
+    static int32_t id = 0;
+    if (id % 2) {
+        pixels = stbi_load("../resources/textures/marsTexture.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    } else {
+        pixels = stbi_load("../resources/textures/andyVanDam.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    }
     VkDeviceSize imageSize = texWidth * texHeight * 4;
 
     if (!pixels) {

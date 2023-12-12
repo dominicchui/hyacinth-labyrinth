@@ -21,7 +21,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
   int numLights;
 } ubo;
 
-layout(set = 0, binding = 1) uniform sampler2D texSampler;
+layout(set = 0, binding = 1) uniform sampler2D texSampler[2];
 
 layout(push_constant) uniform Push {
   mat4 modelMatrix;
@@ -29,7 +29,7 @@ layout(push_constant) uniform Push {
 } push;
 
 void main() {
-  vec3 tex_clr = vec3(texture(texSampler, fragUV));
+  vec3 tex_clr = vec3(texture(texSampler[1], fragUV));
   vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
   vec3 specularLight = vec3(0.0);
   vec3 surfaceNormal = normalize(fragNormalWorld);

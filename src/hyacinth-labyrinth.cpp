@@ -20,6 +20,7 @@
 #include <cassert>
 #include <chrono>
 #include <stdexcept>
+#include <set>
 
 HyacinthLabyrinth::HyacinthLabyrinth()
   : m_window(WIDTH, HEIGHT, "Hyacinth Labrynth"),
@@ -30,7 +31,7 @@ HyacinthLabyrinth::HyacinthLabyrinth()
       VK_DP_Mgr::Builder(m_device)
           .setMaxSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
-          .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
           .build();
     loadGameObjects();
 }
@@ -49,11 +50,16 @@ void HyacinthLabyrinth::run() {
     uboBuffers[i]->map();
   }
 
-  auto globalSetLayout =
-      VK_DSL_Mgr::Builder(m_device)
-          .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-          .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-          .build();
+  auto globalSetLayout_builder = VK_DSL_Mgr::Builder(m_device);
+  globalSetLayout_builder.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS);
+  globalSetLayout_builder.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2);
+
+  // int32_t sl_bind_id = 1;
+  // for (auto& obj : gameObjects) {
+  //     if (sl_bind_id > 2) break;
+  //     globalSetLayout_builder.addBinding(sl_bind_id++, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+  // }
+  auto globalSetLayout = globalSetLayout_builder.build();
 
   auto& ball = gameObjects.at(m_ball_id);
 
@@ -66,11 +72,50 @@ void HyacinthLabyrinth::run() {
 
   std::vector<VkDescriptorSet> globalDescriptorSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT);
   for (int i = 0; i < globalDescriptorSets.size(); i++) {
-    auto bufferInfo = uboBuffers[i]->descriptorInfo();
-    VKDescriptorWriter(*globalSetLayout, *globalPool)
-        .writeBuffer(0, &bufferInfo)
-        .writeImage(1, &imageInfo)
-        .build(globalDescriptorSets[i]);
+      auto bufferInfo = uboBuffers[i]->descriptorInfo();
+      auto writer = VKDescriptorWriter(*globalSetLayout, *globalPool)
+                        .writeBuffer(0, &bufferInfo);
+
+
+      VkDescriptorImageInfo	descriptorImageInfos[2];
+
+
+      // std::vector<VkDescriptorImageInfo*> image_infos;
+      std::set<VkImageView> imviewset;
+      int32_t bind_id = 0;
+      for (auto& obj : gameObjects) {
+          if (bind_id > 1) {
+              break;
+          }
+          if (obj.second.model) {
+              VkImageView imview = obj.second.model->textureImageView;
+              std::cout << "obj.second.model->textureImageView: " << imview << std::endl;
+              if (obj.second.model->textureImageView == VK_NULL_HANDLE) {
+                  std::cout << "Yelling about textureImageView being NULL\n";
+              }
+              if (imviewset.contains(imview)) {
+                  continue;
+              }
+              imviewset.insert(imview);
+              std::cout << "bind_id: " << bind_id << std::endl;
+              descriptorImageInfos[bind_id].sampler = obj.second.model->textureSampler;
+              descriptorImageInfos[bind_id].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+              descriptorImageInfos[bind_id].imageView = imview;
+              // image_infos.push_back(new VkDescriptorImageInfo {
+              //     obj.second.model->textureSampler,
+              //     imview,
+              //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+              // });
+              //writer.writeImage(bind_id, image_infos.back());
+              bind_id++;
+
+           }
+      }
+      writer.writeImage(1, descriptorImageInfos, 2);
+      writer.build(globalDescriptorSets[i]);
+      // for (auto* info : image_infos) {
+      //     delete info;
+      // }
   }
 
   SimpleRenderSystem simpleRenderSystem{
@@ -158,7 +203,7 @@ void HyacinthLabyrinth::run() {
 
       // order here matters
       simpleRenderSystem.renderGameObjects(frameInfo);
-      pointLightSystem.render(frameInfo);
+      //pointLightSystem.render(frameInfo);
 
       m_renderer.endSwapChainRenderPass(commandBuffer);
       m_renderer.endFrame();
@@ -200,19 +245,19 @@ void HyacinthLabyrinth::loadGameObjects() {
   Maze maze = Maze(10,10);
   maze.generate();
   std::cout << maze.toString() << std::endl;
-  std::vector<std::vector<bool>> map = maze.toBoolVector();
-//  std::vector<std::vector<bool>> map = {
-//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
-//      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
-//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-//  };
-//  generateMazeFromBoolVec(map);
+  //std::vector<std::vector<bool>> map = maze.toBoolVector();
+ std::vector<std::vector<bool>> map = {
+     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+     {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
+     {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
+     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+     {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+     {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+     {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+ };
+ //generateMazeFromBoolVec(map);
   m_maze.generateMazeFromBoolVec(m_device, map);
   m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 

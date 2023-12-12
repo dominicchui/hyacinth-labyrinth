@@ -90,7 +90,7 @@ class VKDescriptorWriter {
   VKDescriptorWriter(VK_DSL_Mgr& setLayout, VK_DP_Mgr &pool);
 
   VKDescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo *bufferInfo);
-  VKDescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo);
+  VKDescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo, uint32_t descriptor_count = 1);
 
   bool build(VkDescriptorSet &set);
   void overwrite(VkDescriptorSet &set);
