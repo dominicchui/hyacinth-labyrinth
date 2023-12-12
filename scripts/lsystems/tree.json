@@ -2,6 +2,7 @@
   "type": "PDOL",
   "num_iters": 9,
   "step_size": 1,
+  "leaf_size": 1,
   "stem_radius": 0.2,
   "angle_incr": 22.5,
   "tesselation_level": 30,
