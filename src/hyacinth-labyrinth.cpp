@@ -75,7 +75,7 @@ void HyacinthLabyrinth::run() {
 
   // Create camera
 //  glm::vec4 cam_pos(-5.f, -12.f, 5.f, 1.f);
-  glm::vec4 cam_pos(0.f, -10.f, 6.f, 1.f);
+  glm::vec4 cam_pos(1.f, -11.f, 7.f, 1.f);
   glm::vec4 focus_at(0.f, 0.f, 0.f, 1.f);
   SceneCameraData scd{
       cam_pos, // pos
@@ -116,6 +116,7 @@ void HyacinthLabyrinth::run() {
             frameTime,
             camera
         );
+
     camera.recomputeMatrices(ball.transform.translation);
 
     ballController.moveInPlaneXZ(
@@ -196,7 +197,7 @@ void HyacinthLabyrinth::loadGameObjects() {
 
   model = VKModel::createModelFromFile(m_device,
                                        "resources/models/quad.obj",
-                                       true, glm::vec3(0.9f, 0.9f, 1.f));
+                                       true, glm::vec3(1.f, 1.f, 1.f));
   auto floor = LveGameObject::createGameObject();
   floor.model = model;
   floor.transform.translation = {0.f, 1.f, 0.f};
@@ -245,11 +246,11 @@ void HyacinthLabyrinth::loadGameObjects() {
 //    gameObjects.emplace(pointLight.getId(), std::move(pointLight));
 //  }
 
-// // Sun
-//  auto pointLight = LveGameObject::makePointLight(3.f);
-//  pointLight.color = glm::vec3(1.f, 1.f, 1.f);
-//  pointLight.transform.translation = glm::vec3(0.f, -6.f, 0.f);
-//  pointLight.transform.update_matrices();
-//  gameObjects.emplace(pointLight.getId(), std::move(pointLight));
+ // Sun
+  auto pointLight = LveGameObject::makePointLight(9.f);
+  pointLight.color = glm::vec3(1.f, 1.f, 1.f);
+  pointLight.transform.translation = glm::vec3(0.f, -6.f, 0.f);
+  pointLight.transform.update_matrices();
+  gameObjects.emplace(pointLight.getId(), std::move(pointLight));
 
 }

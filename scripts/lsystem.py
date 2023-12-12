@@ -86,68 +86,68 @@ def generate_regex(module):
 
     return pattern
 
-def generate_lsystem_PDOL(constants, axiom, rules, iters):
-    '''
-    Generates the string representation of a PDOL (parametric,
-    deterministic, context-free) L-system.
-    '''
-    string = axiom
-    # On each iteration, we want to find all occurrences of patterns
-    # matching a rule's predecessor
-    for i in range(iters):
-        print(string)
-        new_string = ''
-        for k in range(len(string)):
-            # Determine if the symbol at k is just a single letter
-            letter = string[k]
-            # If it's just a character by itself...
-            if k+1 >= len(string) or string[k+1] != '(':
-                match_found = False
-                for pred in rules:
-                    if pred == letter:
-                        # Add its replacement to the string
-                        new_string += rules[pred]
-                        match_found = True
-                # If no matching rule was found, append the letter as-is
-                if not match_found:
-                    new_string += letter
-            # Otherwise, if it's a "module", meaning a character with some params...
-            else:
-                # Extract the entire module
-                l = k + 1
-                module = letter
-                while string[l] != ')':
-                    module += string[l]
-                    l += 1
-                module += ')'
-                # Search for a rule which matches this module
-                match_found = False
-                for pred in rules:
-                    # If starting letter doesn't match, it isn't a match
-                    if pred[0] != letter:
-                        continue
+# def generate_lsystem_PDOL(constants, axiom, rules, iters):
+#     '''
+#     Generates the string representation of a PDOL (parametric,
+#     deterministic, context-free) L-system.
+#     '''
+#     string = axiom
+#     # On each iteration, we want to find all occurrences of patterns
+#     # matching a rule's predecessor
+#     for i in range(iters):
+#         print(string)
+#         new_string = ''
+#         for k in range(len(string)):
+#             # Determine if the symbol at k is just a single letter
+#             letter = string[k]
+#             # If it's just a character by itself...
+#             if k+1 >= len(string) or string[k+1] != '(':
+#                 match_found = False
+#                 for pred in rules:
+#                     if pred == letter:
+#                         # Add its replacement to the string
+#                         new_string += rules[pred]
+#                         match_found = True
+#                 # If no matching rule was found, append the letter as-is
+#                 if not match_found:
+#                     new_string += letter
+#             # Otherwise, if it's a "module", meaning a character with some params...
+#             else:
+#                 # Extract the entire module
+#                 l = k + 1
+#                 module = letter
+#                 while string[l] != ')':
+#                     module += string[l]
+#                     l += 1
+#                 module += ')'
+#                 # Search for a rule which matches this module
+#                 match_found = False
+#                 for pred in rules:
+#                     # If starting letter doesn't match, it isn't a match
+#                     if pred[0] != letter:
+#                         continue
 
-                    # If number of commas is not the same, it isn't a match
-                    if pred.count(',') != module.count(','):
-                        continue
+#                     # If number of commas is not the same, it isn't a match
+#                     if pred.count(',') != module.count(','):
+#                         continue
 
-                    # Otherwise, it is a match so extract the names/values of each param
-                    pred_regex = generate_regex(pred)
-                    param_vals = list(re.match(pred_regex, module).groups())
-                    param_names = list(re.match(pred_regex, pred).groups())
-                    param_dict = {k: v for k, v in zip(param_names, param_vals)}
-                    print(param_dict)
+#                     # Otherwise, it is a match so extract the names/values of each param
+#                     pred_regex = generate_regex(pred)
+#                     param_vals = list(re.match(pred_regex, module).groups())
+#                     param_names = list(re.match(pred_regex, pred).groups())
+#                     param_dict = {k: v for k, v in zip(param_names, param_vals)}
+#                     print(param_dict)
 
-                    # Substitute the constants values into the successor
-                    constants_trans = str.maketrans(constants)
-                    succ = succ.translate(constants_trans)
+#                     # Substitute the constants values into the successor
+#                     constants_trans = str.maketrans(constants)
+#                     succ = succ.translate(constants_trans)
 
-                    # Substitute in the param values into the successor
-                    succ = rules[pred]
-                    param_dict_trans = str.maketrans(param_dict)
-                    succ = succ.translate(param_dict_trans)
+#                     # Substitute in the param values into the successor
+#                     succ = rules[pred]
+#                     param_dict_trans = str.maketrans(param_dict)
+#                     succ = succ.translate(param_dict_trans)
 
-                    print(succ)
+#                     print(succ)
 
 
 def generate_lsystem(type, lsystem, iters):
@@ -159,10 +159,11 @@ def generate_lsystem(type, lsystem, iters):
                                     lsystem['rules'], 
                                     iters)
     else:
-        return generate_lsystem_PDOL(lsystem['numerical_constants'], 
-                                     lsystem['axiom'], 
-                                     lsystem['rules'], 
-                                     iters)
+        # return generate_lsystem_PDOL(lsystem['numerical_constants'], 
+        #                              lsystem['axiom'], 
+        #                              lsystem['rules'], 
+        #                              iters)
+        return None
 
 def forward(pos, rot, step_size):
     heading = rot[:, 0].reshape((3))
@@ -187,18 +188,20 @@ def roll(rot, alpha):
                    [0, np.sin(alpha), np.cos(alpha)]])
     return rot @ R_H
 
-def create_geometry(type, lstring, step_size, leaf_size, stem_radius, angle_incr, tesselation_level):
+def create_geometry(type, lstring, step_size, leaf_size, leaf_angle, stem_radius, angle_incr,
+                    tesselation_level, prune_enabled, prune_bounds, show_stem):
     '''
     Creates a list of vertices and faces from the L-system string.
     This is the "geometric interpretation" of the string.
     '''
     if type == TYPE_DOL:
-        return create_geometry_DOL(lstring, step_size, leaf_size, stem_radius,
-                                   angle_incr, tesselation_level)
+        return create_geometry_DOL(lstring, step_size, leaf_size, leaf_angle, stem_radius,
+                                   angle_incr, tesselation_level, prune_enabled, prune_bounds, show_stem)
     else:
         return None # TODO
 
-def create_geometry_DOL(lstring, step_size, leaf_size, stem_radius, angle_incr, tesselation_level):
+def create_geometry_DOL(lstring, step_size, leaf_size, leaf_angle, stem_radius, angle_incr,
+                        tesselation_level, prune_enabled, prune_bounds, show_stem):
     # Track current position
     curr_pos = np.array([0, 0, 0])
     # Use a 3x3 matrix to track our current rotation.
@@ -218,28 +221,28 @@ def create_geometry_DOL(lstring, step_size, leaf_size, stem_radius, angle_incr, 
     # Store the vertices and faces generated as we go
     vertices = []
     faces = []
-    
-    # Define clipping boundaries (for hedges)
-    x_min = -5
-    x_max = 5
-    y_min = -5
-    y_max = 5
-    z_min = 0
-    z_max = 10
 
     # Process the string symbol by symbol
     for symbol in lstring:
+        if in_leaf:
+            theta = leaf_angle
+        else:
+            theta = angle_incr
         if symbol == 'F' or symbol == 'G':
             # Check if current position is in clipping bounds
-            if (curr_pos[0] > x_min and curr_pos[0] < x_max and
-                curr_pos[1] > y_min and curr_pos[1] < y_max and
-                curr_pos[2] > z_min and curr_pos[2] < z_max):
+            if (show_stem and (not prune_enabled or
+                (curr_pos[0] > prune_bounds['x_min'] and curr_pos[0] < prune_bounds['x_max'] and
+                curr_pos[1] > prune_bounds['y_min'] and curr_pos[1] < prune_bounds['y_max'] and
+                curr_pos[2] > prune_bounds['z_min'] and curr_pos[2] < prune_bounds['z_max']))):
                 
                 # Add vertices at the beginning of the segment
                 vertices.extend(get_cross_section_vertices(curr_pos,
                                                             curr_rot,
                                                             stem_radius,
                                                             tesselation_level))
+                # Move forward
+                curr_pos = forward(curr_pos, curr_rot, step_size)
+
                 # Add vertices at the end of the segment
                 vertices.extend(get_cross_section_vertices(curr_pos,
                                                            curr_rot,
@@ -247,9 +250,8 @@ def create_geometry_DOL(lstring, step_size, leaf_size, stem_radius, angle_incr, 
                                                            tesselation_level))
                 # Add faces connecting the sets of vertices
                 faces.extend(get_faces(vertices, tesselation_level))
-
-            # Move forward
-            curr_pos = forward(curr_pos, curr_rot, step_size)
+            else:
+                curr_pos = forward(curr_pos, curr_rot, step_size)
                 
         elif symbol == 'f':
             if in_leaf:
@@ -259,17 +261,17 @@ def create_geometry_DOL(lstring, step_size, leaf_size, stem_radius, angle_incr, 
             else:
                 curr_pos = forward(curr_pos, curr_rot, step_size)
         elif symbol == '+':
-            curr_rot = yaw(curr_rot, angle_incr)
+            curr_rot = yaw(curr_rot, theta)
         elif symbol == '-':
-            curr_rot = yaw(curr_rot, -angle_incr)
+            curr_rot = yaw(curr_rot, -theta)
         elif symbol == '&':
-            curr_rot = pitch(curr_rot, angle_incr)
+            curr_rot = pitch(curr_rot, theta)
         elif symbol == '^' or symbol == '∧':
-            curr_rot = pitch(curr_rot, -angle_incr)
+            curr_rot = pitch(curr_rot, -theta)
         elif symbol == '~':
-            curr_rot = roll(curr_rot, angle_incr)
+            curr_rot = roll(curr_rot, theta)
         elif symbol == '/':
-            curr_rot = roll(curr_rot, -angle_incr)
+            curr_rot = roll(curr_rot, -theta)
         elif symbol == '|':
             curr_rot = yaw(curr_rot, np.radians(180))
         elif symbol == '[':
@@ -280,16 +282,25 @@ def create_geometry_DOL(lstring, step_size, leaf_size, stem_radius, angle_incr, 
             curr_rot = state[1]
         elif symbol == '{':
             # Check if current position is in clipping bounds
-            if (curr_pos[0] > x_min and curr_pos[0] < x_max and
-                curr_pos[1] > y_min and curr_pos[1] < y_max and
-                curr_pos[2] > z_min and curr_pos[2] < z_max):
-                    
+            if (not prune_enabled or
+                (curr_pos[0] > prune_bounds['x_min'] and curr_pos[0] < prune_bounds['x_max'] and
+                curr_pos[1] > prune_bounds['y_min'] and curr_pos[1] < prune_bounds['y_max'] and
+                curr_pos[2] > prune_bounds['z_min'] and curr_pos[2] < prune_bounds['z_max'])):
+
                 in_leaf = True
         elif symbol == '}':
             if in_leaf:
                 faces.append(tuple(leaf_vertices))
                 in_leaf = False
                 leaf_vertices = []
+        elif symbol == '?':
+            # Rotate by random angle along all 3 axes
+            theta_pitch = np.random.uniform(0, 360)
+            theta_roll = np.random.uniform(0, 360)
+            theta_yaw = np.random.uniform(0, 360)
+            curr_rot = pitch(curr_rot, np.radians(theta_pitch))
+            curr_rot = roll(curr_rot, np.radians(theta_roll))
+            curr_rot = yaw(curr_rot, np.radians(theta_yaw))
         else:
             # Symbols with no geometric interpretation are skipped
             continue
@@ -360,7 +371,7 @@ if __name__ == '__main__':
     os.chdir('/Users/echen/Desktop/csci2230/hyacinth-labyrinth/scripts')
 
     # Choose which lsystem json file we want to use
-    filename = 'hedge.json'
+    filename = 'hedge2.json'
 
     # Parse the json to get a dictionary of all settings
     lsystems_dir = os.path.join('lsystems')
@@ -376,9 +387,13 @@ if __name__ == '__main__':
                                       lstring, 
                                       settings['step_size'],
                                       settings['leaf_size'],
+                                      np.radians(settings['leaf_angle']),
                                       settings['stem_radius'], 
-                                      np.radians(settings['angle_incr']), 
-                                      settings['tesselation_level'])
+                                      np.radians(settings['angle_incr']),
+                                      settings['tesselation_level'],
+                                      settings['prune_enabled'],
+                                      settings['prune_bounds'],
+                                      settings['show_stem'])
 
     # Add the geometry to the scene as a mesh
     add_geometry_to_scene(vertices, faces)

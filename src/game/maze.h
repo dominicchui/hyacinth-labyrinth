@@ -104,6 +104,8 @@ public:
         }
         std::shared_ptr<VKModel> maze_wall_model =
             VKModel::createModelFromFile(device, "resources/models/hedge2.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
+        std::shared_ptr<VKModel> maze_wall_base_model =
+            VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
 
         // std::for_each(
         //     wall_spatial_map.begin(),
@@ -122,12 +124,29 @@ public:
             geom_wall.transform = wall.transform;
 
             geom_wall.transform.scale = {0.85f, -0.85f, 0.85f};
-//            geom_wall.transform.scale = {0.45f, -0.45f, 0.45f};
+            geom_wall.transform.translation = {geom_wall.transform.translation.x,
+                                               geom_wall.transform.translation.y + 0.9f,
+                                               geom_wall.transform.translation.z};
             int randomRot = distribution(gen);
             geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
 
             geom_wall.transform.update_matrices();
             obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
+
+            // Add a litle patch of dirt below
+            LveGameObject&& geom_base = LveGameObject::createGameObject();
+            geom_base.model = maze_wall_base_model;
+            geom_base.transform = wall.transform;
+
+            geom_base.transform.scale = {geom_base.transform.scale.x,
+                                         geom_base.transform.scale.y / 10.f,
+                                         geom_base.transform.scale.z};
+            geom_base.transform.translation = {geom_base.transform.translation.x,
+                                               geom_base.transform.translation.y + 1.f,
+                                               geom_base.transform.translation.z};
+
+            geom_base.transform.update_matrices();
+            obj_map.emplace(geom_base.getId(), std::move(geom_base));
        }
 
         //);

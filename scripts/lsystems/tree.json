@@ -3,7 +3,9 @@
   "num_iters": 9,
   "step_size": 1,
   "leaf_size": 1,
+  "leaf_angle": 22.5,
   "stem_radius": 0.2,
+  "show_stem": true,
   "angle_incr": 22.5,
   "tesselation_level": 30,
   "lsystem": {
@@ -21,5 +23,7 @@
       "B(l,w)": "!(w)F(l)[-(a_2)$C(l*r_2,w*w_r)]C(l*r_1,w*w_r)",
       "C(l,w)": "!(w)F(l)[+(a_2)$B(l*r_2,w*w_r)]B(l*r_1,w*w_r)"
     }
-  }
+  },
+  "prune_enabled": false,
+  "prune_bounds": {}
 }
