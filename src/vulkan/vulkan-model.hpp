@@ -52,6 +52,9 @@ class VKModel {
     void bind(VkCommandBuffer commandBuffer);
     void draw(VkCommandBuffer commandBuffer);
 
+    VkImageView textureImageView;
+    VkSampler textureSampler;
+
   private:
     void createImage(
         uint32_t width,
@@ -80,7 +83,5 @@ class VKModel {
     uint32_t indexCount;
 
     VkImage textureImage;
-    VkImageView textureImageView;
-    VkSampler textureSampler;
     VkDeviceMemory textureImageMemory;
 };

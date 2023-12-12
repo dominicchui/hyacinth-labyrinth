@@ -94,8 +94,8 @@ void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
         auto& obj = kv.second;
         if (obj.model == nullptr) continue;
         SimplePushConstantData push{};
-        push.modelMatrix = obj.transform.mat4();
-        push.normalMatrix = obj.transform.normalMatrix();
+        push.modelMatrix = obj.transform.mat4;
+        push.normalMatrix = obj.transform.normalMatrix;
 
         vkCmdPushConstants(
             frameInfo.commandBuffer,
@@ -106,11 +106,11 @@ void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
             &push);
 
         // for image:
-        VkDescriptorImageInfo imageInfo(
-            textureSampler,
-            textureImageView,
+        VkDescriptorImageInfo imageInfo{
+            obj.model->textureSampler,
+            obj.model->textureImageView,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-            );
+        };
         m_descriptorWriter->writeImage(1, &imageInfo /* image pointer */);
         m_descriptorWriter->overwrite(m_descriptorSet);
 
