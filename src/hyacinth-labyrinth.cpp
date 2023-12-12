@@ -24,14 +24,14 @@
 HyacinthLabyrinth::HyacinthLabyrinth()
   : m_window(WIDTH, HEIGHT, "Hyacinth Labrynth"),
     m_device(m_window),
-    m_renderer(m_window, m_device)
-{
-  globalPool =
+    m_renderer(m_window, m_device
+) {
+    globalPool =
       VK_DP_Mgr::Builder(m_device)
           .setMaxSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .build();
-  loadGameObjects();
+    loadGameObjects();
 }
 
 HyacinthLabyrinth::~HyacinthLabyrinth() {}

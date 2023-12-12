@@ -53,6 +53,19 @@ class VKModel {
   void draw(VkCommandBuffer commandBuffer);
 
  private:
+  void createImage(
+      uint32_t width,
+      uint32_t height,
+      VkFormat format,
+      VkImageTiling tiling,
+      VkImageUsageFlags usage,
+      VkMemoryPropertyFlags properties,
+      VkImage& image,
+      VkDeviceMemory& imageMemory
+  );
+
+  void createTextureImage(void);
+  void createTextureImageView(void);
   void createVertexBuffers(const std::vector<Vertex>& vertices);
   void createIndexBuffers(const std::vector<uint32_t>& indices);
 
@@ -64,4 +77,8 @@ class VKModel {
   bool hasIndexBuffer = false;
   std::unique_ptr<VKBufferMgr> indexBuffer;
   uint32_t indexCount;
+
+  VkImage textureImage;
+  VkImageView textureImageView;
+  VkDeviceMemory textureImageMemory;
 };
