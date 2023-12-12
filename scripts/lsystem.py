@@ -218,24 +218,39 @@ def create_geometry_DOL(lstring, step_size, leaf_size, stem_radius, angle_incr, 
     # Store the vertices and faces generated as we go
     vertices = []
     faces = []
+    
+    # Define clipping boundaries (for hedges)
+    x_min = -5
+    x_max = 5
+    y_min = -5
+    y_max = 5
+    z_min = 0
+    z_max = 10
 
     # Process the string symbol by symbol
     for symbol in lstring:
         if symbol == 'F' or symbol == 'G':
-            # Add vertices at the beginning of the segment
-            vertices.extend(get_cross_section_vertices(curr_pos,
-                                                       curr_rot,
-                                                       stem_radius,
-                                                       tesselation_level))
+            # Check if current position is in clipping bounds
+            if (curr_pos[0] > x_min and curr_pos[0] < x_max and
+                curr_pos[1] > y_min and curr_pos[1] < y_max and
+                curr_pos[2] > z_min and curr_pos[2] < z_max):
+                
+                # Add vertices at the beginning of the segment
+                vertices.extend(get_cross_section_vertices(curr_pos,
+                                                            curr_rot,
+                                                            stem_radius,
+                                                            tesselation_level))
+                # Add vertices at the end of the segment
+                vertices.extend(get_cross_section_vertices(curr_pos,
+                                                           curr_rot,
+                                                           stem_radius,
+                                                           tesselation_level))
+                # Add faces connecting the sets of vertices
+                faces.extend(get_faces(vertices, tesselation_level))
+
             # Move forward
             curr_pos = forward(curr_pos, curr_rot, step_size)
-            # Add vertices at the end of the segment
-            vertices.extend(get_cross_section_vertices(curr_pos,
-                                                       curr_rot,
-                                                       stem_radius,
-                                                       tesselation_level))
-            # Add faces connecting the sets of vertices
-            faces.extend(get_faces(vertices, tesselation_level))
+                
         elif symbol == 'f':
             if in_leaf:
                 vertices.append(tuple(curr_pos))
@@ -264,11 +279,17 @@ def create_geometry_DOL(lstring, step_size, leaf_size, stem_radius, angle_incr, 
             curr_pos = state[0]
             curr_rot = state[1]
         elif symbol == '{':
-            in_leaf = True
+            # Check if current position is in clipping bounds
+            if (curr_pos[0] > x_min and curr_pos[0] < x_max and
+                curr_pos[1] > y_min and curr_pos[1] < y_max and
+                curr_pos[2] > z_min and curr_pos[2] < z_max):
+                    
+                in_leaf = True
         elif symbol == '}':
-            faces.append(tuple(leaf_vertices))
-            in_leaf = False
-            leaf_vertices = []
+            if in_leaf:
+                faces.append(tuple(leaf_vertices))
+                in_leaf = False
+                leaf_vertices = []
         else:
             # Symbols with no geometric interpretation are skipped
             continue
@@ -339,7 +360,7 @@ if __name__ == '__main__':
     os.chdir('/Users/echen/Desktop/csci2230/hyacinth-labyrinth/scripts')
 
     # Choose which lsystem json file we want to use
-    filename = 'tree.json'
+    filename = 'hedge.json'
 
     # Parse the json to get a dictionary of all settings
     lsystems_dir = os.path.join('lsystems')

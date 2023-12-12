@@ -114,16 +114,16 @@ public:
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distribution(0, 90);
+        std::uniform_int_distribution<> distribution(0, 3);
 
         for (const auto& wall : wall_blocks) {
             LveGameObject&& geom_wall = LveGameObject::createGameObject();
             geom_wall.model = maze_wall_model;
             geom_wall.transform = wall.transform;
 
-            geom_wall.transform.scale = {0.13f, -0.13f, 0.13f};
+            geom_wall.transform.scale = {0.45f, -0.45f, 0.45f};
             int randomRot = distribution(gen);
-            geom_wall.transform.rotation = {0, randomRot, 0};
+            geom_wall.transform.rotation = {0, 90.f * randomRot, 0};
 
             geom_wall.transform.update_matrices();
             obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
