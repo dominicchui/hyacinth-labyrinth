@@ -21,15 +21,48 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
   int numLights;
 } ubo;
 
-layout(set = 0, binding = 1) uniform sampler2D texSampler;
+// JANKTEX
+
+layout(set = 0, binding = 1) uniform sampler2D texSampler0;
+layout(set = 0, binding = 2) uniform sampler2D texSampler1;
+layout(set = 0, binding = 3) uniform sampler2D texSampler2;
+layout(set = 0, binding = 4) uniform sampler2D texSampler3;
+layout(set = 0, binding = 5) uniform sampler2D texSampler4;
+// layout(set = 0, binding = 6) uniform sampler2D texSampler5;
+// layout(set = 0, binding = 7) uniform sampler2D texSampler6;
+// layout(set = 0, binding = 8) uniform sampler2D texSampler7;
+
 
 layout(push_constant) uniform Push {
   mat4 modelMatrix;
   mat4 normalMatrix;
+  int tex_id;
 } push;
 
+vec3 read_tex_clr() {
+    if (push.tex_id == 0) {
+        return vec3(texture(texSampler0, fragUV));
+    } else if (push.tex_id == 1) {
+        return vec3(texture(texSampler1, fragUV));
+    } else if (push.tex_id == 2) {
+        return vec3(texture(texSampler2, fragUV));
+    } else if (push.tex_id == 3) {
+        return vec3(texture(texSampler3, fragUV));
+    } else if (push.tex_id == 4) {
+        return vec3(texture(texSampler4, fragUV));
+    }/* else if (push.tex_id == 5) {
+        return vec3(texture(texSampler5, fragUV));
+    } else if (push.tex_id == 6) {
+        return vec3(texture(texSampler6, fragUV));
+    } else if (push.tex_id == 7) {
+        return vec3(texture(texSampler7, fragUV));
+    }*/
+    return vec3(1.f, 1.f, 1.f);
+}
+
 void main() {
-  vec3 tex_clr = vec3(texture(texSampler, fragUV));
+  vec3 tex_clr = read_tex_clr();
+
   vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
   vec3 specularLight = vec3(0.0);
   vec3 surfaceNormal = normalize(fragNormalWorld);

@@ -26,11 +26,20 @@ HyacinthLabyrinth::HyacinthLabyrinth()
     m_device(m_window),
     m_renderer(m_window, m_device
 ) {
+    // JANKTEX
     globalPool =
       VK_DP_Mgr::Builder(m_device)
           .setMaxSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+
           .build();
     loadGameObjects();
 }
@@ -49,27 +58,48 @@ void HyacinthLabyrinth::run() {
     uboBuffers[i]->map();
   }
 
+  // JANKTEX
   auto globalSetLayout =
       VK_DSL_Mgr::Builder(m_device)
           .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
           .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          .addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          .addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          .addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          .addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          // .addBinding(6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          // .addBinding(7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          // .addBinding(8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           .build();
 
   auto& ball = gameObjects.at(m_ball_id);
 
   // HACK
-  VkDescriptorImageInfo imageInfo{
-      ball.model->textureSampler,
-      ball.model->textureImageView,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-  };
+  VkDescriptorImageInfo imageInfos[m_device.cur_texture];
+  std::cout << "JANKTEX: we are using: " << m_device.cur_texture << " textures" << std::endl;
 
+  for (int32_t i = 0; i < m_device.cur_texture; i++) {
+      imageInfos[i] = VkDescriptorImageInfo{
+          m_device.textureSampler[i],
+          m_device.textureImageView[i],
+          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+      };
+  }
+
+  // JANKTEX
   std::vector<VkDescriptorSet> globalDescriptorSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT);
   for (int i = 0; i < globalDescriptorSets.size(); i++) {
     auto bufferInfo = uboBuffers[i]->descriptorInfo();
     VKDescriptorWriter(*globalSetLayout, *globalPool)
         .writeBuffer(0, &bufferInfo)
-        .writeImage(1, &imageInfo)
+        .writeImage(1, &imageInfos[0])
+        .writeImage(2, &imageInfos[1])
+        .writeImage(3, &imageInfos[2])
+        .writeImage(4, &imageInfos[3])
+        .writeImage(5, &imageInfos[4])
+        // .writeImage(6, &imageInfos[5])
+        // .writeImage(7, &imageInfos[6])
+        // .writeImage(8, &imageInfos[7])
         .build(globalDescriptorSets[i]);
   }
 
