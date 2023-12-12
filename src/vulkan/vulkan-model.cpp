@@ -429,8 +429,8 @@ void VKModel::Builder::loadModel(const std::string &filepath) {
 
             // UVs
             populate_tex_coords(idx_x, attrib, vertex_x);
-            populate_tex_coords(idx_y, attrib, vertex_x);
-            populate_tex_coords(idx_z, attrib, vertex_x);
+            populate_tex_coords(idx_y, attrib, vertex_y);
+            populate_tex_coords(idx_z, attrib, vertex_z);
 
             printVertex(vertex_x, idx_x.vertex_index);
             printVertex(vertex_y, idx_y.vertex_index);

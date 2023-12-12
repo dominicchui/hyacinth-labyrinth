@@ -21,14 +21,15 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
   int numLights;
 } ubo;
 
+layout(set = 0, binding = 1) uniform sampler2D texSampler;
+
 layout(push_constant) uniform Push {
   mat4 modelMatrix;
   mat4 normalMatrix;
 } push;
 
-layout(binding = 1) uniform sampler2D texture;
-
 void main() {
+  vec3 tex_clr = vec3(texture(texSampler, fragUV));
   vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
   vec3 specularLight = vec3(0.0);
   vec3 surfaceNormal = normalize(fragNormalWorld);
@@ -43,7 +44,7 @@ void main() {
     directionToLight = normalize(directionToLight);
 
     float cosAngIncidence = max(dot(surfaceNormal, directionToLight), 0);
-    vec3 intensity = light.color.xyz * light.color.w * attenuation;
+    vec3 intensity = tex_clr * light.color.xyz * light.color.w * attenuation;
 
     diffuseLight += intensity * cosAngIncidence;
 
@@ -55,6 +56,7 @@ void main() {
     specularLight += intensity * blinnTerm;
   }
 
-//  outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
-  outColor = vec4(fragUV[0], fragUV[1], 0.5, 1);
+  outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
+  //outColor = vec4(fragUV[0], fragUV[1], 0.f, 1.f);
+  //outColor = texture(texSampler, fragUV);
 }

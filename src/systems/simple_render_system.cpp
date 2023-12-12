@@ -29,6 +29,7 @@ SimpleRenderSystem::SimpleRenderSystem(
 
 SimpleRenderSystem::~SimpleRenderSystem() {
     vkDestroyPipelineLayout(m_device.device(), pipelineLayout, nullptr);
+    delete m_descriptorWriter;
 }
 
 void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
@@ -50,17 +51,16 @@ void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLay
         throw std::runtime_error("failed to create pipeline layout!");
     }
 
-    auto layout = VK_DSL_Mgr::Builder(m_device)
-                      .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-                      .build();
-    auto pool = VK_DP_Mgr::Builder(m_device)
-                    .setMaxSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT)
-                    .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
-                    .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
-                    .build();
-    m_descriptorWriter = new VKDescriptorWriter(*layout, *pool);
-    m_descriptorWriter->build(m_descriptorSet);
-    m_descriptorWriter->writeImage(0, nullptr);
+    // auto layout = VK_DSL_Mgr::Builder(m_device)
+    //                   .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+    //                   .build();
+    // auto pool = VK_DP_Mgr::Builder(m_device)
+    //                 .setMaxSets(VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+    //                 .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+    //                 .build();
+    // m_descriptorWriter = new VKDescriptorWriter(*layout, *pool);
+    // //m_descriptorWriter->writeImage(1, nullptr);
+    // m_descriptorWriter->build(m_descriptorSet);
 }
 
 void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
@@ -105,14 +105,14 @@ void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
             sizeof(SimplePushConstantData),
             &push);
 
-        // for image:
-        VkDescriptorImageInfo imageInfo{
-            obj.model->textureSampler,
-            obj.model->textureImageView,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
-        m_descriptorWriter->writeImage(1, &imageInfo /* image pointer */);
-        m_descriptorWriter->overwrite(m_descriptorSet);
+        // // for image:
+        // VkDescriptorImageInfo imageInfo{
+        //     obj.model->textureSampler,
+        //     obj.model->textureImageView,
+        //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        // };
+        // m_descriptorWriter->writeImage(1, &imageInfo /* image pointer */);
+        // m_descriptorWriter->build(m_descriptorSet);
 
         obj.model->bind(frameInfo.commandBuffer);
         obj.model->draw(frameInfo.commandBuffer);
