@@ -9,7 +9,8 @@ GlfwWindow::GlfwWindow(int w, int h, std::string name) :
     width(w),
     height(h),
     windowName(name) {
-  initWindow();
+    initWindow();
+    glfwSetWindowAspectRatio(window, 16, 9);
 }
 
 GlfwWindow::~GlfwWindow() {

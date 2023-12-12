@@ -57,7 +57,7 @@ def generate_lsystem_DOL(axiom, rules, iters):
     string = axiom
     rules_trans = str.maketrans(rules)
     for i in range(iters):
-        string = string.translate(rules)
+        string = string.translate(rules_trans)
     return string
 
 def generate_regex(module):
@@ -134,14 +134,21 @@ def generate_lsystem_PDOL(constants, axiom, rules, iters):
                     # Otherwise, it is a match so extract the names/values of each param
                     pred_regex = generate_regex(pred)
                     param_vals = list(re.match(pred_regex, module).groups())
-                    param_vals = [float(val) for val in param_vals]
                     param_names = list(re.match(pred_regex, pred).groups())
                     param_dict = {k: v for k, v in zip(param_names, param_vals)}
                     print(param_dict)
 
+                    # Substitute the constants values into the successor
+                    constants_trans = str.maketrans(constants)
+                    succ = succ.translate(constants_trans)
+
                     # Substitute in the param values into the successor
                     succ = rules[pred]
-                    pj
+                    param_dict_trans = str.maketrans(param_dict)
+                    succ = succ.translate(param_dict_trans)
+
+                    print(succ)
+
 
 def generate_lsystem(type, lsystem, iters):
     '''
@@ -180,18 +187,18 @@ def roll(rot, alpha):
                    [0, np.sin(alpha), np.cos(alpha)]])
     return rot @ R_H
 
-def create_geometry(type, lstring, step_size, stem_radius, angle_incr, tesselation_level):
+def create_geometry(type, lstring, step_size, leaf_size, stem_radius, angle_incr, tesselation_level):
     '''
     Creates a list of vertices and faces from the L-system string.
     This is the "geometric interpretation" of the string.
     '''
     if type == TYPE_DOL:
-        return create_geometry_DOL(lstring, step_size, stem_radius,
+        return create_geometry_DOL(lstring, step_size, leaf_size, stem_radius,
                                    angle_incr, tesselation_level)
     else:
         return None # TODO
 
-def create_geometry_DOL(lstring, step_size, stem_radius, angle_incr, tesselation_level):
+def create_geometry_DOL(lstring, step_size, leaf_size, stem_radius, angle_incr, tesselation_level):
     # Track current position
     curr_pos = np.array([0, 0, 0])
     # Use a 3x3 matrix to track our current rotation.
@@ -233,7 +240,7 @@ def create_geometry_DOL(lstring, step_size, stem_radius, angle_incr, tesselation
             if in_leaf:
                 vertices.append(tuple(curr_pos))
                 leaf_vertices.append(len(vertices) - 1)
-                curr_pos = forward(curr_pos, curr_rot, step_size)
+                curr_pos = forward(curr_pos, curr_rot, leaf_size)
             else:
                 curr_pos = forward(curr_pos, curr_rot, step_size)
         elif symbol == '+':
@@ -346,7 +353,8 @@ if __name__ == '__main__':
     # Apply geometric interpretation
     vertices, faces = create_geometry(settings['type'],
                                       lstring, 
-                                      settings['step_size'], 
+                                      settings['step_size'],
+                                      settings['leaf_size'],
                                       settings['stem_radius'], 
                                       np.radians(settings['angle_incr']), 
                                       settings['tesselation_level'])

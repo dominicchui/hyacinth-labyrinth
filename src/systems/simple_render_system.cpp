@@ -56,6 +56,7 @@ void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
 
   PipelineConfigInfo pipelineConfig{};
   VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
+  pipelineConfig.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
   pipelineConfig.renderPass = renderPass;
   pipelineConfig.pipelineLayout = pipelineLayout;
   m_pipeline = std::make_unique<VulkanPipeline>(

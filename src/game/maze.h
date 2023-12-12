@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <glm/glm.hpp>
+#include <random>
 
 #include "vulkan/vulkan-model.hpp"
 #include "vulkan/vulkan-device.hpp"
@@ -102,12 +103,7 @@ public:
             throw std::runtime_error("exporteMazeVisibleGeometry called without a valid maze!");
         }
         std::shared_ptr<VKModel> maze_wall_model =
-            VKModel::createModelFromFile(device, "resources/models/cube.obj");
-
-        glm::vec4 cyan = {0,1,1,1};
-        glm::mat4 flctm = {{9.000000, 0.000000, 0.000000, 0.000000}, {0.000000, 0.100000, 0.000000, 0.000000}, {0.000000, 0.000000, 9.000000, 0.000000}, {0.000000, -0.900000, 0.000000, 1.000000}};
-
-        glm::vec4 yellow = {1,1,0,1};
+            VKModel::createModelFromFile(device, "resources/models/hedge.obj");
 
         // std::for_each(
         //     wall_spatial_map.begin(),
@@ -115,11 +111,21 @@ public:
         //       [&obj_map, maze_wall_model](
         //         std::pair<const std::pair<int32_t, int32_t>, LveGameObject*> p
         //     )
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distribution(0, 90);
+
         for (const auto& wall : wall_blocks) {
             LveGameObject&& geom_wall = LveGameObject::createGameObject();
             geom_wall.model = maze_wall_model;
             geom_wall.transform = wall.transform;
 
+            geom_wall.transform.scale = {0.13f, -0.13f, 0.13f};
+            int randomRot = distribution(gen);
+            geom_wall.transform.rotation = {0, randomRot, 0};
+
+            geom_wall.transform.update_matrices();
             obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
        }
 

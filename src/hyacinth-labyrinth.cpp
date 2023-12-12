@@ -169,11 +169,11 @@ void HyacinthLabyrinth::loadGameObjects() {
     m_ball_id = ball.getId();
     gameObjects.emplace(m_ball_id, std::move(ball));
 
-  model = VKModel::createModelFromFile(m_device, "resources/models/smooth_vase.obj");
+  model = VKModel::createModelFromFile(m_device, "resources/models/lsys.obj");
   auto smoothVase = LveGameObject::createGameObject();
   smoothVase.model = model;
   smoothVase.transform.translation = {.5f, .5f, 0.f};
-  smoothVase.transform.scale = {3.f, 1.5f, 3.f};
+  smoothVase.transform.scale = {0.08f, -0.08f, 0.08f};
   smoothVase.transform.update_matrices();
   gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
