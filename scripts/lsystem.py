@@ -263,6 +263,15 @@ def create_geometry_DOL(lstring, step_size, leaf_size, leaf_angle, stem_radius, 
                 curr_pos = forward(curr_pos, curr_rot, leaf_size)
             else:
                 curr_pos = forward(curr_pos, curr_rot, step_size)
+        elif symbol == 'g':
+            # HARDCODED FOR FLOWERS
+            flower_size = 4
+            if in_leaf:
+                vertices.append(tuple(curr_pos))
+                leaf_vertices.append(len(vertices) - 1)
+                curr_pos = forward(curr_pos, curr_rot, flower_size)
+            else:
+                curr_pos = forward(curr_pos, curr_rot, step_size)
         elif symbol == '+':
             curr_rot = yaw(curr_rot, theta)
         elif symbol == '-':

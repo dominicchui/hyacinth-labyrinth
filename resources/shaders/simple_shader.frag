@@ -76,7 +76,7 @@ vec4 nlerp(vec4 a, vec4 b, float t) {
 void main() {
   vec3 tex_clr = read_tex_clr(fragUV);
 
-  vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
+  vec3 diffuseLight = vec3(0.0);
   vec3 specularLight = vec3(0.0);
   vec3 surfaceNormal = normalize(fragNormalWorld);
 
