@@ -36,7 +36,7 @@ HyacinthLabyrinth::HyacinthLabyrinth()
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
-          // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
 
@@ -67,7 +67,7 @@ void HyacinthLabyrinth::run() {
           .addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           .addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           .addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-          // .addBinding(6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          .addBinding(6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           // .addBinding(7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           // .addBinding(8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           .build();
@@ -97,7 +97,7 @@ void HyacinthLabyrinth::run() {
         .writeImage(3, &imageInfos[2])
         .writeImage(4, &imageInfos[3])
         .writeImage(5, &imageInfos[4])
-        // .writeImage(6, &imageInfos[5])
+        .writeImage(6, &imageInfos[5])
         // .writeImage(7, &imageInfos[6])
         // .writeImage(8, &imageInfos[7])
         .build(globalDescriptorSets[i]);
@@ -253,21 +253,21 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  Maze maze = Maze(5,5);
-  maze.generate();
-  //std::cout << maze.toString() << std::endl;
-  std::vector<std::vector<bool>> map = maze.toBoolVector();
-//  std::vector<std::vector<bool>> map = {
-//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
-//      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
-//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-//  };
+ Maze maze = Maze(5,5);
+ maze.generate();
+ //std::cout << maze.toString() << std::endl;
+ std::vector<std::vector<bool>> map = maze.toBoolVector();
+ // std::vector<std::vector<bool>> map = {
+ //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+ //     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+ //     {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
+ //     {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
+ //     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+ //     {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+ //     {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+ //     {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+ //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+ // };
   m_maze.generateMazeFromBoolVec(m_device, map);
   m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 
