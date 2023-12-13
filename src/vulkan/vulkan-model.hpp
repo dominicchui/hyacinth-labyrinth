@@ -33,6 +33,9 @@ class VKModel {
         std::vector<Vertex> vertices{};
         std::vector<uint32_t> indices{};
 
+        bool has_texture = false;
+        std::string tex_filename;
+
         void loadModelWithMaterial(const std::string &filepath);
         void loadModel(const std::string &filepath);
     };
@@ -80,6 +83,7 @@ class VKModel {
     std::unique_ptr<VKBufferMgr> indexBuffer;
     uint32_t indexCount;
 
+    std::string tex_filename;
     VkImage textureImage;
     VkDeviceMemory textureImageMemory;
 };

@@ -46,6 +46,11 @@ VKModel::VKModel(
     if (m_device.cur_texture >= VKDeviceManager::MAX_TEXTURES) {
         throw std::runtime_error("TOO MANY TEXTURES!!!");
     }
+    if (builder.has_texture) {
+        tex_filename = "../resources/models/" + builder.tex_filename;
+    } else {
+        tex_filename = "../resources/textures/andyVanDam.jpg";
+    }
     createTextureImage();
     createTextureImageView();
     createTextureSampler();
@@ -100,16 +105,13 @@ void VKModel::createTextureImage(void) {
     stbi_uc* pixels = nullptr;
 
     // JANKTEX
-    static int32_t id = 0;
-    if (id++ % 2) {
-        pixels = stbi_load("../resources/textures/marsTexture.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    } else {
-        pixels = stbi_load("../resources/textures/andyVanDam.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    }
+
+    pixels = stbi_load(tex_filename.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+
     VkDeviceSize imageSize = texWidth * texHeight * 4;
 
     if (!pixels) {
-        throw std::runtime_error("failed to load texture image!");
+        throw std::runtime_error("failed to load texture image: " + tex_filename);
     }
 
     VKBufferMgr stagingBuffer{
@@ -421,6 +423,12 @@ void VKModel::Builder::loadModel(const std::string &filepath) {
     auto& shapes = reader.GetShapes();
     auto& materials = reader.GetMaterials();
 
+    if (materials.size() > 1) {
+        std::cout << "WARNING: There are more than a single texture file  in the obj" << std::endl;
+    } else if (materials.size() == 1 && !materials[0].diffuse_texname.empty() && materials[0].diffuse_texname != "") {
+        has_texture = true;
+        tex_filename = materials[0].diffuse_texname;
+    }
     vertices.clear();
     indices.clear();
 
