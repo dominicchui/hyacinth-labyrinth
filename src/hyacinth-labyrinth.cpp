@@ -233,8 +233,7 @@ void HyacinthLabyrinth::loadGameObjects() {
     gameObjects.emplace(m_ball_light_id, std::move(ballLight));
 
   model = VKModel::createModelFromFile(m_device,
-                                        "resources/models/lsys.obj",
-                                         true, glm::vec3(1.f, 0.1f, 0.1f));
+                                        "resources/models/flowers.obj");
   auto smoothVase = LveGameObject::createGameObject();
   smoothVase.model = model;
   smoothVase.transform.translation = {.5f, .5f, 0.f};
