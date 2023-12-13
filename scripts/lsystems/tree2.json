@@ -1,0 +1,28 @@
+{
+  "type": "DOL",
+  "num_iters": 5,
+  "step_size": 0.4,
+  "leaf_size": 0.5,
+  "leaf_angle": 22.5,
+  "stem_radius": 0.2,
+  "show_stem": true,
+  "angle_incr": 22.5,
+  "tesselation_level": 20,
+  "lsystem": {
+    "axiom": "X",
+    "rules": {
+      "X": "FZ[+X][-X]&FZX",
+      "Z": "[?[fL]?[fL]?[fL]?[fL]?[fL]?[fL]?[fL]?[fL]]",
+      "F": "FZ///FZ",
+      "P": "I+[P+O]--/+O/+P//[--L]I[++L]-[PO]++PO",
+      "I": "FS[//&&L][//^^L]FS",
+      "S": "SFS",
+      "L": "['{+f-ff-f+|+f-ff-f}]",
+      "O": "[&&&E'/['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]////['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]//['^F][{&-f+f|-f+f}]]",
+      "E": "FF",
+      "W": "['^F][{&-f+f|-f+f}]"
+    }
+  },
+  "prune_enabled": false,
+  "prune_bounds": {}
+}
