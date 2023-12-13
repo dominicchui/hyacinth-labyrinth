@@ -246,22 +246,22 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  Maze maze = Maze(5,5);
-  maze.generate();
-  std::cout << maze.toString() << std::endl;
-  std::vector<std::vector<bool>> map = maze.toBoolVector();
-//  std::vector<std::vector<bool>> map = {
-//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
-//      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
-//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-//  };
-//  generateMazeFromBoolVec(map);
+//  Maze maze = Maze(5,5);
+//  maze.generate();
+//  std::cout << maze.toString() << std::endl;
+//  std::vector<std::vector<bool>> map = maze.toBoolVector();
+  std::vector<std::vector<bool>> map = {
+      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
+      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
+      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+  };
+  //generateMazeFromBoolVec(map);
   m_maze.generateMazeFromBoolVec(m_device, map);
   m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 

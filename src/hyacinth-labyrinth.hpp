@@ -10,6 +10,7 @@
 // std
 #include <memory>
 #include <vector>
+using id_t = unsigned int;
 
 class HyacinthLabyrinth {
  public:
