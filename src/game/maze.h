@@ -107,8 +107,8 @@ public:
             VKModel::createModelFromFile(device, "resources/models/hilbush.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
         std::shared_ptr<VKModel> maze_tree_model_red =
             VKModel::createModelFromFile(device, "resources/models/flowers.obj", true, glm::vec3(0.8f, 0.3f, 0.2f));
-//        std::shared_ptr<VKModel> maze_tree_model_green =
-//            VKModel::createModelFromFile(device, "resources/models/flowers.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
+        std::shared_ptr<VKModel> maze_tree_model_green =
+            VKModel::createModelFromFile(device, "resources/models/flowers.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
         std::shared_ptr<VKModel> maze_wall_base_model =
             VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
 
@@ -136,7 +136,7 @@ public:
                                                    geom_wall.transform.translation.z};
                 geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
 
-            }/* else if ((distribution2(gen))==1) {
+            } else if ((distribution2(gen))==1) {
                 geom_wall.model = maze_tree_model_green;
                 geom_wall.transform.scale = {0.065f, -0.065f, 0.065f};
                 geom_wall.transform.translation = {geom_wall.transform.translation.x,
@@ -144,7 +144,7 @@ public:
                                                    geom_wall.transform.translation.z};
                 geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
 
-            }*/else {
+            } else {
                 geom_wall.model = maze_wall_model;
                 geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
                 geom_wall.transform.translation = {geom_wall.transform.translation.x -0.5f,
