@@ -67,7 +67,8 @@ vec4 nlerp(vec4 a, vec4 b, float t) {
         return a;
     } else {
         t = (t - 0.5)*2;
-        easeFactor = (t == 0) ? 0 : pow(2, 10 * t - 10);
+        easeFactor = t*t*t*t;
+//        easeFactor = (t == 0) ? 0 : pow(2, 10 * t - 10);
         return a + easeFactor*(b-a);
     }
 }
@@ -109,5 +110,5 @@ void main() {
   //outColor = texture(texSampler, fragUV);
 
   float dist = clamp(distance(camPos, fragPosWorld) / 20.f, 0.f, 1.f);
-  outColor = nlerp(outColor, vec4(255.f, 255.f, 255.f, 255) / 255.f, dist);
+  outColor = nlerp(outColor, vec4(240.f, 255.f, 200.f, 255) / 255.f, dist);
 }
