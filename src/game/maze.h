@@ -35,6 +35,7 @@ public:
     std::vector<std::vector<int32_t>> spatial_map;
     GameMaze() : maze_valid(false) {}
     ~GameMaze(void) {}
+    std::shared_ptr<VKModel> maze_tree_model;
 
     std::pair<int32_t, int32_t> world_coords_to_indices(float x, float y) {
         // Assumes map is valid!
@@ -102,6 +103,8 @@ public:
         if (!maze_valid) {
             throw std::runtime_error("exporteMazeVisibleGeometry called without a valid maze!");
         }
+        maze_tree_model = VKModel::createModelFromFile(device,
+                                             "resources/models/flowers.obj");
         std::shared_ptr<VKModel> maze_wall_model =
             VKModel::createModelFromFile(device, "resources/models/hilbush.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
         std::shared_ptr<VKModel> maze_wall_base_model =
@@ -120,7 +123,7 @@ public:
 
         for (const auto& wall : wall_blocks) {
             LveGameObject&& geom_wall = LveGameObject::createGameObject();
-            geom_wall.model = maze_wall_model;
+            geom_wall.model = maze_tree_model;
             geom_wall.transform = wall.transform;
 
             geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
