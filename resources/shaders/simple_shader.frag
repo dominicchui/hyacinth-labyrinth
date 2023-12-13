@@ -28,7 +28,7 @@ layout(set = 0, binding = 2) uniform sampler2D texSampler1;
 layout(set = 0, binding = 3) uniform sampler2D texSampler2;
 layout(set = 0, binding = 4) uniform sampler2D texSampler3;
 layout(set = 0, binding = 5) uniform sampler2D texSampler4;
- layout(set = 0, binding = 6) uniform sampler2D texSampler5;
+// layout(set = 0, binding = 6) uniform sampler2D texSampler5;
 // layout(set = 0, binding = 7) uniform sampler2D texSampler6;
 // layout(set = 0, binding = 8) uniform sampler2D texSampler7;
 
@@ -51,9 +51,9 @@ vec3 read_tex_clr() {
         return vec3(texture(texSampler3, fragUV));
     } else if (push.tex_id == 4) {
         return vec3(texture(texSampler4, fragUV));
-    } else if (push.tex_id == 5) {
+    }/* else if (push.tex_id == 5) {
         return vec3(texture(texSampler5, fragUV));
-    }/* else if (push.tex_id == 6) {
+    } else if (push.tex_id == 6) {
         return vec3(texture(texSampler6, fragUV));
     } else if (push.tex_id == 7) {
         return vec3(texture(texSampler7, fragUV));
