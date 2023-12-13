@@ -1,0 +1,23 @@
+{
+  "type": "DOL",
+  "num_iters": 11,
+  "step_size": 0.8,
+  "leaf_size": 0.5,
+  "leaf_angle": 22.5,
+  "stem_radius": 0.2,
+  "show_stem": true,
+  "angle_incr": 27,
+  "tesselation_level": 10,
+  "lsystem": {
+    "axiom": "FFFA",
+    "rules": {
+      "A": "!F/FZ[&BZ]/AZ",
+      "B": "!F/FZ[-$CZ]CZ",
+      "C": "!F/FZ[+$BZ]ZBZ",
+      "Z": "[?L?L?L]",
+      "L": "['{+f-ff-f+|+f-ff-f}]"
+    }
+  },
+  "prune_enabled": false,
+  "prune_bounds": {}
+}
