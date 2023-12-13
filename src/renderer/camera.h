@@ -81,6 +81,8 @@ public:
     bool rotate(float delta_x, float delta_y, float deltaTime);
 
     void recomputeMatrices(const glm::vec3 &ballPos);
+    void recomputeMatrices(void);
+
 
     // Returns the camera position in world coords
     const glm::vec4& getPosition() const;

@@ -4,6 +4,7 @@ layout (location = 0) in vec3 fragColor;
 layout (location = 1) in vec3 fragPosWorld;
 layout (location = 2) in vec3 fragNormalWorld;
 layout (location = 3) in vec2 fragUV;
+layout (location = 4) in vec4 lightSpacePos;
 
 layout (location = 0) out vec4 outColor;
 
@@ -19,6 +20,8 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
   vec4 ambientLightColor; // w is intensity
   PointLight pointLights[10];
   int numLights;
+  mat4 lightProj;
+  mat4 lightView;
 } ubo;
 
 // JANKTEX
@@ -61,6 +64,31 @@ vec3 read_tex_clr() {
     return vec3(1.f, 1.f, 1.f);
 }
 
+//blogs.igalia.com/itoral/2017/10/02/working-with-lights-and-shadows-part-iii-rendering-the-shadows/
+float compute_shadow_factor(vec4 light_space_pos, sampler2D shadow_map)
+{
+   // Convert light space position to NDC
+   vec3 light_space_ndc = light_space_pos.xyz; // /= light_space_pos.w;
+
+   // If the fragment is outside the light's projection then it is outside
+   // the light's influence, which means it is in the shadow (notice that
+   // such sample would be outside the shadow map image)
+   // if (abs(light_space_ndc.x) > 1.f ||
+   //     abs(light_space_ndc.y) > 1.f ||
+   //     abs(light_space_ndc.z) > 1.f)
+   //    return 0.0;
+
+   // Translate from NDC to shadow map space (Vulkan's Z is already in [0..1])
+   vec2 shadow_map_coord = light_space_ndc.xy * 0.5 + 0.5;
+
+   // Check if the sample is in the light or in the shadow
+   if (light_space_ndc.z > texture(shadow_map, shadow_map_coord.xy).x)
+      return 0.0; // In the shadow
+
+   // In the light
+   return 1.0;
+}
+
 vec4 nlerp(vec4 a, vec4 b, float t) {
     float easeFactor;
     if (t < 0.5) {
@@ -73,41 +101,47 @@ vec4 nlerp(vec4 a, vec4 b, float t) {
 }
 
 void main() {
-  vec3 tex_clr = read_tex_clr();
+    //loat depth = texture(texSampler0, lightSpacePos.xy).x / 5.f;
+    //out_color = vec4(1.0 - (1.0 - depth) * 100.0);
+    float shadow = compute_shadow_factor(lightSpacePos, texSampler0);
+    //float shadow = textureProj(lightSpacePos / lightSpacePos.w, vec2(0.f));
+    outColor = vec4(1.0 - (1.0 - shadow));
+    //outColor = vec4(depth, depth, depth, 1.0);
+  // vec3 tex_clr = read_tex_clr();
 
-  vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
-  vec3 specularLight = vec3(0.0);
-  vec3 surfaceNormal = normalize(fragNormalWorld);
+  // vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
+  // vec3 specularLight = vec3(0.0);
+  // vec3 surfaceNormal = normalize(fragNormalWorld);
 
-  vec3 cameraPosWorld = ubo.invView[3].xyz;
-  vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
+  // vec3 cameraPosWorld = ubo.invView[3].xyz;
+  // vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
 
-  for (int i = 0; i < ubo.numLights; i++) {
-    PointLight light = ubo.pointLights[i];
-    vec3 directionToLight = light.position.xyz - fragPosWorld;
-    float attenuation = 1.0 / dot(directionToLight, directionToLight); // distance squared
-    directionToLight = normalize(directionToLight);
+  // for (int i = 0; i < ubo.numLights; i++) {
+  //   PointLight light = ubo.pointLights[i];
+  //   vec3 directionToLight = light.position.xyz - fragPosWorld;
+  //   float attenuation = 1.0 / dot(directionToLight, directionToLight); // distance squared
+  //   directionToLight = normalize(directionToLight);
 
-    float cosAngIncidence = max(dot(surfaceNormal, directionToLight), 0);
-    vec3 intensity = tex_clr * light.color.xyz * light.color.w * attenuation;
+  //   float cosAngIncidence = max(dot(surfaceNormal, directionToLight), 0);
+  //   vec3 intensity = tex_clr * light.color.xyz * light.color.w * attenuation;
 
-    diffuseLight += intensity * cosAngIncidence;
+  //   diffuseLight += intensity * cosAngIncidence;
 
-    // specular lighting
-    vec3 halfAngle = normalize(directionToLight + viewDirection);
-    float blinnTerm = dot(surfaceNormal, halfAngle);
-    blinnTerm = clamp(blinnTerm, 0, 1);
-    blinnTerm = pow(blinnTerm, 512.0); // higher values -> sharper highlight
-    specularLight += intensity * blinnTerm;
-  }
+  //   // specular lighting
+  //   vec3 halfAngle = normalize(directionToLight + viewDirection);
+  //   float blinnTerm = dot(surfaceNormal, halfAngle);
+  //   blinnTerm = clamp(blinnTerm, 0, 1);
+  //   blinnTerm = pow(blinnTerm, 512.0); // higher values -> sharper highlight
+  //   specularLight += intensity * blinnTerm;
+  // }
 
-  vec4 camPos4 = ubo.invView * vec4(0.f,0.f,0.f,1.f);
-  vec3 camPos = vec3(camPos4[0], camPos4[1], camPos4[2]);
-  outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
+  // vec4 camPos4 = ubo.invView * vec4(0.f,0.f,0.f,1.f);
+  // vec3 camPos = vec3(camPos4[0], camPos4[1], camPos4[2]);
+  // outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
 
-  //outColor = vec4(fragUV[0], fragUV[1], 0.f, 1.f);
-  //outColor = texture(texSampler, fragUV);
+  // //outColor = vec4(fragUV[0], fragUV[1], 0.f, 1.f);
+  // //outColor = texture(texSampler, fragUV);
 
-  float dist = clamp(distance(camPos, fragPosWorld) / 20.f, 0.f, 1.f);
-  outColor = nlerp(outColor, vec4(255.f, 255.f, 255.f, 255) / 255.f, dist);
+  // float dist = clamp(distance(camPos, fragPosWorld) / 20.f, 0.f, 1.f);
+  // outColor = nlerp(outColor, vec4(255.f, 255.f, 255.f, 255) / 255.f, dist);
 }

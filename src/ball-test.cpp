@@ -62,6 +62,7 @@ void BallTest::run() {
   SimpleRenderSystem simpleRenderSystem{
       m_device,
       m_renderer.getSwapChainRenderPass(),
+      m_renderer.getShadowMapRenderPass(),
       globalSetLayout->getDescriptorSetLayout()
   };
 
@@ -114,6 +115,8 @@ void BallTest::run() {
           frameIndex,
           frameTime,
           commandBuffer,
+          commandBuffer, // FIXME?
+          camera,
           camera,
           globalDescriptorSets[frameIndex],
           gameObjects};

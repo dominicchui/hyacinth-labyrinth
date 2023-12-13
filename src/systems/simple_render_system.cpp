@@ -22,11 +22,13 @@ struct SimplePushConstantData {
 SimpleRenderSystem::SimpleRenderSystem(
     VKDeviceManager& device,
     VkRenderPass renderPass,
+    VkRenderPass shadowPass,
     VkDescriptorSetLayout globalSetLayout
     ) : m_device(device), m_descriptorSet()
 {
     createPipelineLayout(globalSetLayout);
     createPipeline(renderPass);
+    createShadowPipeline(shadowPass);
 }
 
 SimpleRenderSystem::~SimpleRenderSystem() {
@@ -81,8 +83,65 @@ void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
       pipelineConfig);
 }
 
+void SimpleRenderSystem::createShadowPipeline(VkRenderPass renderPass) {
+    assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+    PipelineConfigInfo pipelineConfig{};
+    VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
+    pipelineConfig.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
+    pipelineConfig.renderPass = renderPass;
+    pipelineConfig.pipelineLayout = pipelineLayout;
+    m_shadow_pipeline = std::make_unique<VulkanPipeline>(
+        m_device,
+        "shadow_map.vert.spv",
+        pipelineConfig);
+}
+
+void SimpleRenderSystem::generateShadowMap(FrameInfo& frameInfo) {
+    m_shadow_pipeline->bind_shadow(frameInfo.commandBuffer);
+
+    vkCmdBindDescriptorSets(
+        frameInfo.commandBuffer,
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        pipelineLayout,
+        0,
+        1,
+        &frameInfo.globalDescriptorSet,
+        0,
+        nullptr);
+
+    for (auto& kv : frameInfo.gameObjects) {
+        auto& obj = kv.second;
+        if (obj.model == nullptr) continue;
+        SimplePushConstantData push{};
+        push.modelMatrix = obj.transform.mat4;
+        push.normalMatrix = obj.transform.normalMatrix;
+        push.tex_id = obj.model->texture_id;
+
+        vkCmdPushConstants(
+            frameInfo.commandBuffer,
+            pipelineLayout,
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            0,
+            sizeof(SimplePushConstantData),
+            &push);
+
+        // // for image:
+        // VkDescriptorImageInfo imageInfo{
+        //     obj.model->textureSampler,
+        //     obj.model->textureImageView,
+        //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        // };
+        // m_descriptorWriter->writeImage(1, &imageInfo /* image pointer */);
+        // m_descriptorWriter->build(m_descriptorSet);
+
+        obj.model->bind(frameInfo.shadowCommandBuffer);
+        obj.model->draw(frameInfo.shadowCommandBuffer);
+    }
+}
+
 void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
-    m_pipeline->bind(frameInfo.commandBuffer);
+    m_pipeline->bind_graphics(frameInfo.commandBuffer);
 
     vkCmdBindDescriptorSets(
         frameInfo.commandBuffer,

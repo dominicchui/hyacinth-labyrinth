@@ -36,13 +36,22 @@ class VulkanPipeline {
       const std::string& vertFilepath,
       const std::string& fragFilepath,
       const PipelineConfigInfo& configInfo);
+
+  // No frag shader
+  VulkanPipeline(
+       VKDeviceManager& device,
+       const std::string& vertFilepath,
+       const PipelineConfigInfo& configInfo);
+
   ~VulkanPipeline();
 
   // Delete copy constructors
   VulkanPipeline(const VulkanPipeline&) = delete;
   VulkanPipeline& operator=(const VulkanPipeline&) = delete;
 
-  void bind(VkCommandBuffer commandBuffer);
+  void bind_graphics(VkCommandBuffer commandBuffer);
+  void bind_shadow(VkCommandBuffer commandBuffer);
+
 
   static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
   static void enableAlphaBlending(PipelineConfigInfo& configInfo);
@@ -56,6 +65,11 @@ class VulkanPipeline {
       const PipelineConfigInfo& configInfo
   );
 
+  void createShadowGraphicsPipeline(
+      const std::string& vertFilepath,
+      const PipelineConfigInfo& configInfo
+  );
+
   void createShaderModule(
       const std::vector<char>& code,
       VkShaderModule* shaderModule
@@ -65,4 +79,7 @@ class VulkanPipeline {
   VkPipeline graphicsPipeline;
   VkShaderModule vertShaderModule;
   VkShaderModule fragShaderModule;
+
+  VkPipeline shadowPipeline;
+  VkShaderModule shadowVertShaderModule;
 };

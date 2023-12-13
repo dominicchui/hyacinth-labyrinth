@@ -161,12 +161,50 @@ void Camera::recomputeMatrices(const glm::vec3 &ballPos) {
     float aspect_ratio = float(width) / float(height);
     float t_h = heightAngle;
 
+    glm::mat4 clip = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f,
+                               0.0f, 1.0f, 0.0f, 0.0f,
+                               0.0f, 0.0f, 0.5f, 0.0f,
+                               0.0f, 0.0f, 0.5f, 1.0f);
+
     switch (proj_type) {
     case CAM_PROJ_ORTHO:
-        proj_mat = glm::ortho(-width/2.f, width/2.f, -height/2.f, height/2.f, near_plane, far_plane);
+        proj_mat = clip * glm::ortho(-width/2.f, width/2.f, -height/2.f, height/2.f, near_plane, far_plane);
         break;
     case CAM_PROJ_PERSP:
-        proj_mat = glm::perspective(t_h, aspect_ratio, near_plane, far_plane);
+        proj_mat = clip * glm::perspective(t_h, aspect_ratio, near_plane, far_plane);
+        break;
+    default:
+        throw std::runtime_error("Invalid Camera Projection Type" + std::to_string(proj_type));
+    }
+
+    proj_mat_inv = glm::inverse(proj_mat);
+}
+
+void Camera::recomputeMatrices() {
+    // View matrix.
+    glm::vec3 pos3 = glm::vec3(pos);
+
+    view_mat = glm::lookAt(pos3, pos3 + look, up);
+
+    //printMat4(view_mat);
+    view_mat_inv = glm::inverse(view_mat);
+
+    // Projection matrix
+    float aspect_ratio = float(width) / float(height);
+    float t_h = heightAngle;
+
+
+    glm::mat4 clip = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f,
+                               0.0f, 1.0f, 0.0f, 0.0f,
+                               0.0f, 0.0f, 0.5f, 0.0f,
+                               0.0f, 0.0f, 0.5f, 1.0f);
+
+    switch (proj_type) {
+    case CAM_PROJ_ORTHO:
+        proj_mat = clip * glm::ortho(-width/2.f, width/2.f, -height/2.f, height/2.f, near_plane, far_plane);
+        break;
+    case CAM_PROJ_PERSP:
+        proj_mat = clip * glm::perspective(t_h, aspect_ratio, near_plane, far_plane);
         break;
     default:
         throw std::runtime_error("Invalid Camera Projection Type" + std::to_string(proj_type));

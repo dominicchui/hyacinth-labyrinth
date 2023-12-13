@@ -48,7 +48,7 @@ void DestroyDebugUtilsMessengerEXT(
 ///////////////////////////////////////////////////////////////////////////////
 
 // class member functions
-VKDeviceManager::VKDeviceManager(GlfwWindow& window) : window(window), cur_texture(0) {
+VKDeviceManager::VKDeviceManager(GlfwWindow& window) : window(window), cur_texture(1), shadow_texture(0) {
   createInstance();
   setupDebugMessenger();
   createSurface();

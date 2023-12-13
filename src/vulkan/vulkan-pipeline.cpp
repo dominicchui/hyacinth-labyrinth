@@ -24,6 +24,15 @@ VulkanPipeline::VulkanPipeline(
   createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
 }
 
+VulkanPipeline::VulkanPipeline(
+    VKDeviceManager& device,
+    const std::string& vertFilepath,
+    const PipelineConfigInfo& configInfo)
+    : m_device(device)
+{
+    createShadowGraphicsPipeline(vertFilepath, configInfo);
+}
+
 VulkanPipeline::~VulkanPipeline() {
   vkDestroyShaderModule(m_device.device(), vertShaderModule, nullptr);
   vkDestroyShaderModule(m_device.device(), fragShaderModule, nullptr);
@@ -122,6 +131,71 @@ void VulkanPipeline::createGraphicsPipeline(
   }
 }
 
+void VulkanPipeline::createShadowGraphicsPipeline(
+    const std::string& vertFilepath,
+    const PipelineConfigInfo& configInfo) {
+    assert(
+        configInfo.pipelineLayout != VK_NULL_HANDLE &&
+        "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
+    assert(
+        configInfo.renderPass != VK_NULL_HANDLE &&
+        "Cannot create shadow graphics pipeline: no shadowRenderPass provided in configInfo");
+
+    auto vertCode = readFile(vertFilepath);
+
+    createShaderModule(vertCode, &vertShaderModule);
+
+    VkPipelineShaderStageCreateInfo shaderStages[1];
+    shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shaderStages[0].module = vertShaderModule;
+    shaderStages[0].pName = "main";
+    shaderStages[0].flags = 0;
+    shaderStages[0].pNext = nullptr;
+    shaderStages[0].pSpecializationInfo = nullptr;
+
+    auto& bindingDescriptions = configInfo.bindingDescriptions;
+    auto& attributeDescriptions = configInfo.attributeDescriptions;
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputInfo.vertexAttributeDescriptionCount =
+        static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+
+    VkGraphicsPipelineCreateInfo pipelineInfo{};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = 1;
+    pipelineInfo.pStages = shaderStages;
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
+    pipelineInfo.pViewportState = &configInfo.viewportInfo;
+    pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
+    pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
+    pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
+    pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
+    pipelineInfo.pDynamicState = &configInfo.dynamicStateInfo;
+
+    pipelineInfo.layout = configInfo.pipelineLayout;
+    pipelineInfo.renderPass = configInfo.renderPass;
+    pipelineInfo.subpass = configInfo.subpass;
+
+    pipelineInfo.basePipelineIndex = -1;
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+
+    if (vkCreateGraphicsPipelines(
+            m_device.device(),
+            VK_NULL_HANDLE,
+            1,
+            &pipelineInfo,
+            nullptr,
+            &shadowPipeline) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create graphics pipeline");
+    }
+}
+
+
 void VulkanPipeline::createShaderModule(
     const std::vector<char>& code,
     VkShaderModule* shaderModule
@@ -136,9 +210,14 @@ void VulkanPipeline::createShaderModule(
   }
 }
 
-void VulkanPipeline::bind(VkCommandBuffer commandBuffer) {
+void VulkanPipeline::bind_graphics(VkCommandBuffer commandBuffer) {
   vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 }
+
+void VulkanPipeline::bind_shadow(VkCommandBuffer commandBuffer) {
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowPipeline);
+}
+
 
 void VulkanPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
   configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

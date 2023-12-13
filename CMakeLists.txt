@@ -186,6 +186,7 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     resources/shaders/point_light.vert
     resources/shaders/simple_shader.frag
     resources/shaders/simple_shader.vert
+    resources/shaders/shadow_map.vert
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

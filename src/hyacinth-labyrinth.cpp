@@ -37,14 +37,44 @@ HyacinthLabyrinth::HyacinthLabyrinth()
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
-          // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
 
           .build();
+    // Create sampler for shadow map
+    VkSamplerCreateInfo samplerInfo{};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+
+    samplerInfo.anisotropyEnable = VK_FALSE;
+    samplerInfo.maxAnisotropy = m_device.properties.limits.maxSamplerAnisotropy;
+
+    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    samplerInfo.mipLodBias = 0.0f;
+    samplerInfo.minLod = 0.0f;
+    samplerInfo.maxLod = 100.0f;
+
+    if (vkCreateSampler(m_device.device(), &samplerInfo, nullptr, &m_device.textureSampler[m_device.shadow_texture]) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create shadow map texture sampler!");
+    }
+
     loadGameObjects();
 }
 
 HyacinthLabyrinth::~HyacinthLabyrinth() {}
+
 
 void HyacinthLabyrinth::run() {
   std::vector<std::unique_ptr<VKBufferMgr>> uboBuffers(VKSwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -68,7 +98,7 @@ void HyacinthLabyrinth::run() {
           .addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           .addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           .addBinding(6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-          // .addBinding(7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+          .addBinding(7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           // .addBinding(8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
           .build();
 
@@ -78,7 +108,12 @@ void HyacinthLabyrinth::run() {
   VkDescriptorImageInfo imageInfos[m_device.cur_texture];
   std::cout << "JANKTEX: we are using: " << m_device.cur_texture << " textures" << std::endl;
 
-  for (int32_t i = 0; i < m_device.cur_texture; i++) {
+  imageInfos[0] = VkDescriptorImageInfo{
+      m_device.textureSampler[0],
+      m_device.shadowImageViews[0],
+      VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
+  };
+  for (int32_t i = 1; i < m_device.cur_texture; i++) {
       imageInfos[i] = VkDescriptorImageInfo{
           m_device.textureSampler[i],
           m_device.textureImageView[i],
@@ -98,14 +133,17 @@ void HyacinthLabyrinth::run() {
         .writeImage(4, &imageInfos[3])
         .writeImage(5, &imageInfos[4])
         .writeImage(6, &imageInfos[5])
-        // .writeImage(7, &imageInfos[6])
+        .writeImage(7, &imageInfos[6])
         // .writeImage(8, &imageInfos[7])
         .build(globalDescriptorSets[i]);
   }
 
+  // Create4 shadow sampler
+
   SimpleRenderSystem simpleRenderSystem{
       m_device,
       m_renderer.getSwapChainRenderPass(),
+      m_renderer.getShadowMapRenderPass(),
       globalSetLayout->getDescriptorSetLayout()
   };
 
@@ -132,9 +170,23 @@ void HyacinthLabyrinth::run() {
   camera.initScene(scd, WIDTH, HEIGHT, 0.1f, 100.f);
   camera.recomputeMatrices(ball.transform.translation);
 
+  // Hack!
+  glm::vec4 light_pos(0.1f, -40.f, -0.1f, 1.f);
+  glm::vec4 focus_light_at(0.f, 0.f, 0.f, 1.f);
+  SceneCameraData sld{
+      light_pos, // pos
+      focus_light_at - light_pos,  // look
+      glm::vec4(0.f, 1.f, 0.f, 0.f),   // up
+      M_PI/4.f, // height angle
+      0, // DoF
+      0  // focal length
+  };
+  Camera light(CAM_PROJ_PERSP);
+  light.initScene(sld, VKSwapChain::SHADOW_MAP_WIDTH, VKSwapChain::SHADOW_MAP_HEIGHT, 0.1f, 100.f);
+  light.recomputeMatrices();
+
   auto viewerObject = LveGameObject::createGameObject();
   viewerObject.transform.translation.z = -2.5f;
-
 
   KeyboardMovementController cameraController{};
   KeyboardMovementController ballController{};
@@ -142,6 +194,7 @@ void HyacinthLabyrinth::run() {
   auto currentTime = std::chrono::high_resolution_clock::now();
 
   while (!m_window.shouldClose()) {
+  //if (!m_window.shouldClose()) {
     bool do_update = false;
     glfwPollEvents();
 
@@ -182,7 +235,9 @@ void HyacinthLabyrinth::run() {
           frameIndex,
           frameTime,
           commandBuffer,
+          commandBuffer, // FIXME
           camera,
+          light,
           globalDescriptorSets[frameIndex],
           gameObjects};
 
@@ -191,13 +246,21 @@ void HyacinthLabyrinth::run() {
       ubo.projection = camera.proj_mat;
       ubo.view = camera.view_mat;
       ubo.inverseView = camera.view_mat_inv;
+      ubo.lightView = light.view_mat;
+      ubo.lightProj = light.proj_mat;
       pointLightSystem.update(frameInfo, ubo);
       uboBuffers[frameIndex]->writeToBuffer(&ubo);
       uboBuffers[frameIndex]->flush();
 
-      // render
-      m_renderer.beginSwapChainRenderPass(commandBuffer);
+      // get shadow map
+      m_renderer.beginShadowMapRenderPass(commandBuffer);
+      // order here matters
+      simpleRenderSystem.generateShadowMap(frameInfo);
+      m_renderer.endSwapChainRenderPass(commandBuffer);
 
+
+      // render object
+      m_renderer.beginSwapChainRenderPass(commandBuffer);
       // order here matters
       simpleRenderSystem.renderGameObjects(frameInfo);
       pointLightSystem.render(frameInfo);
@@ -253,21 +316,21 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
- Maze maze = Maze(5,5);
- maze.generate();
+ //Maze maze = Maze(5,5);
+ //maze.generate();
  //std::cout << maze.toString() << std::endl;
- std::vector<std::vector<bool>> map = maze.toBoolVector();
- // std::vector<std::vector<bool>> map = {
- //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
- //     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
- //     {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
- //     {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
- //     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
- //     {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
- //     {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
- //     {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
- //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
- // };
+ //std::vector<std::vector<bool>> map = maze.toBoolVector();
+ std::vector<std::vector<bool>> map = {
+     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+     {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
+     {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
+     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+     {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+     {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+     {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+ };
   m_maze.generateMazeFromBoolVec(m_device, map);
   m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 

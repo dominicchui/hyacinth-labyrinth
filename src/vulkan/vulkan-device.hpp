@@ -82,9 +82,11 @@ class VKDeviceManager {
   // Texture hack
   // JANKTEX
   static constexpr int32_t MAX_TEXTURES = 8;
+  std::vector<VkImageView> shadowImageViews;
   VkImageView textureImageView[MAX_TEXTURES];
   VkSampler textureSampler[MAX_TEXTURES];
   int32_t cur_texture;
+  int32_t shadow_texture;
 
  private:
   void createInstance();

@@ -20,6 +20,9 @@ class VKRenderer {
   VkRenderPass getSwapChainRenderPass() const {
       return m_swapChain->getRenderPass();
   }
+  VkRenderPass getShadowMapRenderPass() const {
+      return m_swapChain->getShadowRenderPass();
+  }
   float getAspectRatio() const { return m_swapChain->extentAspectRatio(); }
   bool isFrameInProgress() const { return isFrameStarted; }
 
@@ -36,6 +39,7 @@ class VKRenderer {
   VkCommandBuffer beginFrame(void);
   void endFrame();
   void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
+  void beginShadowMapRenderPass(VkCommandBuffer commandBuffer);
   void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
  private:

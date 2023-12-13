@@ -17,6 +17,7 @@ public:
     SimpleRenderSystem(
         VKDeviceManager& device,
         VkRenderPass renderPass,
+        VkRenderPass shadowPass,
         VkDescriptorSetLayout globalSetLayout
         );
     ~SimpleRenderSystem();
@@ -24,15 +25,20 @@ public:
     SimpleRenderSystem(const SimpleRenderSystem &) = delete;
     SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
 
+    void generateShadowMap(FrameInfo &frameInfo);
     void renderGameObjects(FrameInfo &frameInfo);
 
 private:
     void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
     void createPipeline(VkRenderPass renderPass);
+    void createShadowPipeline(VkRenderPass renderPass);
+
 
     VKDeviceManager& m_device;
 
     std::unique_ptr<VulkanPipeline> m_pipeline;
+    std::unique_ptr<VulkanPipeline> m_shadow_pipeline;
+
     VkPipelineLayout pipelineLayout;
 
     VKDescriptorWriter *m_descriptorWriter;

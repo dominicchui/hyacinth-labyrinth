@@ -12,6 +12,8 @@
 class VKSwapChain {
  public:
   static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+  static constexpr int SHADOW_MAP_WIDTH = 2048;
+  static constexpr int SHADOW_MAP_HEIGHT = 2048;
 
   VKSwapChain(VKDeviceManager& deviceRef, VkExtent2D windowExtent);
   VKSwapChain(
@@ -27,10 +29,17 @@ class VKSwapChain {
 
   VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
   VkRenderPass getRenderPass() { return renderPass; }
+
+  VkFramebuffer getShadowFrameBuffer(int index) { return shadowMapFramebuffers[index]; }
+  VkRenderPass getShadowRenderPass() { return shadowRenderPass; }
+
   VkImageView getImageView(int index) { return swapChainImageViews[index]; }
   size_t imageCount() { return swapChainImages.size(); }
   VkFormat getSwapChainImageFormat() { return swapChainImageFormat; }
+
   VkExtent2D getSwapChainExtent() { return swapChainExtent; }
+  VkExtent2D getShadowSwapChainExtent() { return {SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT}; }
+
   uint32_t width() { return swapChainExtent.width; }
   uint32_t height() { return swapChainExtent.height; }
 
@@ -52,8 +61,11 @@ class VKSwapChain {
   void createSwapChain();
   void createImageViews();
   void createDepthResources();
+  void createShadowResources();
   void createRenderPass();
+  void createShadowMapRenderPass();
   void createFramebuffers();
+  void createShadowFramebuffers();
   void createSyncObjects();
 
   // Helper functions
@@ -68,11 +80,20 @@ class VKSwapChain {
   VkExtent2D swapChainExtent;
 
   std::vector<VkFramebuffer> swapChainFramebuffers;
+  std::vector<VkFramebuffer> shadowMapFramebuffers;
+
   VkRenderPass renderPass;
+  VkRenderPass shadowRenderPass;
 
   std::vector<VkImage> depthImages;
   std::vector<VkDeviceMemory> depthImageMemorys;
   std::vector<VkImageView> depthImageViews;
+
+  std::vector<VkImage> shadowImages;
+  std::vector<VkDeviceMemory> shadowImageMemorys;
+  // Moved to device for hacky reasons
+  //std::vector<VkImageView> shadowImageViews;
+
   std::vector<VkImage> swapChainImages;
   std::vector<VkImageView> swapChainImageViews;
 

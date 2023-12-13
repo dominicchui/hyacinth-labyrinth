@@ -106,7 +106,7 @@ void PointLightSystem::render(FrameInfo& frameInfo) {
     sorted[disSquared] = obj.getId();
   }
 
-  m_pipeline->bind(frameInfo.commandBuffer);
+  m_pipeline->bind_graphics(frameInfo.commandBuffer);
 
   vkCmdBindDescriptorSets(
       frameInfo.commandBuffer,
