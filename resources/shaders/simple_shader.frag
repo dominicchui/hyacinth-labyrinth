@@ -25,6 +25,19 @@ layout(push_constant) uniform Push {
   mat4 normalMatrix;
 } push;
 
+
+
+vec4 lerp(vec4 a, vec4 b, float t) {
+    float easeFactor;
+    if (t < 0.5) {
+        return a;
+    } else {
+        t = (t - 0.5)*2;
+        easeFactor = (t == 0) ? 0 : pow(2, 10 * t - 10);
+        return a + easeFactor*(b-a);
+    }
+}
+
 void main() {
   vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
   vec3 specularLight = vec3(0.0);
@@ -52,5 +65,9 @@ void main() {
     specularLight += intensity * blinnTerm;
   }
 
+  vec4 camPos4 = ubo.invView * vec4(0.f,0.f,0.f,1.f);
+  vec3 camPos = vec3(camPos4[0], camPos4[1], camPos4[2]);
   outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
+  float dist = clamp(distance(camPos, fragPosWorld) / 20.f, 0.f, 1.f);
+  outColor = lerp(outColor, vec4(255.f, 255.f, 255.f, 255) / 255.f, dist);
 }

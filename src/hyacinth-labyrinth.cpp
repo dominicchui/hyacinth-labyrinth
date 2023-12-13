@@ -125,7 +125,15 @@ void HyacinthLabyrinth::run() {
         gameObjects.at(m_ball_id),
         &m_maze
     );
+    // move the lights with the ball
     gameObjects.at(m_ball_light_id).transform.translation = gameObjects.at(m_ball_id).transform.translation;
+//    for (int i=0; i<point_light_ids.size(); i++) {
+//        auto rotateLight = glm::rotate(
+//            glm::mat4(1.f),
+//            (i * glm::two_pi<float>()) / point_light_ids.size(),
+//            {0.f, 1.f, 0.f});
+//        gameObjects.at(point_light_ids[i]).transform.translation = glm::vec3(rotateLight * glm::vec4(gameObjects.at(m_ball_id).transform.translation,1.0f)) + glm::vec3(0.f,-2.f,0.f);
+//    }
 
     if (auto commandBuffer = m_renderer.beginFrame()) {
       int frameIndex = m_renderer.getFrameIndex();
@@ -183,8 +191,6 @@ void HyacinthLabyrinth::loadGameObjects() {
     m_ball_light_id = ballLight.getId();
     gameObjects.emplace(m_ball_light_id, std::move(ballLight));
 
-//    gameObjects.at(m_ball_id).pointLight = std::unique_ptr<PointLightComponent> (ballLight);
-
   model = VKModel::createModelFromFile(m_device,
                                         "resources/models/lsys.obj",
                                          true, glm::vec3(1.f, 0.1f, 0.1f));
@@ -208,49 +214,17 @@ void HyacinthLabyrinth::loadGameObjects() {
   //// Generate the maze:
   Maze maze = Maze(5,5);
   maze.generate();
-  std::cout << maze.toString() << std::endl;
+//  std::cout << maze.toString() << std::endl;
   std::vector<std::vector<bool>> map = maze.toBoolVector();
-//  std::vector<std::vector<bool>> map = {
-//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
-//      {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
-//      {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-//      {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-//      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-//  };
-//  generateMazeFromBoolVec(map);
+
   m_maze.generateMazeFromBoolVec(m_device, map);
   m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 
-  std::vector<glm::vec3> lightColors{
-      {1.f, .1f, .1f},
-      {.1f, .1f, 1.f},
-      {.1f, 1.f, .1f},
-      {1.f, 1.f, .1f},
-      {.1f, 1.f, 1.f},
-      {1.f, 1.f, 1.f}
-  };
-
-//  for (int i = 0; i < lightColors.size(); i++) {
-//    auto pointLight = LveGameObject::makePointLight(0.2f);
-//    pointLight.color = lightColors[i];
-//    auto rotateLight = glm::rotate(
-//        glm::mat4(1.f),
-//        (i * glm::two_pi<float>()) / lightColors.size(),
-//        {0.f, 1.f, 0.f});
-//    pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-//    pointLight.transform.update_matrices();
-//    gameObjects.emplace(pointLight.getId(), std::move(pointLight));
-//  }
 
  // Sun
-  auto pointLight = LveGameObject::makePointLight(9.f);
-  pointLight.color = glm::vec3(1.f, 1.f, 1.f);
-  pointLight.transform.translation = glm::vec3(0.f, -6.f, 0.f);
+  auto pointLight = LveGameObject::makePointLight(90.f);
+  pointLight.color = glm::vec3(.98f, .84f, .11f);
+  pointLight.transform.translation = glm::vec3(0.f, -20.f, 0.f);
   pointLight.transform.update_matrices();
   gameObjects.emplace(pointLight.getId(), std::move(pointLight));
-
 }

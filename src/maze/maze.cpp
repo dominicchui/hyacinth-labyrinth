@@ -244,7 +244,7 @@ void Maze::shift(Direction dir) {
 // assumes blocks are adjacent and first < second
 void Maze::addExtraPathBetweenBlocks(int first, int second) {
     static std::random_device rd;
-    static std::mt19937 gen(rd());
+    static std::mt19937 gen(0);
     // pick random spot to add an extra path
     if (second-first==1) {
         // horizontally adjacent
