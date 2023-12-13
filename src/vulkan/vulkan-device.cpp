@@ -91,6 +91,10 @@ void VKDeviceManager::createInstance() {
   createInfo.pApplicationInfo = &appInfo;
   createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 
+  const char* instExtension = "VK_KHR_get_physical_device_properties2";
+  createInfo.enabledExtensionCount = 1;
+  createInfo.ppEnabledExtensionNames = &instExtension;
+
   auto extensions = getRequiredExtensions();
   createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
   createInfo.ppEnabledExtensionNames = extensions.data();

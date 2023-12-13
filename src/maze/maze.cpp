@@ -425,3 +425,9 @@ std::vector<std::vector<bool>> Maze::toBoolVector() {
     }
     return vectorRep;
 }
+
+void Maze::deleteMaze() {
+    for (int i=0; i<mazeBlocks.size(); i++) {
+        delete mazeBlocks[i];
+    }
+}

@@ -34,6 +34,7 @@ public:
 
     // maze is generated in compact fashion, so add unit width walls when converting to string
     std::string toString(bool undensify = true, bool includeNewLines = false);
+    std::vector<std::vector<bool>> toBoolVector();
 
 private:
     std::set<int> mazeCells = std::set<int>();
@@ -42,6 +43,8 @@ private:
     char WALL_REPRESENTATION = ' ';
     char PATH_REPRESENTATION = 'O';
     char CLOSED_AREA_REPRESENTATION = 'C';
+    int blockWidth = width * 2 - 1;
+    int blockHeight = height * 2 - 1;
 
     //    static std::random_device rd;  // a seed source for the random number engine
     //    static std::mt19937 gen; // mersenne_twister_engine

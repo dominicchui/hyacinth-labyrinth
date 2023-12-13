@@ -22,7 +22,7 @@
 #include <stdexcept>
 
 HyacinthLabyrinth::HyacinthLabyrinth()
-  : m_window(WIDTH, HEIGHT, "Hyacinth Labrynth"),
+  : m_window(WIDTH, HEIGHT, "Hyacinth Labyrinth"),
     m_device(m_window),
     m_renderer(m_window, m_device
 ) {
@@ -119,8 +119,7 @@ void HyacinthLabyrinth::run() {
   };
 
   // Create camera
-//  glm::vec4 cam_pos(-5.f, -12.f, 5.f, 1.f);
-  glm::vec4 cam_pos(0.f, -11.f, 0.1f, 1.f);
+  glm::vec4 cam_pos(1.f, -11.f, 7.f, 1.f);
   glm::vec4 focus_at(0.f, 0.f, 0.f, 1.f);
   SceneCameraData scd{
       cam_pos, // pos
@@ -255,7 +254,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
- Maze maze = Maze(5,5);
+ MazeBlock maze = MazeBlock(30,30);
  maze.generate();
  //std::cout << maze.toString() << std::endl;
  std::vector<std::vector<bool>> map = maze.toBoolVector();
