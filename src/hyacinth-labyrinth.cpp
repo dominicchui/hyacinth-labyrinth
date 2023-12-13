@@ -265,7 +265,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  MazeBlock maze = MazeBlock(11,11);
+  MazeBlock maze = MazeBlock(13,13);
  maze.generate();
  //std::cout << maze.toString() << std::endl;
  std::vector<std::vector<bool>> map = maze.toBoolVector();

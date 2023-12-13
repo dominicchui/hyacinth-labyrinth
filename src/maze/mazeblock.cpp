@@ -28,7 +28,7 @@ int MazeBlock::getRandomEmptyCell() {
     if (mazeCells.size() == size()) { return -1; }
     // todo move for performance?
     static std::random_device rd;
-    static std::mt19937 gen(1); // mersenne_twister_engine seeded with rd()
+    static std::mt19937 gen(4); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib(0, size()-1);
     // todo maybe don't rely on luck
     // idea: shuffle cells and iterate
@@ -65,7 +65,7 @@ void MazeBlock::performRandomWalk() {
 
     // set up random generation
     static std::random_device rd; // a seed source for the random number engine
-    static std::mt19937 gen(1); // mersenne_twister_engine seeded with rd()
+    static std::mt19937 gen(4); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib(0, directions.size() - 1);
 
     // FIRST PASS
@@ -214,7 +214,7 @@ void MazeBlock::makePathBetweenCells(Cell* first, Cell* second, Direction dir) {
 // randomly places closed spaces to be used for decor later
 void MazeBlock::insertClosedSpaces() {
     static std::random_device rd; // a seed source for the random number engine
-    static std::mt19937 gen(1); // mersenne_twister_engine seeded with rd()
+    static std::mt19937 gen(4); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distribLoc(0, cells.size()-1);
 
     // add one closed space to a random location

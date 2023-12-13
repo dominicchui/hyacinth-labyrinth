@@ -72,7 +72,7 @@ private:
 
     float getOOBpop(auto mz, int r, int c) {
         std::optional<float> mzVal = getOOB(mz, r, c);
-        return mzVal.has_value() ? (mzVal.value() - 0.4) * 1.75 : 0;
+        return mzVal.has_value() ? (mzVal.value() - 0.4) * 2.75 : 0;
     }
 
     float avgpop(auto mz, int ri, int ci) {
@@ -172,9 +172,9 @@ private:
         //  find_stretch(output)
 
         std::vector<std::tuple<std::string, float>> assets = {
-            std::tuple("bush ", 0.2),
+            std::tuple("bush ", 0.35),
             std::tuple("fbush ", 0.17),
-            std::tuple("tree ", 0.05)
+            std::tuple("tree ", 0.01)
         };
 
         for (int r = 0; r < output.size(); r++) {
@@ -274,9 +274,9 @@ public:
         std::shared_ptr<VKModel> maze_flower_model =
             VKModel::createModelFromFile(device, "resources/models/flowers.obj");
         std::shared_ptr<VKModel> maze_tree1_model =
-            VKModel::createModelFromFile(device, "resources/models/tree1.obj");
+            VKModel::createModelFromFile(device, "resources/models/tree3.obj", true, glm::vec3(0.6f, 0.4f, 0.6f));
         std::shared_ptr<VKModel> maze_tree2_model =
-            VKModel::createModelFromFile(device, "resources/models/tree2.obj");
+            VKModel::createModelFromFile(device, "resources/models/tree3.obj", true, glm::vec3(0.6f, 0.4f, 0.6f));
         std::shared_ptr<VKModel> maze_wall_base_model =
             VKModel::createModelFromFile(device, "resources/models/dirt.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
         std::shared_ptr<VKModel> path_base_model_0 =
@@ -286,7 +286,7 @@ public:
             VKModel::createModelFromFile(device, "resources/models/tile.obj", true, glm::vec3(1.f, 1.f, 1.f));
 
         std::random_device rd;
-        std::mt19937 gen(rd());
+        std::mt19937 gen(0);
         std::uniform_int_distribution<> distribution(0, 7);
 
         auto pop = populate(boolVec);
@@ -304,24 +304,45 @@ public:
             auto [mx, my] = world_coords_to_indices(wall.transform.translation.x, wall.transform.translation.z);
 
             if (asset_map[my][mx] == "fbush ") {
-//            if (randomRot == 0) {
-                // occasional flower
+                // occasional flowers
                 LveGameObject&& flower = LveGameObject::createGameObject();
                 flower.model = maze_flower_model;
                 flower.transform = wall.transform;
                 flower.transform.scale = {0.04f, -0.04f, 0.04f};
-                flower.transform.translation = {flower.transform.translation.x - 0.5f,
-                                                flower.transform.translation.y + 0.9f,
-                                                flower.transform.translation.z + 0.5f};
+                flower.transform.translation = {flower.transform.translation.x,
+                                                flower.transform.translation.y + 1.6f,
+                                                flower.transform.translation.z};
                 flower.transform.update_matrices();
                 obj_map.emplace(flower.getId(), std::move(flower));
+
+                flower = LveGameObject::createGameObject();
+                flower.model = maze_flower_model;
+                flower.transform = wall.transform;
+                flower.transform.scale = {0.04f, -0.04f, 0.04f};
+                flower.transform.translation = {flower.transform.translation.x+0.3f,
+                                                flower.transform.translation.y + 1.6f,
+                                                flower.transform.translation.z};
+                flower.transform.update_matrices();
+                obj_map.emplace(flower.getId(), std::move(flower));
+
+                flower = LveGameObject::createGameObject();
+                flower.model = maze_flower_model;
+                flower.transform = wall.transform;
+                flower.transform.scale = {0.04f, -0.04f, 0.04f};
+                flower.transform.translation = {flower.transform.translation.x,
+                                                flower.transform.translation.y + 1.6f,
+                                                flower.transform.translation.z+0.3f};
+                flower.transform.update_matrices();
+                obj_map.emplace(flower.getId(), std::move(flower));
+
+
             } else if (asset_map[my][mx] == "tree ") {
                 std::uniform_int_distribution<> distrib2(0, 1);
                 LveGameObject&& geom_wall = LveGameObject::createGameObject();
                 geom_wall.transform = wall.transform;
                 if (distrib2(gen)==0) {
                     geom_wall.model = maze_tree1_model;
-                    geom_wall.transform.scale = {0.045f, -0.045f, 0.045f};
+                    geom_wall.transform.scale = {0.15f, -0.2f, 0.15f};
                 } else {
                     geom_wall.model = maze_tree2_model;
                     geom_wall.transform.scale = {0.15f, -0.15f, 0.15f};
