@@ -254,14 +254,14 @@ void HyacinthLabyrinth::loadGameObjects() {
     m_ball_light_id = ballLight.getId();
     gameObjects.emplace(m_ball_light_id, std::move(ballLight));
 
-//  model = VKModel::createModelFromFile(m_device,
-//                                        "resources/models/flowers.obj");
-//  auto smoothVase = LveGameObject::createGameObject();
-//  smoothVase.model = m_maze.maze_tree_model;
-//  smoothVase.transform.translation = {.5f, .5f, 0.f};
-//  smoothVase.transform.scale = {0.08f, -0.08f, 0.08f};
-//  smoothVase.transform.update_matrices();
-//  gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
+  model = VKModel::createModelFromFile(m_device,
+                                        "resources/models/flowers.obj");
+  auto smoothVase = LveGameObject::createGameObject();
+  smoothVase.model = model;
+  smoothVase.transform.translation = {.5f, .5f, 0.f};
+  smoothVase.transform.scale = {0.08f, -0.08f, 0.08f};
+  smoothVase.transform.update_matrices();
+  gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
   model = VKModel::createModelFromFile(m_device,
                                        "resources/models/quad.obj",

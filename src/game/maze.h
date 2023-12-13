@@ -35,7 +35,7 @@ public:
     std::vector<std::vector<int32_t>> spatial_map;
     GameMaze() : maze_valid(false) {}
     ~GameMaze(void) {}
-    std::shared_ptr<VKModel> maze_tree_model;
+//    std::shared_ptr<VKModel> maze_tree_model;
 
     std::pair<int32_t, int32_t> world_coords_to_indices(float x, float y) {
         // Assumes map is valid!
@@ -103,10 +103,12 @@ public:
         if (!maze_valid) {
             throw std::runtime_error("exporteMazeVisibleGeometry called without a valid maze!");
         }
-        maze_tree_model = VKModel::createModelFromFile(device,
-                                             "resources/models/flowers.obj");
         std::shared_ptr<VKModel> maze_wall_model =
             VKModel::createModelFromFile(device, "resources/models/hilbush.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
+        std::shared_ptr<VKModel> maze_tree_model_red =
+            VKModel::createModelFromFile(device, "resources/models/flowers.obj", true, glm::vec3(0.8f, 0.3f, 0.2f));
+//        std::shared_ptr<VKModel> maze_tree_model_green =
+//            VKModel::createModelFromFile(device, "resources/models/flowers.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
         std::shared_ptr<VKModel> maze_wall_base_model =
             VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
 
@@ -120,18 +122,35 @@ public:
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distribution(0, 3);
+        std::uniform_int_distribution<> distribution2(0, 3);
 
         for (const auto& wall : wall_blocks) {
             LveGameObject&& geom_wall = LveGameObject::createGameObject();
-            geom_wall.model = maze_tree_model;
             geom_wall.transform = wall.transform;
-
-            geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
-            geom_wall.transform.translation = {geom_wall.transform.translation.x -0.5f,
-                                               geom_wall.transform.translation.y + 0.9f,
-                                               geom_wall.transform.translation.z + 0.5f};
             int randomRot = distribution(gen);
-//            geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+            if ((distribution2(gen))==0) {
+                geom_wall.model = maze_tree_model_red;
+                geom_wall.transform.scale = {0.065f, -0.065f, 0.065f};
+                geom_wall.transform.translation = {geom_wall.transform.translation.x,
+                                                   geom_wall.transform.translation.y + 0.9f,
+                                                   geom_wall.transform.translation.z};
+                geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+
+            }/* else if ((distribution2(gen))==1) {
+                geom_wall.model = maze_tree_model_green;
+                geom_wall.transform.scale = {0.065f, -0.065f, 0.065f};
+                geom_wall.transform.translation = {geom_wall.transform.translation.x,
+                                                   geom_wall.transform.translation.y + 0.9f,
+                                                   geom_wall.transform.translation.z};
+                geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+
+            }*/else {
+                geom_wall.model = maze_wall_model;
+                geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
+                geom_wall.transform.translation = {geom_wall.transform.translation.x -0.5f,
+                                                   geom_wall.transform.translation.y + 0.9f,
+                                                   geom_wall.transform.translation.z + 0.5f};
+            }
 
             geom_wall.transform.update_matrices();
             obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
