@@ -1,0 +1,24 @@
+{
+  "type": "DOL",
+  "num_iters": 6,
+  "step_size": 0.2,
+  "leaf_size": 0.6,
+  "leaf_angle": 22.5,
+  "stem_radius": 0.1,
+  "show_stem": false,
+  "angle_incr": 90,
+  "tesselation_level": 3,
+  "lsystem": {
+    "axiom": "A",
+    "rules": {
+      "A": "B-FPP+CFPCP+F-D&FPP∧D-FP+&&CFPC+F+B//",
+      "B": "A&F∧CFPPB∧F∧D∧∧-FPP-D∧|F∧B|FC∧F∧PA//",
+      "C": "|DP∧|FP∧B-FPP+C∧F∧A&&PFA&FP∧C+FP+B∧F∧D//",
+      "D": "|CPFPPB-PFP+B|FPA&F∧A&P&PFPB-FP+BP|PFPPC//",
+      "P": "[?L]",
+      "L": "['''∧∧{-f+f+f-|-f+f+f}]"
+    }
+  },
+  "prune_enabled": false,
+  "prune_bounds": {}
+}

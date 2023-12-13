@@ -39,6 +39,7 @@ layout(push_constant) uniform Push {
   int tex_id;
 } push;
 
+
 vec3 read_tex_clr() {
     if (push.tex_id == 0) {
         return vec3(texture(texSampler0, fragUV));
@@ -58,6 +59,17 @@ vec3 read_tex_clr() {
         return vec3(texture(texSampler7, fragUV));
     }*/
     return vec3(1.f, 1.f, 1.f);
+}
+
+vec4 nlerp(vec4 a, vec4 b, float t) {
+    float easeFactor;
+    if (t < 0.5) {
+        return a;
+    } else {
+        t = (t - 0.5)*2;
+        easeFactor = (t == 0) ? 0 : pow(2, 10 * t - 10);
+        return a + easeFactor*(b-a);
+    }
 }
 
 void main() {
@@ -89,7 +101,13 @@ void main() {
     specularLight += intensity * blinnTerm;
   }
 
+  vec4 camPos4 = ubo.invView * vec4(0.f,0.f,0.f,1.f);
+  vec3 camPos = vec3(camPos4[0], camPos4[1], camPos4[2]);
   outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
+
   //outColor = vec4(fragUV[0], fragUV[1], 0.f, 1.f);
   //outColor = texture(texSampler, fragUV);
+
+  float dist = clamp(distance(camPos, fragPosWorld) / 20.f, 0.f, 1.f);
+  outColor = nlerp(outColor, vec4(255.f, 255.f, 255.f, 255) / 255.f, dist);
 }
