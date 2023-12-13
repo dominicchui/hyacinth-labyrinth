@@ -72,7 +72,7 @@ private:
 
     float getOOBpop(auto mz, int r, int c) {
         std::optional<float> mzVal = getOOB(mz, r, c);
-        return mzVal.has_value() ? (mzVal.value() - 0.4) * 2.35 : 0;
+        return mzVal.has_value() ? (mzVal.value() - 0.4) * 3.f : 0;
     }
 
     float avgpop(auto mz, int ri, int ci) {
