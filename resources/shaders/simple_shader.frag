@@ -31,6 +31,8 @@ layout(set = 0, binding = 5) uniform sampler2D texSampler4;
 layout(set = 0, binding = 6) uniform sampler2D texSampler5;
 layout(set = 0, binding = 7) uniform sampler2D texSampler6;
 layout(set = 0, binding = 8) uniform sampler2D texSampler7;
+layout(set = 0, binding = 9) uniform sampler2D texSampler8;
+layout(set = 0, binding = 10) uniform sampler2D texSampler9;
 
 
 layout(push_constant) uniform Push {
@@ -43,21 +45,25 @@ layout(push_constant) uniform Push {
 vec3 read_tex_clr(vec2 frag_uv) {
     frag_uv = vec2(frag_uv[0], 1.f - frag_uv[1]);
     if (push.tex_id == 0) {
-        return vec3(texture(texSampler0, frag_uv));
+      return vec3(texture(texSampler0, frag_uv));
     } else if (push.tex_id == 1) {
-        return vec3(texture(texSampler1, frag_uv));
+      return vec3(texture(texSampler1, frag_uv));
     } else if (push.tex_id == 2) {
-        return vec3(texture(texSampler2, frag_uv));
+      return vec3(texture(texSampler2, frag_uv));
     } else if (push.tex_id == 3) {
-        return vec3(texture(texSampler3, frag_uv));
+      return vec3(texture(texSampler3, frag_uv));
     } else if (push.tex_id == 4) {
-        return vec3(texture(texSampler4, frag_uv));
+      return vec3(texture(texSampler4, frag_uv));
     } else if (push.tex_id == 5) {
-        return vec3(texture(texSampler5, frag_uv));
+      return vec3(texture(texSampler5, frag_uv));
     } else if (push.tex_id == 6) {
-        return vec3(texture(texSampler6, frag_uv));
+      return vec3(texture(texSampler6, frag_uv));
     } else if (push.tex_id == 7) {
-        return vec3(texture(texSampler7, frag_uv));
+      return vec3(texture(texSampler7, frag_uv));
+    } else if (push.tex_id == 8) {
+      return vec3(texture(texSampler8, frag_uv));
+    } else if (push.tex_id == 9) {
+      return vec3(texture(texSampler9, frag_uv));
     }
     return vec3(1.f, 1.f, 1.f);
 }

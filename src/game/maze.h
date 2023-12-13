@@ -289,18 +289,10 @@ public:
         auto pop = populate(boolVec);
         auto asset_map = fill_assets(boolVec, pop);
 
-        for (auto a : asset_map) {
-            for (auto b : a) {
-                std::cout << b;
-            }
-            std::cout << std::endl;
-        }
-
         for (const auto& wall : wall_blocks) {
 
             int randomRot = distribution(gen);
             auto [mx, my] = world_coords_to_indices(wall.transform.translation.x, wall.transform.translation.z);
-            std::cout << mx << ", " << my << ": " << asset_map[my][mx] << std::endl;
 
             if (asset_map[my][mx] != "tbsh ") {
 //            if (randomRot == 0) {

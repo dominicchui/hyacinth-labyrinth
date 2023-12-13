@@ -81,7 +81,7 @@ class VKDeviceManager {
 
   // Texture hack
   // JANKTEX
-  static constexpr int32_t MAX_TEXTURES = 8;
+  static constexpr int32_t MAX_TEXTURES = 10;
   VkImageView textureImageView[MAX_TEXTURES];
   VkSampler textureSampler[MAX_TEXTURES];
   int32_t cur_texture;
