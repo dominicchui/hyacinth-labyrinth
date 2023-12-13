@@ -273,9 +273,9 @@ public:
             VKModel::createModelFromFile(device, "resources/models/hilbush.obj");
         std::shared_ptr<VKModel> maze_flower_model =
             VKModel::createModelFromFile(device, "resources/models/big-color-flower-red.obj");
+        std::shared_ptr<VKModel> maze_flower2_model =
+            VKModel::createModelFromFile(device, "resources/models/big-color-flower-blue.obj");
         std::shared_ptr<VKModel> maze_tree1_model =
-            VKModel::createModelFromFile(device, "resources/models/tree3.obj", true, glm::vec3(0.6f, 0.4f, 0.6f));
-        std::shared_ptr<VKModel> maze_tree2_model =
             VKModel::createModelFromFile(device, "resources/models/tree3.obj", true, glm::vec3(0.6f, 0.4f, 0.6f));
         std::shared_ptr<VKModel> maze_wall_base_model =
             VKModel::createModelFromFile(device, "resources/models/dirt.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
@@ -306,47 +306,28 @@ public:
             if (asset_map[my][mx] == "fbush ") {
                 // occasional flowers
                 LveGameObject&& flower = LveGameObject::createGameObject();
-                flower.model = maze_flower_model;
+                std::uniform_int_distribution<> distribution2(0, 1);
+                if (distribution2(gen)==0) {
+                    flower.model = maze_flower_model;
+                } else {
+                    flower.model = maze_flower2_model;
+
+                }
                 flower.transform = wall.transform;
                 flower.transform.scale = {0.04f, -0.04f, 0.04f};
                 flower.transform.translation = {flower.transform.translation.x,
                                                 flower.transform.translation.y + 1.f,
                                                 flower.transform.translation.z};
+                flower.transform.rotation = {0, glm::radians(45.f * randomRot), 0};
                 flower.transform.update_matrices();
                 obj_map.emplace(flower.getId(), std::move(flower));
-
-//                flower = LveGameObject::createGameObject();
-//                flower.model = maze_flower_model;
-//                flower.transform = wall.transform;
-//                flower.transform.scale = {0.04f, -0.04f, 0.04f};
-//                flower.transform.translation = {flower.transform.translation.x+0.3f,
-//                                                flower.transform.translation.y + 1.6f,
-//                                                flower.transform.translation.z};
-//                flower.transform.update_matrices();
-//                obj_map.emplace(flower.getId(), std::move(flower));
-
-//                flower = LveGameObject::createGameObject();
-//                flower.model = maze_flower_model;
-//                flower.transform = wall.transform;
-//                flower.transform.scale = {0.04f, -0.04f, 0.04f};
-//                flower.transform.translation = {flower.transform.translation.x,
-//                                                flower.transform.translation.y + 1.6f,
-//                                                flower.transform.translation.z+0.3f};
-//                flower.transform.update_matrices();
-//                obj_map.emplace(flower.getId(), std::move(flower));
-
 
             } else if (asset_map[my][mx] == "tree ") {
                 std::uniform_int_distribution<> distrib2(0, 1);
                 LveGameObject&& geom_wall = LveGameObject::createGameObject();
                 geom_wall.transform = wall.transform;
-                if (distrib2(gen)==0) {
-                    geom_wall.model = maze_tree1_model;
-                    geom_wall.transform.scale = {0.15f, -0.2f, 0.15f};
-                } else {
-                    geom_wall.model = maze_tree2_model;
-                    geom_wall.transform.scale = {0.15f, -0.15f, 0.15f};
-                }
+                geom_wall.model = maze_tree1_model;
+                geom_wall.transform.scale = {0.15f, -0.2f, 0.15f};
                 geom_wall.transform.translation = {geom_wall.transform.translation.x,
                                                    geom_wall.transform.translation.y + 0.9f,
                                                    geom_wall.transform.translation.z};

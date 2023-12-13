@@ -156,7 +156,7 @@ void HyacinthLabyrinth::run() {
 
     // TODO: Update the frame only when something changes
     bool did_move =
-        cameraController.moveCameraNoRot(
+        cameraController.moveCamera(
             m_window.getGLFWwindow(),
             frameTime,
             camera
@@ -247,7 +247,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
-  MazeBlock maze = MazeBlock(18,18);
+  MazeBlock maze = MazeBlock(17,17);
  maze.generate();
  //std::cout << maze.toString() << std::endl;
  std::vector<std::vector<bool>> map = maze.toBoolVector();
