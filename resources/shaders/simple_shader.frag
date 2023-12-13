@@ -28,9 +28,9 @@ layout(set = 0, binding = 2) uniform sampler2D texSampler1;
 layout(set = 0, binding = 3) uniform sampler2D texSampler2;
 layout(set = 0, binding = 4) uniform sampler2D texSampler3;
 layout(set = 0, binding = 5) uniform sampler2D texSampler4;
- layout(set = 0, binding = 6) uniform sampler2D texSampler5;
-// layout(set = 0, binding = 7) uniform sampler2D texSampler6;
-// layout(set = 0, binding = 8) uniform sampler2D texSampler7;
+layout(set = 0, binding = 6) uniform sampler2D texSampler5;
+layout(set = 0, binding = 7) uniform sampler2D texSampler6;
+layout(set = 0, binding = 8) uniform sampler2D texSampler7;
 
 
 layout(push_constant) uniform Push {
@@ -54,11 +54,11 @@ vec3 read_tex_clr(vec2 frag_uv) {
         return vec3(texture(texSampler4, frag_uv));
     } else if (push.tex_id == 5) {
         return vec3(texture(texSampler5, frag_uv));
-    }/* else if (push.tex_id == 6) {
+    } else if (push.tex_id == 6) {
         return vec3(texture(texSampler6, frag_uv));
     } else if (push.tex_id == 7) {
         return vec3(texture(texSampler7, frag_uv));
-    }*/
+    }
     return vec3(1.f, 1.f, 1.f);
 }
 

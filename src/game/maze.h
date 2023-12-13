@@ -1,6 +1,7 @@
 #ifndef MAZE_H
 #define MAZE_H
 
+#include <optional>
 #include <vector>
 #include <unordered_map>
 #include <glm/glm.hpp>
@@ -29,6 +30,167 @@ private:
     float map_height;
     float map_half_width;
     float map_half_height;
+    std::vector<std::vector<bool>> boolVec;
+
+//    std::vector<std::tuple<std::string, float>> large_assets = {
+//        std::tuple("tree ", 0.5),
+//        std::tuple("lake ", 0.4)
+//    };
+//    wall_assets = {
+//              '__/-' : 0,
+//              '----' : 1,
+//              '-\__' : 2
+//          }
+
+
+//    std::tuple<int, int> findsq(auto mz) {
+//        for (int ri = 0; ri < mz[0].size() - 2; ri++) {
+//            for (int ci = 0; ci < mz.size() - 2; ci++) {
+//                bool val = mz[ri][ci];
+//                if (val == 1 and val == mz[ri + 1][ci] and val == mz[ri][ci + 1] and val == mz[ri + 1][ci + 1] and
+//                    val == mz[ri][ci + 2] and val == mz[ri + 1][ci + 2] and val == mz[ri + 2][ci + 2] and val == mz[ri + 2][ci] and val == mz[ri + 2][ci + 1]) {
+//                    return std::tuple(ri, ci);
+//                }
+//            }
+//        }
+//        return std::tuple(-1, -1);
+//    }
+
+    std::optional<bool> getOOB(std::vector<std::vector<bool>> mz, int r, int c) {
+        if (r < 0 or c < 0 or r >= mz.size() or c >= mz[0].size()) {
+            return std::optional<bool>();
+        }
+        return mz[r][c];
+    }
+
+//    std::optional<std::string> getOOB(std::vector<std::vector<std::string>> mz, int r, int c) {
+//        if (r < 0 or c < 0 or r >= mz.size() or c >= mz[0].size()) {
+//            return std::optional<std::string>();
+//        }
+//        return mz[r][c];
+//    }
+
+    float getOOBpop(auto mz, int r, int c) {
+        std::optional<float> mzVal = getOOB(mz, r, c);
+        return mzVal.has_value() ? (mzVal.value() - 0.25) * 1.5 : 0;
+    }
+
+    float avgpop(auto mz, int ri, int ci) {
+        float sum = 0;
+        for (int i = -2; i <= 2; i++) {
+            for (int j = -2; j <= 2; j++) {
+                sum += getOOBpop(mz, ri + i, ci + j);
+            }
+        }
+        return sum / 25.f;
+    }
+
+    std::vector<std::vector<float>> populate(std::vector<std::vector<bool>> mz) {
+        std::vector<std::vector<float>> output = {};
+        for (int ri = 0; ri < mz.size(); ri++) {
+            std::vector<float> outr = {};
+            for (int ci = 0; ci < mz[ri].size(); ci++) {
+                if (mz[ri][ci]) {
+                    outr.push_back(avgpop(mz, ri, ci));
+                } else {
+                    outr.push_back(0);
+                }
+            }
+            output.push_back(outr);
+        }
+        return output;
+    }
+
+    std::string get_asset(std::vector<std::tuple<std::string, float>> alist, float p) {
+        std::string clA = "    ";
+        float clV = 99;
+        for (int i = 0; i < alist.size(); i++) {
+            auto [asset, value] = alist[i];
+            float dist = abs(value - p);
+            if (dist < clV) {
+                clV = dist;
+                clA = asset;
+            }
+        }
+        return clA;
+    }
+
+    //void find_stretch(std::vector<std::vector<std::string>> filled) {
+    //    int width = filled[0].size();
+    //    std::vector<std::tuple<int, int>> found = {};
+    //    for (int ri = 0; ri < filled.size(); ri++) {
+    //        for (int ci = 0; ci < filled[ri].size(); ci++) {
+    //            if (filled[ri][ci] == "UNFILLED" and (getOOB(filled, ri, ci - 1) == "UNFILLED") and (getOOB(filled, ri, ci + 1) == "UNFILLED")) {
+    //                found.push_back(std::tuple(ri, ci));
+    //            }
+    //        }
+    //    }
+    //    if (!found.empty()) {
+    //        ri, ci = choice(found)
+    //        for i in range(ci, width, 1):
+    //          filled[ri][i] = '---- '
+    //          if i == width-1 or filled[ri][i+1] != 'UNFILLED':
+    //            filled[ri][i] = '-\__ '
+    //            break
+    //        for i in range(ci, -1, -1):
+    //          filled[ri][i] = '---- '
+    //          if i == 0 or filled[ri][i-1] != 'UNFILLED':
+    //            filled[ri][i] = '__/- '
+    //            break
+    //    }
+    //}
+
+    std::vector<std::vector<std::string>> fill_assets(std::vector<std::vector<bool>> mz, std::vector<std::vector<float>> pop) {
+
+        std::vector<std::vector<std::string>> output = {};
+        for (int r = 0; r < mz.size(); r++) {
+            std::vector<std::string> o = {};
+            for (int c = 0; c < mz[0].size(); c++) {
+                if (mz[r][c]) {
+                    o.push_back("UNFILLED");
+                } else {
+//                    if (rand() < 0.05) {
+//                        o.push_back("perg ");
+//                    } else {
+                        o.push_back("     ");
+//                    }
+                }
+            }
+            output.push_back(o);
+        }
+
+//        auto [tr, tc] = findsq(mz);
+//        if (tr != -1) {
+//            std::string lg_asset = get_asset(large_assets, pop[tr][tc]);
+//            for (int i = 0; i <= 2; i++) {
+//                for (int j = 0; j <= 2; j++) {
+//                    output[tr + i][tc + j] = lg_asset;
+//                }
+//            }
+//        }
+        //  wall stretches
+        //  find_stretch(output)
+
+        std::vector<std::tuple<std::string, float>> assets = {
+            std::tuple("bush ", 0.4),
+            std::tuple("tbsh ", 0.5),
+            std::tuple("vine ", 0.3),
+            std::tuple("flwr ", 0.2),
+            std::tuple("gras ", 0.1)
+        };
+
+        for (int r = 0; r < output.size(); r++) {
+            std::vector<std::string> o = {};
+            for (int c = 0; c < output[0].size(); c++) {
+                if (output[r][c] == "UNFILLED") {
+                    output[r][c] = get_asset(assets, pop[r][c]);
+                }
+            }
+        }
+
+        return output;
+    }
+
 public:
     std::vector<LveGameObject> wall_blocks;
     std::vector<glm::vec4> path_coords;
@@ -54,6 +216,7 @@ public:
         VKDeviceManager& device,
         std::vector<std::vector<bool>>& map
     ) {
+        boolVec = map;
         std::shared_ptr<VKModel> maze_wall_model =
             VKModel::createModelFromFile(device, "resources/models/cube.obj");
 
@@ -110,6 +273,8 @@ public:
         }
         std::shared_ptr<VKModel> maze_wall_model =
             VKModel::createModelFromFile(device, "resources/models/hilbush.obj");
+        std::shared_ptr<VKModel> maze_flower_model =
+            VKModel::createModelFromFile(device, "resources/models/flowers.obj");
         std::shared_ptr<VKModel> maze_wall_base_model =
             VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
         std::shared_ptr<VKModel> path_base_model_0 =
@@ -117,31 +282,50 @@ public:
         std::shared_ptr<VKModel> path_base_model_1 =
             VKModel::createModelFromFile(device, "resources/models/tile.obj", true, glm::vec3(1.f, 1.f, 1.f));
 
-        // std::for_each(
-        //     wall_spatial_map.begin(),
-        //     wall_spatial_map.end(),
-        //       [&obj_map, maze_wall_model](
-        //         std::pair<const std::pair<int32_t, int32_t>, LveGameObject*> p
-        //     )
-
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distribution(0, 3);
 
+        auto pop = populate(boolVec);
+        auto asset_map = fill_assets(boolVec, pop);
+
+        for (auto a : asset_map) {
+            for (auto b : a) {
+                std::cout << b;
+            }
+            std::cout << std::endl;
+        }
+
         for (const auto& wall : wall_blocks) {
-            LveGameObject&& geom_wall = LveGameObject::createGameObject();
-            geom_wall.model = maze_wall_model;
-            geom_wall.transform = wall.transform;
 
-            geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
-            geom_wall.transform.translation = {geom_wall.transform.translation.x -0.5f,
-                                               geom_wall.transform.translation.y + 0.9f,
-                                               geom_wall.transform.translation.z + 0.5f};
             int randomRot = distribution(gen);
-//            geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+            auto [mx, my] = world_coords_to_indices(wall.transform.translation.x, wall.transform.translation.z);
+            std::cout << mx << ", " << my << ": " << asset_map[my][mx] << std::endl;
 
-            geom_wall.transform.update_matrices();
-            obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
+            if (asset_map[my][mx] != "tbsh ") {
+//            if (randomRot == 0) {
+                // occasional flower
+                LveGameObject&& flower = LveGameObject::createGameObject();
+                flower.model = maze_flower_model;
+                flower.transform = wall.transform;
+                flower.transform.scale = {0.08f, -0.08f, 0.08f};
+                flower.transform.translation = {flower.transform.translation.x - 0.5f,
+                                                flower.transform.translation.y + 0.9f,
+                                                flower.transform.translation.z + 0.5f};
+                flower.transform.update_matrices();
+                obj_map.emplace(flower.getId(), std::move(flower));
+            } else {
+                LveGameObject&& geom_wall = LveGameObject::createGameObject();
+                geom_wall.model = maze_wall_model;
+                geom_wall.transform = wall.transform;
+                geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
+                geom_wall.transform.translation = {geom_wall.transform.translation.x - 0.5f,
+                                                   geom_wall.transform.translation.y + 0.9f,
+                                                   geom_wall.transform.translation.z + 0.5f};
+//                geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+                geom_wall.transform.update_matrices();
+                obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
+            }
 
             // Add a litle patch of dirt below
             LveGameObject&& geom_base = LveGameObject::createGameObject();
@@ -181,8 +365,6 @@ public:
             geom_tile.transform.update_matrices();
             obj_map.emplace(geom_tile.getId(), std::move(geom_tile));
        }
-
-        //);
     }
 };
 
