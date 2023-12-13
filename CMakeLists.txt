@@ -111,16 +111,16 @@ add_executable(MazeTest
 )
 
 # VULKAN: Tested on VulkanSDK v1.3.268.1
-find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
-if (NOT Vulkan_FOUND)
-    message(FATAL_ERROR "Could not find Vulkan library!")
-else()
-    message(STATUS "Using vulkan headers at: ${Vulkan_INCLUDE_DIRS}")
-    message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
-endif()
+#find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
+#if (NOT Vulkan_FOUND)
+#    message(FATAL_ERROR "Could not find Vulkan library!")
+#else()
+#    message(STATUS "Using vulkan headers at: ${Vulkan_INCLUDE_DIRS}")
+#    message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
+#endif()
 
-#set(Vulkan_LIBRARIES "/usr/local/lib")
-#set(Vulkan_INCLUDE_DIRS "/usr/local/include")
+set(Vulkan_LIBRARIES "/usr/local/lib")
+set(Vulkan_INCLUDE_DIRS "/usr/local/include")
 
 # GLFW
 if (WIN32)
@@ -155,7 +155,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt::OpenGLWidgets
     Qt::Xml
     StaticGLEW
-    ${Vulkan_LIBRARIES}
+    ${Vulkan_LIBRARIES}/libvulkan.1.dylib
 )
 if (WIN32)
   target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)

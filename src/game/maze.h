@@ -36,6 +36,8 @@ public:
     GameMaze() : maze_valid(false) {}
     ~GameMaze(void) {}
 
+    std::shared_ptr<VKModel> maze_tree_model;
+
     std::pair<int32_t, int32_t> world_coords_to_indices(float x, float y) {
         // Assumes map is valid!
         if (x < -map_half_width || x >= map_half_width) {
@@ -102,8 +104,11 @@ public:
         if (!maze_valid) {
             throw std::runtime_error("exporteMazeVisibleGeometry called without a valid maze!");
         }
-        std::shared_ptr<VKModel> maze_wall_model =
-            VKModel::createModelFromFile(device, "resources/models/hedge2.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
+//        std::shared_ptr<VKModel> maze_wall_model =
+//            VKModel::createModelFromFile(device, "resources/models/hilbush.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
+        maze_tree_model = VKModel::createModelFromFile(device,
+                                             "resources/models/lsys.obj",
+                                             true, glm::vec3(1.f, 0.1f, 0.1f));
         std::shared_ptr<VKModel> maze_wall_base_model =
             VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
 
@@ -119,19 +124,34 @@ public:
         std::uniform_int_distribution<> distribution(0, 3);
 
         for (const auto& wall : wall_blocks) {
-            LveGameObject&& geom_wall = LveGameObject::createGameObject();
-            geom_wall.model = maze_wall_model;
-            geom_wall.transform = wall.transform;
+//            LveGameObject&& geom_wall = LveGameObject::createGameObject();
+//            geom_wall.model = maze_wall_model;
+//            geom_wall.transform = wall.transform;
 
-            geom_wall.transform.scale = {0.85f, -0.85f, 0.85f};
-            geom_wall.transform.translation = {geom_wall.transform.translation.x,
-                                               geom_wall.transform.translation.y + 0.9f,
-                                               geom_wall.transform.translation.z};
+//            geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
+//            geom_wall.transform.translation = {geom_wall.transform.translation.x -0.5f,
+//                                               geom_wall.transform.translation.y + 0.9f,
+//                                               geom_wall.transform.translation.z + 0.5f};
             int randomRot = distribution(gen);
-            geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+////            geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
 
-            geom_wall.transform.update_matrices();
-            obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
+//            geom_wall.transform.update_matrices();
+//            obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
+
+
+            // add trees
+            LveGameObject&& geom_tree = LveGameObject::createGameObject();
+            geom_tree.model = maze_tree_model;
+            geom_tree.transform = wall.transform;
+
+            geom_tree.transform.scale = {0.85f, -0.85f, 0.85f};
+            geom_tree.transform.translation = {geom_tree.transform.translation.x,
+                                               geom_tree.transform.translation.y + 0.9f,
+                                               geom_tree.transform.translation.z};
+            geom_tree.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+
+            geom_tree.transform.update_matrices();
+            obj_map.emplace(geom_tree.getId(), std::move(geom_tree));
 
             // Add a litle patch of dirt below
             LveGameObject&& geom_base = LveGameObject::createGameObject();

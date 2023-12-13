@@ -35,6 +35,7 @@ class HyacinthLabyrinth {
   VKRenderer m_renderer;
   id_t m_ball_id;
   id_t m_ball_light_id;
+  std::shared_ptr<VKModel> treeModel;
 
   // note: order of declarations matters
   std::unique_ptr<VK_DP_Mgr> globalPool{};

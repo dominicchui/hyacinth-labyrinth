@@ -37,7 +37,7 @@ HyacinthLabyrinth::HyacinthLabyrinth()
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
-          // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
+           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
           // .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VKSwapChain::MAX_FRAMES_IN_FLIGHT)
 
           .build();
@@ -211,6 +211,26 @@ void HyacinthLabyrinth::run() {
 }
 
 void HyacinthLabyrinth::loadGameObjects() {
+
+      //// Generate the maze:
+      Maze maze = Maze(5,5);
+      maze.generate();
+      //std::cout << maze.toString() << std::endl;
+      std::vector<std::vector<bool>> map = maze.toBoolVector();
+      // std::vector<std::vector<bool>> map = {
+      //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+      //     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+      //     {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
+      //     {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
+      //     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+      //     {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+      //     {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+      //     {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+      //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+      // };
+      m_maze.generateMazeFromBoolVec(m_device, map);
+      m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
+
     std::shared_ptr<VKModel> model =
         VKModel::createModelFromFile(m_device, "resources/models/ball.obj", true);
     auto ball = LveGameObject::createGameObject();
@@ -232,11 +252,11 @@ void HyacinthLabyrinth::loadGameObjects() {
     m_ball_light_id = ballLight.getId();
     gameObjects.emplace(m_ball_light_id, std::move(ballLight));
 
-  model = VKModel::createModelFromFile(m_device,
-                                        "resources/models/lsys.obj",
-                                         true, glm::vec3(1.f, 0.1f, 0.1f));
+//  model = VKModel::createModelFromFile(m_device,
+//                                        "resources/models/lsys.obj",
+//                                         true, glm::vec3(1.f, 0.1f, 0.1f));
   auto smoothVase = LveGameObject::createGameObject();
-  smoothVase.model = model;
+  smoothVase.model = m_maze.maze_tree_model;
   smoothVase.transform.translation = {.5f, .5f, 0.f};
   smoothVase.transform.scale = {0.08f, -0.08f, 0.08f};
   smoothVase.transform.update_matrices();
@@ -251,25 +271,6 @@ void HyacinthLabyrinth::loadGameObjects() {
   floor.transform.scale = {50.f, 1.f, 50.f};
   floor.transform.update_matrices();
   gameObjects.emplace(floor.getId(), std::move(floor));
-
-  //// Generate the maze:
- Maze maze = Maze(5,5);
- maze.generate();
- //std::cout << maze.toString() << std::endl;
- std::vector<std::vector<bool>> map = maze.toBoolVector();
- // std::vector<std::vector<bool>> map = {
- //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
- //     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
- //     {1, 0, 0, 1, 0, 1, 1, 1, 1, 1},
- //     {1, 0, 0, 1, 1, 1, 0, 0, 0, 1},
- //     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
- //     {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
- //     {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
- //     {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
- //     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
- // };
-  m_maze.generateMazeFromBoolVec(m_device, map);
-  m_maze.exportMazeVisibleGeometry(m_device, gameObjects);
 
 
  // Sun
