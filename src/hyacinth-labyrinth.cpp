@@ -243,7 +243,7 @@ void HyacinthLabyrinth::loadGameObjects() {
 
   model = VKModel::createModelFromFile(m_device,
                                        "resources/models/quad.obj",
-                                       true, glm::vec3(1.f, 1.f, 1.f));
+                                       true, glm::vec3(0.f, 0.f, 0.f));
   auto floor = LveGameObject::createGameObject();
   floor.model = model;
   floor.transform.translation = {0.f, 1.f, 0.f};
@@ -273,7 +273,7 @@ void HyacinthLabyrinth::loadGameObjects() {
 
  // Sun
   auto pointLight = LveGameObject::makePointLight(90.f);
-  pointLight.color = glm::vec3(.98f, .84f, .11f);
+  pointLight.color = glm::vec3(.98f, .84f, .5f);
   pointLight.transform.translation = glm::vec3(0.f, -20.f, 0.f);
   pointLight.transform.update_matrices();
   gameObjects.emplace(pointLight.getId(), std::move(pointLight));

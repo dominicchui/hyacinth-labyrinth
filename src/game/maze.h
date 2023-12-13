@@ -31,6 +31,7 @@ private:
     float map_half_height;
 public:
     std::vector<LveGameObject> wall_blocks;
+    std::vector<glm::vec4> path_coords;
    // std::unordered_map<std::pair<int32_t, int32_t>, LveGameObject*, pair_hash> wall_spatial_map;
     std::vector<std::vector<int32_t>> spatial_map;
     GameMaze() : maze_valid(false) {}
@@ -84,6 +85,11 @@ public:
                     // };
                     spatial_map[y][x] = wall_blocks.size() - 1;
                 } else {
+                    // Just store our coordinates to come back to later
+                    glm::vec3 translation(coord);
+                    // Store the parity for check tiling in the last entry of the vec4
+                    float parity = (x+y) % 2;
+                    path_coords.push_back(glm::vec4(translation, parity));
                     spatial_map[y][x] = -1;
                 }
                 coord.x += 1.f;
@@ -103,9 +109,13 @@ public:
             throw std::runtime_error("exporteMazeVisibleGeometry called without a valid maze!");
         }
         std::shared_ptr<VKModel> maze_wall_model =
-            VKModel::createModelFromFile(device, "resources/models/hilbush.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
+            VKModel::createModelFromFile(device, "resources/models/hilbush.obj");
         std::shared_ptr<VKModel> maze_wall_base_model =
             VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
+        std::shared_ptr<VKModel> path_base_model_0 =
+            VKModel::createModelFromFile(device, "resources/models/tile.obj", true, glm::vec3(0.8f, 0.8f, 0.8f));
+        std::shared_ptr<VKModel> path_base_model_1 =
+            VKModel::createModelFromFile(device, "resources/models/tile.obj", true, glm::vec3(1.f, 1.f, 1.f));
 
         // std::for_each(
         //     wall_spatial_map.begin(),
@@ -147,6 +157,29 @@ public:
 
             geom_base.transform.update_matrices();
             obj_map.emplace(geom_base.getId(), std::move(geom_base));
+       }
+
+       for (const auto &coord : path_coords) {
+            // Add a tile
+            LveGameObject&& geom_tile = LveGameObject::createGameObject();
+            int parity = coord[3];
+            if (parity == 0)
+                geom_tile.model = path_base_model_0;
+            else
+                geom_tile.model = path_base_model_1;
+
+            geom_tile.transform.scale = {0.47f, 1.f, 0.47f};
+            geom_tile.transform.translation = glm::vec3(coord);
+
+            geom_tile.transform.scale = {geom_tile.transform.scale.x,
+                                         geom_tile.transform.scale.y / 10.f,
+                                         geom_tile.transform.scale.z};
+            geom_tile.transform.translation = {geom_tile.transform.translation.x,
+                                               geom_tile.transform.translation.y + 1.f,
+                                               geom_tile.transform.translation.z};
+
+            geom_tile.transform.update_matrices();
+            obj_map.emplace(geom_tile.getId(), std::move(geom_tile));
        }
 
         //);
