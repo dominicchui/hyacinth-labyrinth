@@ -1,0 +1,25 @@
+{
+  "type": "DOL",
+  "num_iters": 3,
+  "step_size": 3,
+  "leaf_size": 0.5,
+  "leaf_angle": 22.5,
+  "stem_radius": 0.07,
+  "show_stem": true,
+  "angle_incr": 2.5,
+  "tesselation_level": 30,
+  "lsystem": {
+    "axiom": "P",
+    "rules": {
+      "P": "I+[~~P+O]--//[--L]I[++L]-[//PO]++PO",
+      "I": "FS[//&&L][//^^L]FS",
+      "S": "SFS",
+      "L": "['{+f-ff-f+|+f-ff-f}]",
+      "O": "[&&&E'/W//W//W//W//W////W//W//W//W//W//W//W//W]",
+      "E": "FF",
+      "W": "['^F][{&&&-g+g|-g+g}]"
+    }
+  },
+  "prune_enabled": false,
+  "prune_bounds": {}
+}
