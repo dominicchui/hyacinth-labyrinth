@@ -103,7 +103,7 @@ public:
             throw std::runtime_error("exporteMazeVisibleGeometry called without a valid maze!");
         }
         std::shared_ptr<VKModel> maze_wall_model =
-            VKModel::createModelFromFile(device, "resources/models/hedge2.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
+            VKModel::createModelFromFile(device, "resources/models/hilbush.obj", true, glm::vec3(0.3f, 0.8f, 0.2f));
         std::shared_ptr<VKModel> maze_wall_base_model =
             VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
 
@@ -123,12 +123,12 @@ public:
             geom_wall.model = maze_wall_model;
             geom_wall.transform = wall.transform;
 
-            geom_wall.transform.scale = {0.85f, -0.85f, 0.85f};
-            geom_wall.transform.translation = {geom_wall.transform.translation.x,
+            geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
+            geom_wall.transform.translation = {geom_wall.transform.translation.x -0.5f,
                                                geom_wall.transform.translation.y + 0.9f,
-                                               geom_wall.transform.translation.z};
+                                               geom_wall.transform.translation.z + 0.5f};
             int randomRot = distribution(gen);
-            geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+//            geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
 
             geom_wall.transform.update_matrices();
             obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
