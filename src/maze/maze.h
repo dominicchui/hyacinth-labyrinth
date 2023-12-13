@@ -22,6 +22,7 @@ public:
     void shiftDown();
 
     void addExtraPaths();
+    void deleteMaze();
 
 private:
     // height and width of constituent maze blocks, not the maze itself

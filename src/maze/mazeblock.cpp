@@ -380,3 +380,27 @@ Cell* MazeBlock::getCellFromExternalBorder(int index, Direction dir) {
     Cell* neighborCell = &neighborMaze->cells[neighborIndex];
     return neighborCell;
 }
+
+std::vector<std::vector<bool>> MazeBlock::toBoolVector() {
+    //    WALL_REPRESENTATION = 1;
+    //    PATH_REPRESENTATION = 0;
+    //    CLOSED_AREA_REPRESENTATION = 0;
+    std::string stringRep = toString(true, true);
+    std::vector<std::vector<bool>> vectorRep;
+    vectorRep.reserve(height);
+
+    for (int i=0; i<blockHeight; i++) {
+        std::vector<bool> row;
+        row.reserve(blockWidth);
+        for (int j=0; j<blockWidth; j++) {
+            char c = stringRep[i*blockWidth+j+i];
+            if (c=='O') {
+                row.push_back(0);
+            } else {
+                row.push_back(1);
+            }
+        }
+        vectorRep.push_back(row);
+    }
+    return vectorRep;
+}
