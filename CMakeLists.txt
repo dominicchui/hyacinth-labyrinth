@@ -27,6 +27,7 @@ include_directories(src)
 add_executable(${PROJECT_NAME}
   # src
   src/main.cpp
+#  src/debug.h
   src/gl_kernel.h
   src/hyacinth-labyrinth.hpp                  src/hyacinth-labyrinth.cpp
 
@@ -37,6 +38,7 @@ add_executable(${PROJECT_NAME}
   src/game/keyboard_movement_controller.hpp   src/game/keyboard_movement_controller.cpp
   src/game/lve_game_object.hpp                src/game/lve_game_object.cpp
   src/game/lve_camera.hpp                     src/game/lve_camera.cpp
+  src/game/maze.h
 
   # realtime renderer
   src/renderer/camera.h                       src/renderer/camera.cpp
@@ -86,9 +88,26 @@ add_executable(${PROJECT_NAME}
 
   src/ball-test.hpp
   src/ball-test.cpp
-  src/game/maze.h
   src/utils/debug.h
-  src/maze/cell.cpp src/maze/cell.h src/maze/maze.cpp src/maze/maze.h src/maze/mazeblock.cpp src/maze/mazeblock.h
+
+  # maze
+  src/maze/maze.h
+  src/maze/maze.cpp
+  src/maze/mazeblock.h
+  src/maze/mazeblock.cpp
+  src/maze/cell.h
+  src/maze/cell.cpp
+
+  src/extern/stb_image.h
+)
+add_executable(MazeTest
+    src/maze/maze.h
+    src/maze/maze.cpp
+    src/maze/mazeblock.h
+    src/maze/mazeblock.cpp
+    src/maze/cell.h
+    src/maze/cell.cpp
+    src/maze/mazetest.cpp
 )
 
 # VULKAN: Tested on VulkanSDK v1.3.268.1
@@ -99,6 +118,9 @@ else()
     message(STATUS "Using vulkan headers at: ${Vulkan_INCLUDE_DIRS}")
     message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
 endif()
+
+#set(Vulkan_LIBRARIES "/usr/local/lib")
+#set(Vulkan_INCLUDE_DIRS "/usr/local/include")
 
 # GLFW
 if (WIN32)

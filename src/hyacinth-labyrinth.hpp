@@ -10,11 +10,12 @@
 // std
 #include <memory>
 #include <vector>
+using id_t = unsigned int;
 
 class HyacinthLabyrinth {
  public:
-  static constexpr int WIDTH = 800;
-  static constexpr int HEIGHT = 600;
+  static constexpr int WIDTH = 1280;
+  static constexpr int HEIGHT = 720;
 
   HyacinthLabyrinth();
   ~HyacinthLabyrinth();
@@ -33,6 +34,7 @@ class HyacinthLabyrinth {
   VKDeviceManager m_device;
   VKRenderer m_renderer;
   id_t m_ball_id;
+  id_t m_ball_light_id;
 
   // note: order of declarations matters
   std::unique_ptr<VK_DP_Mgr> globalPool{};
