@@ -117,7 +117,7 @@ void HyacinthLabyrinth::run() {
 
   // Create camera
 //  glm::vec4 cam_pos(-5.f, -12.f, 5.f, 1.f);
-  glm::vec4 cam_pos(1.f, -11.f, 7.f, 1.f);
+  glm::vec4 cam_pos(0.f, -11.f, 0.1f, 1.f);
   glm::vec4 focus_at(0.f, 0.f, 0.f, 1.f);
   SceneCameraData scd{
       cam_pos, // pos
@@ -272,9 +272,10 @@ void HyacinthLabyrinth::loadGameObjects() {
 
 
  // Sun
-  auto pointLight = LveGameObject::makePointLight(90.f);
-  pointLight.color = glm::vec3(.98f, .84f, .5f);
-  pointLight.transform.translation = glm::vec3(0.f, -20.f, 0.f);
+  auto pointLight = LveGameObject::makePointLight(8.f * 300.f);
+//  pointLight.color = glm::vec3(.98f, .84f, .5f);
+  pointLight.color = glm::vec3(254.f, 255.f, 242.f) / 255.f;
+  pointLight.transform.translation = glm::vec3(10.f, -80.f, -10.f);
   pointLight.transform.update_matrices();
   gameObjects.emplace(pointLight.getId(), std::move(pointLight));
 }

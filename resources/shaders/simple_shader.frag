@@ -40,23 +40,24 @@ layout(push_constant) uniform Push {
 } push;
 
 
-vec3 read_tex_clr() {
+vec3 read_tex_clr(vec2 frag_uv) {
+    frag_uv = vec2(frag_uv[0], 1.f - frag_uv[1]);
     if (push.tex_id == 0) {
-        return vec3(texture(texSampler0, fragUV));
+        return vec3(texture(texSampler0, frag_uv));
     } else if (push.tex_id == 1) {
-        return vec3(texture(texSampler1, fragUV));
+        return vec3(texture(texSampler1, frag_uv));
     } else if (push.tex_id == 2) {
-        return vec3(texture(texSampler2, fragUV));
+        return vec3(texture(texSampler2, frag_uv));
     } else if (push.tex_id == 3) {
-        return vec3(texture(texSampler3, fragUV));
+        return vec3(texture(texSampler3, frag_uv));
     } else if (push.tex_id == 4) {
-        return vec3(texture(texSampler4, fragUV));
+        return vec3(texture(texSampler4, frag_uv));
     } else if (push.tex_id == 5) {
-        return vec3(texture(texSampler5, fragUV));
+        return vec3(texture(texSampler5, frag_uv));
     }/* else if (push.tex_id == 6) {
-        return vec3(texture(texSampler6, fragUV));
+        return vec3(texture(texSampler6, frag_uv));
     } else if (push.tex_id == 7) {
-        return vec3(texture(texSampler7, fragUV));
+        return vec3(texture(texSampler7, frag_uv));
     }*/
     return vec3(1.f, 1.f, 1.f);
 }
@@ -73,7 +74,7 @@ vec4 nlerp(vec4 a, vec4 b, float t) {
 }
 
 void main() {
-  vec3 tex_clr = read_tex_clr();
+  vec3 tex_clr = read_tex_clr(fragUV);
 
   vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
   vec3 specularLight = vec3(0.0);
@@ -110,4 +111,5 @@ void main() {
 
   float dist = clamp(distance(camPos, fragPosWorld) / 20.f, 0.f, 1.f);
   outColor = nlerp(outColor, vec4(255.f, 255.f, 255.f, 255) / 255.f, dist);
+
 }
