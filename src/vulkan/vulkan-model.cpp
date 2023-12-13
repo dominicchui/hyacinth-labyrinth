@@ -49,7 +49,7 @@ VKModel::VKModel(
     if (builder.has_texture) {
         tex_filename = "../resources/models/" + builder.tex_filename;
     } else {
-        tex_filename = "../resources/textures/andyVanDam.jpg";
+        tex_filename = "../resources/textures/bark.png";
     }
     createTextureImage();
     createTextureImageView();

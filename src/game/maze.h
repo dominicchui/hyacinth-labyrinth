@@ -31,6 +31,8 @@ private:
     float map_half_height;
 public:
     std::vector<LveGameObject> wall_blocks;
+    std::vector<LveGameObject> path_blocks;
+
    // std::unordered_map<std::pair<int32_t, int32_t>, LveGameObject*, pair_hash> wall_spatial_map;
     std::vector<std::vector<int32_t>> spatial_map;
     GameMaze() : maze_valid(false) {}
@@ -55,7 +57,10 @@ public:
         std::vector<std::vector<bool>>& map
     ) {
         std::shared_ptr<VKModel> maze_wall_model =
-            VKModel::createModelFromFile(device, "resources/models/cube.obj");
+            VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.f,0.f,1.f));
+
+        std::shared_ptr<VKModel> maze_floor_model =
+            VKModel::createModelFromFile(device, "resources/models/floor.obj");
 
         map_height = float(map.size());
         map_width = float(map[0].size()); // Assuming all rows are the same size
@@ -85,6 +90,12 @@ public:
                     // };
                     spatial_map[y][x] = wall_blocks.size() - 1;
                 } else {
+//                    LveGameObject&& path = LveGameObject::createGameObject();
+//                    path.model = maze_floor_model;
+//                    path.transform.translation = coord;
+//                    path.transform.scale = {0.5f, 1.f, 0.5f};
+//                    path.transform.update_matrices();
+//                    path_blocks.emplace_back(std::move(path));
                     spatial_map[y][x] = -1;
                 }
                 coord.x += 1.f;
@@ -122,7 +133,7 @@ public:
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distribution(0, 3);
-        std::uniform_int_distribution<> distribution2(0, 3);
+        std::uniform_int_distribution<> distribution2(0, 15);
 
         for (const auto& wall : wall_blocks) {
             LveGameObject&& geom_wall = LveGameObject::createGameObject();
@@ -159,6 +170,30 @@ public:
             LveGameObject&& geom_base = LveGameObject::createGameObject();
             geom_base.model = maze_wall_base_model;
             geom_base.transform = wall.transform;
+
+            geom_base.transform.scale = {geom_base.transform.scale.x,
+                                         geom_base.transform.scale.y / 10.f,
+                                         geom_base.transform.scale.z};
+            geom_base.transform.translation = {geom_base.transform.translation.x,
+                                               geom_base.transform.translation.y + 1.f,
+                                               geom_base.transform.translation.z};
+
+            geom_base.transform.update_matrices();
+            obj_map.emplace(geom_base.getId(), std::move(geom_base));
+       }
+       for (const auto& path : path_blocks) {
+//            LveGameObject&& geom_wall = LveGameObject::createGameObject();
+//            geom_wall.transform = path.transform;
+//            int randomRot = distribution(gen);
+//            geom_wall.model = maze_tree_model_green;
+//            geom_wall.transform.scale = {0.065f, -0.065f, 0.065f};
+//            geom_wall.transform.translation = {geom_wall.transform.translation.x,
+//                                               geom_wall.transform.translation.y + 0.9f,
+//                                               geom_wall.transform.translation.z};
+//            geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+            LveGameObject&& geom_base = LveGameObject::createGameObject();
+            geom_base.model = maze_wall_base_model;
+            geom_base.transform = path.transform;
 
             geom_base.transform.scale = {geom_base.transform.scale.x,
                                          geom_base.transform.scale.y / 10.f,
