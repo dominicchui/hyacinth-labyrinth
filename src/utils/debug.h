@@ -47,56 +47,6 @@ static void printMat4(const glm::mat4& mat) {
 
 #include <GL/glew.h>
 
-namespace Debug
-{
-// Task 2: Add file name and line number parameters
-static inline void glErrorCheck(const char* fname, int32_t line) {
-    GLenum errorNumber = glGetError();
-    while (errorNumber != GL_NO_ERROR) {
-        // Task 2: Edit this print statement to be more descriptive
-        std::cerr << fname << ":" << line << " " <<
-            errorNumber << std::endl;
-
-        errorNumber = glGetError();
-    }
-}
-
-static void verifyVAO(
-    const char* fname,
-    int32_t line,
-    std::vector<GLfloat> &triangleData,
-    GLuint index,
-    GLsizei size,
-    GLsizei stride,
-    const void* offset
-) {
-    int newStride = int(stride / 4);
-    int groupNum = 0;
-    int newOffset = static_cast<int>(reinterpret_cast<intptr_t>(offset)) / 4;
-
-    std::cerr << fname << ":" << line << ":" << std::endl;
-
-//    for (int i = newOffset; i < triangleData.size(); i = i + newStride) {
-//        std::cerr << "Group " << groupNum << " of Values for VAO index " << index << std::endl;
-//        std::cerr << "[";
-//        for (auto j = i; j < i + size; ++j) {
-//            if (j != i + size - 1) {
-//                std::cerr << triangleData[j]<< ", ";
-//            } else {
-//                std::cerr << triangleData[j]<< "]" << std::endl;
-//            }
-//        }
-//        groupNum = groupNum + 1;
-//    }
-    std::cout << "" << std::endl;
-}
-
-}
-
-#define glErrorCheck() Debug::glErrorCheck(__FILE__, __LINE__)
-#define verifyVAO(tri_data, index, size, stride, offset)    \
-    Debug::verifyVAO(__FILE__, __LINE__, tri_data, index, size, stride, offset)
-
 #else
 #define printVec3(...)
 #define printVec4(...)

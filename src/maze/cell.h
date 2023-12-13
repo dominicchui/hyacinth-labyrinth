@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+
 enum CellType {
     Empty, // cell that has not been initalized with a value, de facto wall
     Open, // cell that is an "open" space, e.g. corridor

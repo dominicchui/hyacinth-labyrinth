@@ -68,7 +68,23 @@ class VKDeviceManager {
       VkImage &image,
       VkDeviceMemory &imageMemory);
 
+  void transitionImageLayout(
+      VkImage image,
+      VkFormat format,
+      VkImageLayout oldLayout,
+      VkImageLayout newLayout
+  );
+
+  VkImageView createImageView(VkImage image, VkFormat format);
+
   VkPhysicalDeviceProperties properties;
+
+  // Texture hack
+  // JANKTEX
+  static constexpr int32_t MAX_TEXTURES = 8;
+  VkImageView textureImageView[MAX_TEXTURES];
+  VkSampler textureSampler[MAX_TEXTURES];
+  int32_t cur_texture;
 
  private:
   void createInstance();

@@ -10,11 +10,12 @@
 // std
 #include <memory>
 #include <vector>
+using id_t = unsigned int;
 
 class HyacinthLabyrinth {
  public:
-  static constexpr int WIDTH = 1920;
-  static constexpr int HEIGHT = 1080;
+  static constexpr int WIDTH = 1280;
+  static constexpr int HEIGHT = 720;
 
   HyacinthLabyrinth();
   ~HyacinthLabyrinth();

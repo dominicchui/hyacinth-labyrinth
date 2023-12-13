@@ -4,6 +4,8 @@
 // libs
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <extern/tiny_obj_loader.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <extern/stb_image.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
@@ -36,17 +38,159 @@ struct std::hash<VKModel::Vertex> {
   }
 };
 
-
 VKModel::VKModel(
     VKDeviceManager& device,
     const VKModel::Builder& builder)
     : m_device(device)
 {
-  createVertexBuffers(builder.vertices);
-  createIndexBuffers(builder.indices);
+    if (m_device.cur_texture >= VKDeviceManager::MAX_TEXTURES) {
+        throw std::runtime_error("TOO MANY TEXTURES!!!");
+    }
+    createTextureImage();
+    createTextureImageView();
+    createTextureSampler();
+    createVertexBuffers(builder.vertices);
+    createIndexBuffers(builder.indices);
+
+    texture_id = m_device.cur_texture;
+    m_device.cur_texture++;
 }
 
-VKModel::~VKModel() {}
+VKModel::~VKModel() {
+    vkDestroyImage(m_device.device(), textureImage, nullptr);
+    vkFreeMemory(m_device.device(), textureImageMemory, nullptr);
+}
+
+void VKModel::createImage(
+    uint32_t width,
+    uint32_t height,
+    VkFormat format,
+    VkImageTiling tiling,
+    VkImageUsageFlags usage,
+    VkMemoryPropertyFlags properties,
+    VkImage& image,
+    VkDeviceMemory& imageMemory
+) {
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = width;
+    imageInfo.extent.height = height;
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = 1;
+    imageInfo.format = format;
+    imageInfo.tiling = tiling;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = usage;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    m_device.createImageWithInfo(
+        imageInfo,
+        properties,
+        image,
+        imageMemory
+    );
+}
+
+void VKModel::createTextureImage(void) {
+    int texWidth, texHeight, texChannels;
+
+    stbi_uc* pixels = nullptr;
+
+    // JANKTEX
+    static int32_t id = 0;
+    if (id++ % 2) {
+        pixels = stbi_load("../resources/textures/marsTexture.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    } else {
+        pixels = stbi_load("../resources/textures/andyVanDam.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    }
+    VkDeviceSize imageSize = texWidth * texHeight * 4;
+
+    if (!pixels) {
+        throw std::runtime_error("failed to load texture image!");
+    }
+
+    VKBufferMgr stagingBuffer{
+        m_device,
+        imageSize,
+        1,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+    };
+
+    // Copy image data to a buffer
+    stagingBuffer.map();
+    stagingBuffer.writeToBuffer(pixels);
+    stagingBuffer.unmap();
+
+    stbi_image_free(pixels);
+
+    createImage(
+        texWidth,
+        texHeight,
+        VK_FORMAT_R8G8B8A8_SRGB,
+        VK_IMAGE_TILING_OPTIMAL,
+        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        textureImage,
+        textureImageMemory
+    );
+
+    // Change the texture image layout
+    m_device.transitionImageLayout(textureImage,
+                                   VK_FORMAT_R8G8B8A8_SRGB,
+                                   VK_IMAGE_LAYOUT_UNDEFINED,
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    // Copy to the destination buffer
+    m_device.copyBufferToImage(stagingBuffer.getBuffer(),
+                               textureImage,
+                               static_cast<uint32_t>(texWidth),
+                               static_cast<uint32_t>(texHeight),
+                               1);
+
+    // Cleanup
+    m_device.transitionImageLayout(textureImage,
+                                   VK_FORMAT_R8G8B8A8_SRGB,
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
+void VKModel::createTextureSampler(void) {
+    VkSamplerCreateInfo samplerInfo{};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+    samplerInfo.anisotropyEnable = VK_TRUE;
+    samplerInfo.maxAnisotropy = m_device.properties.limits.maxSamplerAnisotropy;
+
+    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.mipLodBias = 0.0f;
+    samplerInfo.minLod = 0.0f;
+    samplerInfo.maxLod = 0.0f;
+
+    if (vkCreateSampler(m_device.device(), &samplerInfo, nullptr, &m_device.textureSampler[m_device.cur_texture]) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create texture sampler!");
+    }
+}
+
+void VKModel::createTextureImageView() {
+    m_device.textureImageView[m_device.cur_texture] =
+        m_device.createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+}
 
 std::unique_ptr<VKModel> VKModel::createModelFromFile(
     VKDeviceManager& device,
@@ -303,8 +447,8 @@ void VKModel::Builder::loadModel(const std::string &filepath) {
 
             // UVs
             populate_tex_coords(idx_x, attrib, vertex_x);
-            populate_tex_coords(idx_y, attrib, vertex_x);
-            populate_tex_coords(idx_z, attrib, vertex_x);
+            populate_tex_coords(idx_y, attrib, vertex_y);
+            populate_tex_coords(idx_z, attrib, vertex_z);
 
             printVertex(vertex_x, idx_x.vertex_index);
             printVertex(vertex_y, idx_y.vertex_index);

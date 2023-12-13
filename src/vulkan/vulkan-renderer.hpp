@@ -33,7 +33,7 @@ class VKRenderer {
     return currentFrameIndex;
   }
 
-  VkCommandBuffer beginFrame();
+  VkCommandBuffer beginFrame(void);
   void endFrame();
   void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
   void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
