@@ -6,7 +6,7 @@
 // lib
 #include <vulkan/vulkan.h>
 
-#define MAX_LIGHTS 10
+#define MAX_LIGHTS 30
 
 struct PointLight {
   glm::vec4 position{};  // ignore w

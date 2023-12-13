@@ -155,6 +155,14 @@ public:
                                                    geom_wall.transform.translation.z};
                 geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
 
+                auto light = LveGameObject::makePointLight(0.2f);
+                light.transform.translation = {geom_wall.transform.translation.x,
+                                         geom_wall.transform.translation.y - 0.5f,
+                                         geom_wall.transform.translation.z};
+                light.transform.update_matrices();
+                light.color = glm::vec3(0.1f, 0.1f, 0.8f);
+                obj_map.emplace(light.getId(), std::move(light));
+
             } else {
                 geom_wall.model = maze_wall_model;
                 geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
