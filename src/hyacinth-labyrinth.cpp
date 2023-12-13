@@ -103,6 +103,8 @@ void HyacinthLabyrinth::run() {
         .writeImage(6, &imageInfos[5])
         .writeImage(7, &imageInfos[6])
         .writeImage(8, &imageInfos[7])
+        .writeImage(9, &imageInfos[8])
+        .writeImage(10, &imageInfos[9])
         .build(globalDescriptorSets[i]);
   }
 
@@ -234,14 +236,23 @@ void HyacinthLabyrinth::loadGameObjects() {
     m_ball_light_id = ballLight.getId();
     gameObjects.emplace(m_ball_light_id, std::move(ballLight));
 
-//  model = VKModel::createModelFromFile(m_device,
-//                                        "resources/models/flowers.obj");
-//  auto smoothVase = LveGameObject::createGameObject();
-//  smoothVase.model = model;
-//  smoothVase.transform.translation = {.5f, .5f, 0.f};
-//  smoothVase.transform.scale = {0.08f, -0.08f, 0.08f};
-//  smoothVase.transform.update_matrices();
-//  gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
+  model = VKModel::createModelFromFile(m_device,
+                                        "resources/models/flowers.obj");
+  auto ttt = LveGameObject::createGameObject();
+  ttt.model = model;
+  ttt.transform.translation = {.5f, .5f, 0.f};
+  ttt.transform.scale = {0.08f, -0.08f, 0.08f};
+  ttt.transform.update_matrices();
+  gameObjects.emplace(ttt.getId(), std::move(ttt));
+
+  model = VKModel::createModelFromFile(m_device,
+                                       "resources/models/flowers.obj");
+  auto smoothVase = LveGameObject::createGameObject();
+  smoothVase.model = model;
+  smoothVase.transform.translation = {.5f, .5f, 0.f};
+  smoothVase.transform.scale = {0.08f, -0.08f, 0.08f};
+  smoothVase.transform.update_matrices();
+  gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
   model = VKModel::createModelFromFile(m_device,
                                        "resources/models/quad.obj",
@@ -254,7 +265,7 @@ void HyacinthLabyrinth::loadGameObjects() {
   gameObjects.emplace(floor.getId(), std::move(floor));
 
   //// Generate the maze:
- MazeBlock maze = MazeBlock(30,30);
+ MazeBlock maze = MazeBlock(10,10);
  maze.generate();
  //std::cout << maze.toString() << std::endl;
  std::vector<std::vector<bool>> map = maze.toBoolVector();

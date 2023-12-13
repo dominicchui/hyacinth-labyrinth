@@ -276,7 +276,7 @@ public:
         std::shared_ptr<VKModel> maze_flower_model =
             VKModel::createModelFromFile(device, "resources/models/flowers.obj");
         std::shared_ptr<VKModel> maze_wall_base_model =
-            VKModel::createModelFromFile(device, "resources/models/cube.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
+            VKModel::createModelFromFile(device, "resources/models/dirt.obj", true, glm::vec3(0.6f, 0.4f, 0.2f));
         std::shared_ptr<VKModel> path_base_model_0 =
             VKModel::createModelFromFile(device, "resources/models/tile.obj", true, glm::vec3(153.f, 180.f, 255.f) / 255.f);
         std::shared_ptr<VKModel> path_base_model_1 =

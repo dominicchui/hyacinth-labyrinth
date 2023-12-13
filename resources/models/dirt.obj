@@ -1,5 +1,5 @@
 # Apple ModelIO OBJ File: cube
-mtllib cube.mtl
+mtllib dirt.mtl
 g 
 v -1.0 -1.0 1.0
 v 1.0 1.0 1.0
