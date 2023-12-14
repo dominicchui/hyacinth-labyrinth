@@ -50,3 +50,16 @@ Procedurally generated maze with procedurally generated innards with ball physic
     - Start+end cycle 
 Ball movement
 - Instead of ball moving around, move the whole maze plane (e.g. camera and gravity direction)
+
+
+## Submission notes:
+### External dependencies
+- The base Vulkan system was repurposed from https://github.com/blurrypiano/littleVulkanEngine, on top of which we added support for texture mapping.
+- For loading obj files and textures, we use https://github.com/tinyobjloader/tinyobjloader
+- For loading texture images we use https://github.com/nothings/stb
+
+### Existing features
+-  Random (but solvable) maze generation using Wilson's algorithm
+-  Lsystems for offline generation of foliage geometry and textures
+-  Physics simulation of a ball within the maze
+-  Real-time rendering using Vulkan
