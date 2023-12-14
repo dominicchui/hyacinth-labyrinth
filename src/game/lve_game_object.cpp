@@ -156,26 +156,26 @@ void LveGameObject::collision_handler(GameMaze& maze) {
 
                 if (intersects.first) {
                     glm::vec3& normal = intersects.second;
-                    std::cout << "Hit wall: " << coord.first << ", " << coord.second;
-                    std::cout << " normal: ";
+                    // std::cout << "Hit wall: " << coord.first << ", " << coord.second;
+                    // std::cout << " normal: ";
                     printVec3(normal);
 
-                    std::cout << "old old_velocity: ";
+                    // std::cout << "old old_velocity: ";
                     printVec3(phys.cur_velocity, false);
                     if (glm::dot(phys.cur_velocity, normal) < 0) {
                         phys.prev_velocity = glm::reflect(phys.prev_velocity, normal);
                         phys.cur_velocity = glm::reflect(phys.cur_velocity, normal);
                     }
-                    std::cout << "new cur_velocity: ";
+                    // std::cout << "new cur_velocity: ";
                     printVec3(phys.cur_velocity);
 
                     // Find out how much of the ball got inside the wall, and reflect the position by that amount
                     glm::vec3 center_diff = glm::vec3(cur_pos) - glm::vec3(wall.transform.translation);
-                    std::cout << "diff: ";
+                    //std::cout << "diff: ";
                     printVec3(center_diff);
                     float wallPlusBallLength = wall.phys.radius + phys.radius;
                     glm::vec3 bounce_amount = (center_diff - normal*wallPlusBallLength) * -glm::abs(normal);
-                    std::cout << "bounce amount: ";
+                    //std::cout << "bounce amount: ";
                     printVec3(bounce_amount);
                     transform.translation += bounce_amount;
                 }

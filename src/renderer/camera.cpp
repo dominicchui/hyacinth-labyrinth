@@ -123,24 +123,30 @@ bool Camera::rotate(float delta_x, float delta_y, float deltaTime) {
     float theta_x = -delta_x * mouse_sensitivity;
     float theta_y = delta_y * mouse_sensitivity;
 
+    // Translate the camera to the ball, rotate, then translate it back
+    glm::vec4 translated_campos = pos + glm::vec4(unnormLook, 0);
+
     if (theta_x) {
-        glm::mat3 rot_up = getRotationMatrixUp(theta_x);
-        look = rot_up * look;
+        glm::mat3 rot_up = glm::rotate(theta_x, up);
+        unnormLook = rot_up * unnormLook;
+        look = glm::normalize(unnormLook);
         right = glm::cross(-look, up);
+        pos = pos - glm::vec4(unnormLook, 0.f);
         rotated = true;
     }
 
-    // Rotation about "right" (delta_y)
-    float new_theta_pitch = theta_pitch + theta_y;
-    if ((theta_y > 0.f && new_theta_pitch < theta_pitch_max) ||
-        (theta_y < 0.f && new_theta_pitch > theta_pitch_min)
-    ) {
-        glm::mat3 rot_right = glm::rotate(theta_y, right);
-        look = rot_right * look;
 
-        theta_pitch = new_theta_pitch;
-        rotated = true;
-    }
+    // // Rotation about "right" (delta_y)
+    // float new_theta_pitch = theta_pitch + theta_y;
+    // if ((theta_y > 0.f && new_theta_pitch < theta_pitch_max) ||
+    //     (theta_y < 0.f && new_theta_pitch > theta_pitch_min)
+    // ) {
+    //     glm::mat3 rot_right = glm::rotate(theta_y, right);
+    //     look = rot_right * look;
+
+    //     theta_pitch = new_theta_pitch;
+    //     rotated = true;
+    // }
 
     look = glm::normalize(look);
 
@@ -149,6 +155,7 @@ bool Camera::rotate(float delta_x, float delta_y, float deltaTime) {
 
 void Camera::recomputeMatrices(const glm::vec3 &ballPos) {
     // View matrix.
+    cur_ball_pos = ballPos;
     glm::vec3 pos3 = ballPos - unnormLook;
 //    glm::vec3 pos3 = glm::vec3(pos);
 

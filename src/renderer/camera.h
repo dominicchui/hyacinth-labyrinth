@@ -18,6 +18,7 @@ enum CameraProjectionType {
 
 class Camera {
     glm::vec4 pos;
+    glm::vec3 cur_ball_pos;
 
     // Unit vecs
     glm::vec3 look;
