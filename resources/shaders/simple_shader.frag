@@ -84,10 +84,11 @@ vec4 nlerp2(vec4 a, vec4 b, float t) {
     if (t > 0.2) {
         return a;
     } else {
-        t = t * 5;
-        return t * a + (1.f - t) * b;
+        float t_percent = t * 5.f;
+        return 0.8 * a + 0.2 * b;
     }
 }
+
 
 void main() {
   vec3 tex_clr = read_tex_clr(fragUV);
@@ -125,9 +126,11 @@ void main() {
   //outColor = vec4(fragUV[0], fragUV[1], 0.f, 1.f);
   //outColor = texture(texSampler, fragUV);
 
-  float dist = clamp(distance(camPos, fragPosWorld) / 20.f, 0.f, 1.f);
-  outColor = nlerp(outColor, vec4(220.f, 220.f, 220.f, 255) / 255.f, dist);
-  //float dist_to_floor = abs(fragPosWorld.y - 1.f);
-  //outColor = nlerp2(outColor, vec4(220.f, 220.f, 220.f, 255) / 255.f, dist_to_floor);
+  // FOG:
+//  float dist = clamp(distance(camPos, fragPosWorld) / 20.f, 0.f, 1.f);
+//  outColor = nlerp(outColor, vec4(220.f, 220.f, 220.f, 255) / 255.f, dist);
+
+//  float dist_to_floor = abs(fragPosWorld.y - .9f);
+//  outColor = nlerp2(outColor, vec4(220.f, 220.f, 220.f, 255) / 255.f, dist_to_floor);
 
 }

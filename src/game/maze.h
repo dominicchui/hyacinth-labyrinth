@@ -347,16 +347,16 @@ public:
                 obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
             }
             // always add hedge
-            LveGameObject&& geom_wall = LveGameObject::createGameObject();
-            geom_wall.model = maze_wall_model;
-            geom_wall.transform = wall.transform;
-            geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
-            geom_wall.transform.translation = {geom_wall.transform.translation.x - 0.5f,
-                                               geom_wall.transform.translation.y + 0.9f,
-                                               geom_wall.transform.translation.z + 0.5f};
-            //                geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
-            geom_wall.transform.update_matrices();
-            obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
+//            LveGameObject&& geom_wall = LveGameObject::createGameObject();
+//            geom_wall.model = maze_wall_model;
+//            geom_wall.transform = wall.transform;
+//            geom_wall.transform.scale = {0.085f, -0.085f, 0.085f};
+//            geom_wall.transform.translation = {geom_wall.transform.translation.x - 0.5f,
+//                                               geom_wall.transform.translation.y + 0.9f,
+//                                               geom_wall.transform.translation.z + 0.5f};
+//            //                geom_wall.transform.rotation = {0, glm::radians(90.f * randomRot), 0};
+//            geom_wall.transform.update_matrices();
+//            obj_map.emplace(geom_wall.getId(), std::move(geom_wall));
 
             // Add a litle patch of dirt below
             LveGameObject&& geom_base = LveGameObject::createGameObject();
