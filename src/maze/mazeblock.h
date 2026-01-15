@@ -9,7 +9,7 @@
 class MazeBlock
 {
 public:
-    MazeBlock();
+    MazeBlock() = delete;
     MazeBlock(int width, int height);
     MazeBlock(int width, int height, bool insertClosedSpaces);
 

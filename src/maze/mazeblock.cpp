@@ -2,16 +2,26 @@
 #include <iostream>
 
 
-MazeBlock::MazeBlock()
+// MazeBlock::MazeBlock()
+// {
+//
+// }
+
+MazeBlock::MazeBlock(int _width, int _height)
+  : width(_width)
+  , height(_height)
+  , blockWidth(2 * width - 1)
+  , blockHeight(2 * height - 1)
 {
-
-}
-
-MazeBlock::MazeBlock(int _width, int _height): width(_width), height(_height) {
     cells = std::vector(size(),Cell(CellType::Empty));
 }
 
-MazeBlock::MazeBlock(int _width, int _height, bool _insertClosedSpaces): width(_width), height(_height) {
+MazeBlock::MazeBlock(int _width, int _height, bool _insertClosedSpaces)
+  : width(_width)
+  , height(_height)
+  , blockWidth(2 * width - 1)
+  , blockHeight(2 * height - 1)
+{
     cells = std::vector(size(),Cell(CellType::Empty, WALL_REPRESENTATION, PATH_REPRESENTATION, CLOSED_AREA_REPRESENTATION));
     if (_insertClosedSpaces) {
         insertClosedSpaces();
