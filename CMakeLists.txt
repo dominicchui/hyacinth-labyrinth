@@ -5,20 +5,9 @@ project(hyacinth-labyrinth LANGUAGES CXX C)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
 # Sets C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Specifies required Qt components
-find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Gui)
-find_package(Qt6 REQUIRED COMPONENTS OpenGL)
-find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
-find_package(Qt6 REQUIRED COMPONENTS Xml)
 
 # Allows you to include files from within those directories, without prefixing their filepaths
 include_directories(src)
@@ -27,8 +16,6 @@ include_directories(src)
 add_executable(${PROJECT_NAME}
   # src
   src/main.cpp
-#  src/debug.h
-  src/gl_kernel.h
   src/hyacinth-labyrinth.hpp                  src/hyacinth-labyrinth.cpp
 
   # external files
@@ -40,34 +27,19 @@ add_executable(${PROJECT_NAME}
   src/game/lve_camera.hpp                     src/game/lve_camera.cpp
   src/game/maze.h
 
-  # realtime renderer
+  # renderer
   src/renderer/camera.h                       src/renderer/camera.cpp
-  src/renderer/realtime.h                     src/renderer/realtime.cpp
 
-  # scene
-  src/scene/scene.h                           src/scene/scene.cpp
+  # scene data
   src/scene/scenedata.h
-  src/scene/scenefilereader.h                 src/scene/scenefilereader.cpp
-  src/scene/sceneparser.h                     src/scene/sceneparser.cpp
-  src/scene/shaderloader.h
-
   src/scene/objloader.h                       src/scene/objloader.cpp
 
-  # shapes / objects
-                                              src/shapes/cone.cpp
-                                              src/shapes/cube.cpp
-                                              src/shapes/cylinder.cpp
-                                              src/shapes/mesh.cpp
-  src/shapes/shapes.h                         src/shapes/shapes.cpp
-                                              src/shapes/sphere.cpp
-
-  # systems (? faisal give a better name pls)
+  # systems
   src/systems/point_light_system.hpp          src/systems/point_light_system.cpp
   src/systems/simple_render_system.hpp        src/systems/simple_render_system.cpp
 
   # utils
   src/utils/settings.h                        src/utils/settings.cpp
-  src/utils/texture.h                         src/utils/texture.cpp
   src/utils/timer.h
 
   # vulkan files
@@ -81,9 +53,7 @@ add_executable(${PROJECT_NAME}
   src/vulkan/vulkan-swapchain.hpp             src/vulkan/vulkan-swapchain.cpp
 
   # windowing
-  src/window/aspectratiowidget.hpp
   src/window/glfw-window.hpp                  src/window/glfw-window.cpp
-  src/window/mainwindow.h                     src/window/mainwindow.cpp
   src/utils/utils.h
 
   src/ball-test.hpp
@@ -147,13 +117,8 @@ include_directories(${PROJECT_NAME} PRIVATE
     ${Vulkan_INCLUDE_DIRS}
 )
 
-# Specifies libraries to be linked (Qt components, glew, etc)
+# Specifies libraries to be linked
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt::Core
-    Qt::Gui
-    Qt::OpenGL
-    Qt::OpenGLWidgets
-    Qt::Xml
     StaticGLEW
     ${Vulkan_LIBRARIES}
 )
@@ -162,31 +127,6 @@ if (WIN32)
 else ()
   target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
 endif ()
-
-# Specifies other files
-qt6_add_resources(${PROJECT_NAME} "Resources"
-    PREFIX
-        "/"
-    FILES
-
-    resources/models/bunny.obj
-    resources/models/colored_cube.obj
-    resources/models/cube.obj
-    resources/models/dragon.obj
-    resources/models/flat_vase.obj
-    resources/models/quad.obj
-    resources/models/smooth_vase.obj
-
-    resources/proj6_shaders/phong.frag
-    resources/proj6_shaders/phong.vert
-    resources/proj6_shaders/texture.frag
-    resources/proj6_shaders/texture.vert
-
-    resources/shaders/point_light.frag
-    resources/shaders/point_light.vert
-    resources/shaders/simple_shader.frag
-    resources/shaders/simple_shader.vert
-)
 
 # GLEW: this provides support for Windows (including 64-bit)
 if (WIN32)
