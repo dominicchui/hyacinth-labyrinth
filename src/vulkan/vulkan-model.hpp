@@ -55,7 +55,7 @@ class VKModel {
 
     void bind(VkCommandBuffer commandBuffer);
     void draw(VkCommandBuffer commandBuffer);
-    int32_t texture_id;
+    int32_t texture_id{-1};
   private:
     void createImage(
         uint32_t width,
@@ -84,6 +84,6 @@ class VKModel {
     uint32_t indexCount;
 
     std::string tex_filename;
-    VkImage textureImage;
-    VkDeviceMemory textureImageMemory;
+    VkImage textureImage{VK_NULL_HANDLE};
+    VkDeviceMemory textureImageMemory{VK_NULL_HANDLE};
 };

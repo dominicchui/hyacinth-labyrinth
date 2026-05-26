@@ -29,14 +29,14 @@ class HyacinthLabyrinth {
   void loadGameObjects();
   void generateMazeFromBoolVec(std::vector<std::vector<bool>>& map);
   
-  GameMaze m_maze;
   GlfwWindow m_window;
   VKDeviceManager m_device;
   VKRenderer m_renderer;
   id_t m_ball_id;
   id_t m_ball_light_id;
 
-  // note: order of declarations matters
+  // note: order of declarations matters for Vulkan resource teardown
   std::unique_ptr<VK_DP_Mgr> globalPool{};
   LveGameObject::Map gameObjects;
+  GameMaze m_maze;
 };

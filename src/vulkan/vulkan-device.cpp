@@ -59,8 +59,12 @@ VKDeviceManager::VKDeviceManager(GlfwWindow& window) : window(window), cur_textu
 
 VKDeviceManager::~VKDeviceManager() {
   for (int32_t i = 0; i < MAX_TEXTURES; i++) {
-      vkDestroySampler(device_, textureSampler[i], nullptr);
-      vkDestroyImageView(device_, textureImageView[i], nullptr);
+      if (textureSampler[i] != VK_NULL_HANDLE) {
+          vkDestroySampler(device_, textureSampler[i], nullptr);
+      }
+      if (textureImageView[i] != VK_NULL_HANDLE) {
+          vkDestroyImageView(device_, textureImageView[i], nullptr);
+      }
   }
   vkDestroyCommandPool(device_, commandPool, nullptr);
   vkDestroyDevice(device_, nullptr);

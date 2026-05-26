@@ -29,7 +29,10 @@ PointLightSystem::PointLightSystem(
 }
 
 PointLightSystem::~PointLightSystem() {
-  vkDestroyPipelineLayout(m_device.device(), pipelineLayout, nullptr);
+  m_pipeline.reset();
+  if (pipelineLayout != VK_NULL_HANDLE) {
+    vkDestroyPipelineLayout(m_device.device(), pipelineLayout, nullptr);
+  }
 }
 
 void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {

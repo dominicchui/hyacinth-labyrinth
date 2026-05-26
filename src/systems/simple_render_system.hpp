@@ -33,8 +33,5 @@ private:
     VKDeviceManager& m_device;
 
     std::unique_ptr<VulkanPipeline> m_pipeline;
-    VkPipelineLayout pipelineLayout;
-
-    VKDescriptorWriter *m_descriptorWriter;
-    VkDescriptorSet m_descriptorSet;
+    VkPipelineLayout pipelineLayout{VK_NULL_HANDLE};
 };

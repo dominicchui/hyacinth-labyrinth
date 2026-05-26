@@ -33,5 +33,5 @@ class PointLightSystem {
   VKDeviceManager& m_device;
 
   std::unique_ptr<VulkanPipeline> m_pipeline;
-  VkPipelineLayout pipelineLayout;
+  VkPipelineLayout pipelineLayout{VK_NULL_HANDLE};
 };

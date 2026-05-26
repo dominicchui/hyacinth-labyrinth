@@ -23,15 +23,17 @@ SimpleRenderSystem::SimpleRenderSystem(
     VKDeviceManager& device,
     VkRenderPass renderPass,
     VkDescriptorSetLayout globalSetLayout
-    ) : m_device(device), m_descriptorSet()
+    ) : m_device(device)
 {
     createPipelineLayout(globalSetLayout);
     createPipeline(renderPass);
 }
 
 SimpleRenderSystem::~SimpleRenderSystem() {
-    vkDestroyPipelineLayout(m_device.device(), pipelineLayout, nullptr);
-    delete m_descriptorWriter;
+    m_pipeline.reset();
+    if (pipelineLayout != VK_NULL_HANDLE) {
+        vkDestroyPipelineLayout(m_device.device(), pipelineLayout, nullptr);
+    }
 }
 
 void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {

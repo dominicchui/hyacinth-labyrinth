@@ -51,19 +51,33 @@ VKModel::VKModel(
     } else {
         tex_filename = "../resources/textures/andyVanDam.jpg";
     }
+    texture_id = m_device.cur_texture;
     createTextureImage();
     createTextureImageView();
     createTextureSampler();
     createVertexBuffers(builder.vertices);
     createIndexBuffers(builder.indices);
 
-    texture_id = m_device.cur_texture;
     m_device.cur_texture++;
 }
 
 VKModel::~VKModel() {
-    vkDestroyImage(m_device.device(), textureImage, nullptr);
-    vkFreeMemory(m_device.device(), textureImageMemory, nullptr);
+    if (texture_id >= 0) {
+        if (m_device.textureSampler[texture_id] != VK_NULL_HANDLE) {
+            vkDestroySampler(m_device.device(), m_device.textureSampler[texture_id], nullptr);
+            m_device.textureSampler[texture_id] = VK_NULL_HANDLE;
+        }
+        if (m_device.textureImageView[texture_id] != VK_NULL_HANDLE) {
+            vkDestroyImageView(m_device.device(), m_device.textureImageView[texture_id], nullptr);
+            m_device.textureImageView[texture_id] = VK_NULL_HANDLE;
+        }
+    }
+    if (textureImage != VK_NULL_HANDLE) {
+        vkDestroyImage(m_device.device(), textureImage, nullptr);
+    }
+    if (textureImageMemory != VK_NULL_HANDLE) {
+        vkFreeMemory(m_device.device(), textureImageMemory, nullptr);
+    }
 }
 
 void VKModel::createImage(
@@ -184,13 +198,13 @@ void VKModel::createTextureSampler(void) {
     samplerInfo.minLod = 0.0f;
     samplerInfo.maxLod = 0.0f;
 
-    if (vkCreateSampler(m_device.device(), &samplerInfo, nullptr, &m_device.textureSampler[m_device.cur_texture]) != VK_SUCCESS) {
+    if (vkCreateSampler(m_device.device(), &samplerInfo, nullptr, &m_device.textureSampler[texture_id]) != VK_SUCCESS) {
         throw std::runtime_error("failed to create texture sampler!");
     }
 }
 
 void VKModel::createTextureImageView() {
-    m_device.textureImageView[m_device.cur_texture] =
+    m_device.textureImageView[texture_id] =
         m_device.createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
 }
 
